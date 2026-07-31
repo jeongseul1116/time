@@ -83,9 +83,10 @@
   .main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 8px 8px 0}
 
   /* ---------- 만들기 ---------- */
-  .create-wrap{position:relative;margin:0 0 16px 4px}
+  .create-wrap{position:relative;margin:6px 0 16px 4px}
   .create-btn{
-    display:flex;align-items:center;gap:10px;
+    position:relative;               /* 링이 버튼 크기를 따라가도록 */
+    display:inline-flex;align-items:center;gap:10px;
     background:var(--surface-3);border-radius:16px;padding:0 24px 0 16px;height:48px;
     box-shadow:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15);font-size:14px;font-weight:500;
   }
@@ -93,7 +94,7 @@
   .create-btn .plus{font-size:22px;line-height:1;font-weight:400}
   .create-btn .caret{font-size:9px;color:var(--text-dim)}
   .create-btn.ring::after{
-    content:"";position:absolute;inset:-4px;border-radius:20px;border:2px solid var(--accent);
+    content:"";position:absolute;inset:-3px;border-radius:19px;border:2px solid var(--accent);
     pointer-events:none;animation:breathe 1.8s ease-in-out infinite;
   }
   @keyframes breathe{0%,100%{opacity:.9}50%{opacity:.3}}
@@ -143,21 +144,28 @@
   .side-search input::placeholder{color:var(--text-dim)}
   .side-search .results{top:calc(100% + 6px)}
 
-  /* 상단바 검색 */
-  .top-search{display:flex;align-items:center}
-  .top-search input{
-    width:0;padding:0;border:none;outline:none;background:none;color:var(--text);font-size:14px;
-    transition:width .2s,padding .2s;
+  /* 상단바 검색 — 항상 펼쳐 둔다 */
+  .top-search{
+    display:flex;align-items:center;gap:6px;background:var(--surface-2);
+    border-radius:999px;padding:0 6px 0 14px;height:38px;margin-right:4px;
   }
+  .top-search .ico{font-size:14px;opacity:.75}
+  .top-search input{
+    width:170px;padding:0;border:none;outline:none;background:none;color:var(--text);font-size:14px;
+  }
+  .top-search input::placeholder{color:var(--text-dim)}
   .top-search #btnSearchX{display:none}
-  .top-search.open{background:var(--surface-2);border-radius:999px;padding-right:4px}
-  .top-search.open input{width:180px;padding:0 8px}
-  .top-search.open #btnSearchX{display:grid}
+  .top-search.has #btnSearchX{display:grid}
 
   /* 접힌 사이드바 */
   .app.no-side .sidebar{display:none}
 
   .side-h{cursor:pointer}
+  .side-h .h-act{display:flex;align-items:center;gap:6px}
+  .side-h .all{
+    font-size:11px;color:var(--accent);padding:3px 8px;border-radius:999px;
+  }
+  .side-h .all:hover{background:rgba(168,199,250,.14)}
   .side-h .chev{transition:transform .15s;display:inline-block}
   .side-h.closed .chev{transform:rotate(180deg)}
   .cal-row{cursor:pointer;user-select:none}
@@ -188,38 +196,107 @@
   .tmenu .acct .em{font-size:12px;color:var(--text-dim)}
 
   /* ---------- 둘러보기 ---------- */
-  .tour-btn{border-color:rgba(168,199,250,.5);color:var(--accent);font-size:13px;padding:0 14px}
-  .tour-btn:hover{background:rgba(168,199,250,.12)}
-  .tour-btn.on{background:var(--accent);color:var(--on-accent);border-color:transparent}
+  /* 우측 하단 플로팅 버튼 — 여기서 안내가 펼쳐진다 */
+  .tour-btn{
+    position:fixed;right:24px;bottom:24px;z-index:199;
+    display:flex;align-items:center;gap:7px;height:44px;padding:0 20px;border-radius:999px;
+    background:var(--accent);color:var(--on-accent);font-size:13.5px;font-weight:600;
+    box-shadow:0 4px 10px rgba(0,0,0,.4);
+    animation:tourglow 2.4s ease-in-out infinite;
+  }
+  @keyframes tourglow{
+    0%,100%{box-shadow:0 4px 10px rgba(0,0,0,.4), 0 0 0 0 rgba(168,199,250,.45)}
+    50%{box-shadow:0 4px 10px rgba(0,0,0,.4), 0 0 0 9px rgba(168,199,250,0)}
+  }
+  .tour-btn:hover{background:#bcd5fb}
+  .tour-btn.on{
+    background:var(--surface-3);color:var(--accent);animation:none;
+    box-shadow:0 2px 6px rgba(0,0,0,.35);
+  }
+  /* 시트가 열리면 옆으로 비켜선다 */
+  .tour-btn,.onb{transition:right .22s cubic-bezier(.2,.7,.3,1)}
+  body.sheet-open .tour-btn,
+  body.sheet-open .onb{right:calc(var(--sheetW) + 24px)}
 
-  /* 대상 위에 링만 씌운다 — 화면은 가리지 않는다 */
-  .tour-ring{
-    position:fixed;z-index:190;pointer-events:none;border-radius:10px;
-    box-shadow:0 0 0 2px var(--accent), 0 0 0 7px rgba(168,199,250,.18);
-    transition:all .22s cubic-bezier(.2,.7,.3,1);
+  /* 시작하기 체크리스트 */
+  .onb{
+    position:fixed;right:24px;bottom:80px;z-index:200;width:274px;background:#2d2f31;
+    transform-origin:bottom right;
+    border-radius:14px;border:1px solid rgba(168,199,250,.28);
+    box-shadow:0 8px 10px 1px rgba(0,0,0,.35),0 3px 14px 2px rgba(0,0,0,.4);
+    display:none;overflow:hidden;
   }
-  .tour-tip{
-    position:fixed;z-index:200;width:286px;background:#2d2f31;border-radius:12px;
-    padding:14px 16px 12px;box-shadow:0 8px 10px 1px rgba(0,0,0,.35),0 3px 14px 2px rgba(0,0,0,.4);
-    border:1px solid rgba(168,199,250,.28);display:none;
-    transition:top .22s cubic-bezier(.2,.7,.3,1), left .22s cubic-bezier(.2,.7,.3,1);
+  .onb.on{display:block;animation:pop .16s ease-out}
+  .onb-h{display:flex;align-items:center;gap:8px;padding:13px 14px 11px}
+  .onb-h .t{font-size:13.5px;font-weight:600;flex:1}
+  .onb-h .n{font-size:11px;color:var(--accent)}
+  .onb-h button{
+    width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
+    font-size:11px;color:var(--text-dim);
   }
-  .tour-tip.on{display:block}
-  .tour-tip .step{font-size:10.5px;color:var(--accent);letter-spacing:.4px;margin-bottom:5px}
-  .tour-tip h4{margin:0 0 6px;font-size:14px;font-weight:600;line-height:1.4}
-  .tour-tip p{margin:0;font-size:12px;line-height:1.75;color:#c4c7c5}
-  .tour-tip .row{display:flex;align-items:center;gap:8px;margin-top:12px}
-  .tour-tip .dots{display:flex;gap:4px;flex:1}
-  .tour-tip .dots i{width:5px;height:5px;border-radius:50%;background:#4a4d51}
-  .tour-tip .dots i.on{background:var(--accent)}
-  .tour-tip .sk{font-size:11.5px;color:var(--text-faint);padding:4px 6px;border-radius:6px}
-  .tour-tip .sk:hover{color:var(--text-dim)}
-  .tour-tip .nx{
-    font-size:12.5px;font-weight:600;background:var(--accent);color:var(--on-accent);
-    border-radius:999px;padding:6px 16px;
+  .onb-h button:hover{background:rgba(232,234,237,.1);color:var(--text)}
+  .onb-bar{height:3px;background:rgba(255,255,255,.1);margin:0 14px}
+  .onb-bar i{display:block;height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+  .onb-list{padding:10px 6px 12px}
+  .onb-i{display:flex;gap:10px;padding:8px 10px;border-radius:9px;align-items:flex-start}
+  .onb-i .bx{
+    width:16px;height:16px;border-radius:50%;flex:none;margin-top:1px;
+    box-shadow:inset 0 0 0 1.5px #5f6368;display:grid;place-items:center;font-size:9px;color:transparent;
   }
-  .tour-tip .nx:hover{background:#bcd5fb}
-  .tour-tip .wait{font-size:11.5px;color:var(--text-faint);padding:6px 4px}
+  .onb-i{width:100%;text-align:left;cursor:pointer}
+  .onb-i:hover{background:rgba(232,234,237,.07)}
+  .onb-i .lb{display:block;font-size:12.5px;line-height:1.5}
+  .onb-i .hint{display:block;font-size:11px;color:var(--text-faint);margin-top:2px;line-height:1.5}
+  .onb-i .go{
+    margin-left:auto;flex:none;font-size:10.5px;color:var(--accent);opacity:0;transition:opacity .12s;
+  }
+  .onb-i:hover .go{opacity:1}
+  .onb-i.next{background:rgba(168,199,250,.1)}
+  .onb-i.done{cursor:default}
+  .onb-i.done:hover{background:none}
+  .onb-i.done .go{display:none}
+
+  /* 눌렀을 때 어디가 움직이는지 짚어준다 */
+  .flash-ring{
+    position:fixed;z-index:215;pointer-events:none;
+    box-shadow:0 0 0 2px var(--accent), 0 0 0 8px rgba(168,199,250,.2);
+    animation:flashout 2.6s ease-out forwards;
+  }
+  @keyframes flashout{0%,85%{opacity:1}100%{opacity:0}}
+  .flash-lb{
+    position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;
+    background:var(--accent);color:var(--on-accent);font-size:11px;font-weight:700;
+    border-radius:999px;padding:4px 11px;box-shadow:0 3px 8px rgba(0,0,0,.45);
+  }
+  .flash-lb.up{bottom:calc(100% + 8px)}
+  .flash-lb.down{top:calc(100% + 8px)}
+  .onb-i.next .lb{color:var(--accent);font-weight:600}
+  .onb-i.done .bx{background:var(--p1);box-shadow:none;color:#0b2e1c}
+  .onb-i.done .lb{color:var(--text-faint);text-decoration:line-through}
+  .onb-i.done .hint{display:none}
+  .onb-done{padding:18px 16px;text-align:center}
+  .onb-done h4{margin:0 0 6px;font-size:14px}
+  .onb-done p{margin:0;font-size:12px;color:var(--text-dim);line-height:1.7}
+  .onb-again{
+    margin-top:12px;font-size:12px;font-weight:600;color:var(--accent);
+    border-radius:999px;padding:6px 14px;background:rgba(168,199,250,.12);
+  }
+  .onb-again:hover{background:rgba(168,199,250,.22)}
+
+  /* 그 자리에서 한 줄로 알려주는 힌트 */
+  .tip{
+    position:fixed;z-index:205;max-width:268px;background:#2d2f31;border-radius:10px;
+    padding:11px 13px;font-size:12px;line-height:1.7;color:#d7d9dc;
+    border:1px solid rgba(197,138,249,.35);
+    box-shadow:0 6px 18px rgba(0,0,0,.45);display:none;
+  }
+  .tip.on{display:block;animation:pop .16s ease-out}
+  .tip b{color:#fff}
+  .tip .x{
+    position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;
+    display:grid;place-items:center;font-size:10px;color:var(--text-faint);
+  }
+  .tip .x:hover{background:rgba(232,234,237,.1);color:var(--text)}
 
   /* 스낵바 */
   .toast{
@@ -438,6 +515,10 @@
   .quick .acts button:hover{background:#3a3c3f}
   .quick .acts button.pri{background:var(--accent);color:var(--on-accent)}
   .quick .acts button.pri:hover{background:#bcd5fb}
+  .quick .text-input{font-size:16px;padding:9px 12px}
+  .quick .seg{display:flex;background:var(--surface-2);border-radius:999px;padding:2px}
+  .quick .seg button{flex:1;font-size:11.5px;padding:6px 0;border-radius:999px;color:var(--text-dim)}
+  .quick .seg button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
   .quick .note{font-size:11px;color:var(--text-faint);margin-top:9px;line-height:1.6}
 
   .field{margin-bottom:18px}
@@ -477,6 +558,13 @@
     display:flex;align-items:center;gap:5px;flex-wrap:wrap;
   }
   .why .src-mark{color:#c58af9}
+  /* AI가 근거로 삼은 원문 */
+  .att .quote{
+    display:block;margin-top:5px;font-size:11.5px;line-height:1.65;color:#c4c7c5;
+    background:var(--surface-2);border-left:2px solid rgba(197,138,249,.55);
+    border-radius:0 6px 6px 0;padding:6px 9px;
+  }
+  .att .quote .by{display:block;font-size:10.5px;color:var(--text-faint);margin-top:3px}
   .chip-edit{font-size:10px;border-radius:999px;padding:1px 6px;border:1px solid var(--line);color:var(--text-dim)}
   .seg{display:flex;background:var(--surface-2);border-radius:999px;padding:2px;flex:none}
   .seg button{font-size:11px;padding:5px 11px;border-radius:999px;color:var(--text-dim)}
@@ -711,6 +799,10 @@
     backdrop-filter:blur(2px);
   }
   .ev-hold .sub{font-size:10px;opacity:.9;margin-top:1px}
+  .ev-hold.multi .tt{padding-right:52px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ev-hold.answered{
+    border:2px solid var(--p1);background:rgba(129,201,149,.2);color:#c8ecd2;
+  }
   .ev-hold.done{
     border:none;background:var(--accent);color:var(--on-accent);font-weight:600;
     box-shadow:0 4px 14px rgba(0,0,0,.5);
@@ -732,11 +824,10 @@
   <div class="range-title" id="rangeTitle">2026년 8월</div>
   <div class="spacer"></div>
   <div class="top-search" id="topSearch">
-    <button class="icon-btn" id="btnSearch" title="검색">🔍</button>
+    <span class="ico">🔍</span>
     <input id="searchEv" placeholder="일정 검색" autocomplete="off">
     <button class="icon-btn sm" id="btnSearchX" title="검색 지우기">✕</button>
   </div>
-  <button class="g-btn tour-btn" id="btnTour">▶ 둘러보기</button>
   <button class="icon-btn" id="btnHelp" title="지원">?</button>
   <button class="icon-btn" id="btnSettings" title="설정">⚙</button>
   <button class="g-btn" id="btnView">주 ▾</button>
@@ -774,7 +865,9 @@
       <div class="results" id="userResults"></div>
     </div>
 
-    <div class="side-h" id="myCalHead"><span>내 캘린더</span><span class="chev">⌃</span></div>
+    <div class="side-h" id="myCalHead"><span>내 캘린더</span>
+      <span class="h-act"><button class="all" id="calAll"></button><span class="chev">⌃</span></span>
+    </div>
     <div id="calList"></div>
     <div class="side-h" id="otherCalHead"><span>다른 캘린더</span><span class="chev">⌃</span></div>
     <div id="otherList">
@@ -803,9 +896,10 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- ================= 둘러보기 ================= -->
-<div class="tour-ring" id="tourRing" style="display:none"></div>
-<div class="tour-tip" id="tourTip"></div>
+<!-- ================= 시작하기 ================= -->
+<button class="tour-btn" id="btnTour">💡 처음 이용해봐요!</button>
+<div class="onb" id="onb"></div>
+<div class="tip" id="tip"></div>
 
 <!-- ================= 일정 상세 ================= -->
 <div class="pop" id="pop"></div>
@@ -1200,12 +1294,18 @@ const LINK_FIXTURES = {
     title:"3분기 로드맵 우선순위 정렬",
     steps:["스레드 메시지 34개 읽는 중","발언자와 멘션 대상 구분","질문을 직접 받은 사람 식별","필수 / 선택 배분"],
     people:[
-      { id:"kdh", need:"required", reason:"스레드를 열고 결정을 요청함" },
-      { id:"ljh", need:"required", reason:"일정 산정 질문을 직접 받음 · 미응답" },
-      { id:"psy", need:"required", reason:"디자인 리소스 확정이 스레드 안건" },
-      { id:"cma", need:"optional", reason:"멘션으로 언급만 됨" },
-      { id:"hjw", need:"optional", reason:"이모지 반응만 남김" },
-      { id:"ohj", need:"optional", reason:"작업 범위를 한 번 답변함" },
+      { id:"kdh", need:"required", reason:"스레드를 열고 결정을 요청함",
+        q:"다음 주까지 3분기 우선순위 정해야 합니다. 다들 의견 주세요.", by:"김도현", at:"화 10:04" },
+      { id:"ljh", need:"required", reason:"질문을 직접 받고 아직 답하지 않음",
+        q:"@이준호 검색 개편 2주면 될까요?", by:"김도현", at:"화 14:22", note:"이후 이준호 발언 없음" },
+      { id:"psy", need:"required", reason:"결정의 조건을 본인이 제시함",
+        q:"디자인 리소스가 언제 붙는지에 따라 순서가 달라져요.", by:"박서연", at:"수 09:31" },
+      { id:"cma", need:"optional", reason:"확인만 요청받음",
+        q:"마케팅은 @최민아 확인만 해주시면 됩니다.", by:"김도현", at:"수 11:02" },
+      { id:"hjw", need:"optional", reason:"발언 없이 반응만 남김",
+        q:"👀 반응 1개", by:"한지우", at:"수 11:05" },
+      { id:"ohj", need:"optional", reason:"범위를 한 번 답하고 끝남",
+        q:"백엔드는 스키마만 바꾸면 됩니다.", by:"오하진", at:"목 16:40" },
     ],
   },
   notion:{
@@ -1214,11 +1314,16 @@ const LINK_FIXTURES = {
     title:"3분기 로드맵 초안 리뷰",
     steps:["문서 본문과 속성 읽는 중","담당자 · 승인자 필드 확인","미해결 코멘트 작성자 추출","필수 / 선택 배분"],
     people:[
-      { id:"kdh", need:"required", reason:"담당자(Owner) 필드에 지정됨" },
-      { id:"hjw", need:"required", reason:"미해결 코멘트 4건을 남김" },
-      { id:"kts", need:"required", reason:"승인자 필드에 지정됨" },
-      { id:"psy", need:"optional", reason:"열람 기록만 있음" },
-      { id:"ysj", need:"optional", reason:"코멘트 1건 · 이미 해결됨" },
+      { id:"kdh", need:"required", reason:"담당자(Owner) 필드에 지정됨",
+        q:"담당자 = 김도현", by:"문서 속성", at:"7/28 수정" },
+      { id:"hjw", need:"required", reason:"미해결 코멘트 4건을 남김",
+        q:"이 수치 출처가 어디인가요?", by:"한지우", at:"미해결 4건 중 1" },
+      { id:"kts", need:"required", reason:"승인자 필드에 지정됨",
+        q:"승인자 = 강태섭", by:"문서 속성", at:"승인 대기" },
+      { id:"psy", need:"optional", reason:"읽기만 하고 남긴 말이 없음",
+        q:"열람 3회 · 코멘트 없음", by:"활동 기록", at:"마지막 7/29" },
+      { id:"ysj", need:"optional", reason:"남긴 코멘트가 이미 해결됨",
+        q:"여기 문구 오타요", by:"윤소정", at:"해결됨" },
     ],
   },
   generic:{
@@ -1227,9 +1332,12 @@ const LINK_FIXTURES = {
     title:"논의 마무리 미팅",
     steps:["링크 본문 가져오는 중","등장 인물 추출","역할 추정","필수 / 선택 배분"],
     people:[
-      { id:"kdh", need:"required", reason:"본문에서 결정을 요청받음" },
-      { id:"ljh", need:"required", reason:"작업 항목이 배정됨" },
-      { id:"psy", need:"optional", reason:"본문에 이름만 등장" },
+      { id:"kdh", need:"required", reason:"본문에서 결정을 요청받음",
+        q:"최종 결정은 김도현님이 해주세요.", by:"본문", at:"3문단" },
+      { id:"ljh", need:"required", reason:"작업 항목이 배정됨",
+        q:"구현 · 이준호", by:"본문", at:"할 일 목록" },
+      { id:"psy", need:"optional", reason:"이름만 등장하고 요청은 없음",
+        q:"참고: 박서연 시안", by:"본문", at:"5문단" },
     ],
   },
 };
@@ -1258,8 +1366,9 @@ const state = {
   onlyAttendees:true, sheetOpen:false, restored:false,
   focus:new Date(2026, 7, 3), view:"week", weekend:false, showDeclined:true,
   miniYear:2026, miniMonth:7,
-  hidden:{}, query:"", sidebar:true,
-  hold:null, holdReplies:{}, reminders:0,
+  hidden:{}, query:"", sidebar:true, userEvents:[], seeded:0,
+  onbOpen:true, onbDone:{}, tipSeen:{},
+  hold:null, holdReplies:{}, reminders:0, holdAnswer:null,
   blockedCount:0, blockedDays:[], showAlts:false,
 };
 
@@ -1284,6 +1393,37 @@ function load(){
   }catch(e){}
 }
 
+/* 캘린더에 실제로 남는 것들 — 새로고침해도 유지된다 */
+const PERSIST_KEY = "auto-coordination-state-v1";
+function persist(){
+  try{
+    localStorage.setItem(PERSIST_KEY, JSON.stringify({
+      hold:state.hold, holdAnswer:state.holdAnswer, reminders:state.reminders,
+      userEvents:state.userEvents, hidden:state.hidden,
+      onbDone:state.onbDone, tipSeen:state.tipSeen, onbOpen:state.onbOpen,
+      view:state.view, weekend:state.weekend, showDeclined:state.showDeclined,
+    }));
+  }catch(e){}
+}
+function loadPersist(){
+  try{
+    const d = JSON.parse(localStorage.getItem(PERSIST_KEY) || "null");
+    if(!d) return;
+    state.hold = d.hold || null;
+    state.holdAnswer = d.holdAnswer || null;
+    state.reminders = d.reminders || 0;
+    state.userEvents = Array.isArray(d.userEvents) ? d.userEvents : [];
+    state.userEvents.forEach((u,i) => { u._k = "u" + i; });
+    state.hidden = d.hidden || {};
+    state.onbDone = d.onbDone || {};
+    state.tipSeen = d.tipSeen || {};
+    state.onbOpen = d.onbOpen !== false;
+    if(d.view) state.view = d.view;
+    state.weekend = !!d.weekend;
+    state.showDeclined = d.showDeclined !== false;
+  }catch(e){}
+}
+
 /* 시트를 닫으면 초안을 비운다 */
 function clearDraft(){
   state.title = ""; state.attendees = []; state.source = null;
@@ -1300,7 +1440,9 @@ const weekOff = () => weekOffOf(state.focus);
 
 /* 어떤 날짜든 그 날의 일정을 돌려준다 */
 function eventsForDate(dt){
-  return weekEvents(weekOffOf(dt)).filter(e => e.d === wdIndex(dt));
+  const base = weekEvents(weekOffOf(dt)).filter(e => e.d === wdIndex(dt));
+  const mine = state.userEvents.filter(u => u.key === isoOf(dt));
+  return mine.length ? base.concat(mine) : base;
 }
 /* 한 일정은 한 블록.
    여러 캘린더에 걸쳐 있으면 왼쪽 색 띠로 그 사실만 남긴다. */
@@ -1638,6 +1780,17 @@ const filtering = () => coordMode() && state.onlyAttendees;
 function paintCalList(){
   /* 자동 조율 중에는 이 회의 참석자의 캘린더만 남긴다 */
   const list = filtering() ? PEOPLE.filter(p => needOf(p.id)) : PEOPLE;
+
+  /* 전체 선택 / 전체 해제 */
+  const allOn = list.length > 0 && list.every(p => !state.hidden[p.id]);
+  const ab = document.getElementById("calAll");
+  ab.textContent = allOn ? "전체 해제" : "전체 선택";
+  ab.onclick = e => {
+    e.stopPropagation();               /* 섹션이 접히지 않도록 */
+    list.forEach(p => { state.hidden[p.id] = allOn; });
+    paintCalList(); buildGrid(); paintCandidates();
+  };
+
   const el = document.getElementById("calList");
   el.innerHTML = list.map(p =>
     '<div class="cal-row' + (state.hidden[p.id] ? " hid" : "") + '" data-cal="' + p.id + '">' +
@@ -1685,18 +1838,36 @@ function paintCandidates(){
     const h = state.hold, done = h.confirmed;
     const col = document.querySelector('.daycol[data-day="' + h.d + '"]');
     if(col){
+      const ok = !done && state.holdAnswer === "yes";
       const el = document.createElement("div");
-      el.className = "ev-hold" + (done ? " done" : "");
+      el.className = "ev-hold" + (done ? " done" : ok ? " answered" : "");
       el.style.top = (h.s - START_H) * rh + "px";
       el.style.height = (h.e - h.s) * rh - 2 + "px";
-      el.innerHTML = '<div>' + (done ? "✓ " : "[미정] ") + esc(h.title || "제목 없음") + '</div>' +
-        '<div class="sub">' + (done ? "확정 · 참석자 " + h.people + "명"
-                                   : "응답 대기 중 · 정슬기") + '</div>';
+      el.innerHTML = '<div class="tt">' + (done ? "✓ " : "[미정] ") + esc(h.title || "제목 없음") + '</div>' +
+        '<div class="sub">' + (done ? "확정"
+                              : ok ? "가능 답변 도착 · 확정 대기"
+                              : "응답 대기 중") + '</div>';
+
+      /* 공통 일정과 같은 규칙 — 참석자는 프로필로 보여준다 */
+      const att = h.att || [];
+      if(att.length){
+        el.classList.add("multi");
+        const av = document.createElement("div");
+        av.className = "ev-avs";
+        av.innerHTML = att.slice(0, 3).map(a => {
+          const p = P(a.id);
+          return '<i title="' + p.name + '" style="background:' + p.color + ';color:' + p.ink + '">' +
+            p.name.slice(0,1) + '</i>';
+        }).join("") +
+          (att.length > 3 ? '<i class="more">+' + (att.length - 3) + '</i>' : '');
+        el.appendChild(av);
+      }
       el.onclick = e => { e.stopPropagation(); openHoldPop(el); };
       col.appendChild(el);
     }
   }
 
+  persist();
   if(!state.sheetOpen || state.step < 3 || !onScanWeek){
     shell.classList.remove("dim"); return;
   }
@@ -1806,10 +1977,24 @@ function toast(msg, actionLabel, action){
 /* 캘린더에 잡힌 확보 시간의 상태 */
 function openHoldPop(anchor){
   const h = state.hold;
+  const list = (h.att || []).map(a => {
+    const p = P(a.id);
+    return '<div class="pop-att">' + avatar(p, 26) +
+      '<span><span class="nm">' + p.name + '</span> <span class="rl">· ' + p.role + '</span></span>' +
+      '<span class="pop-tag' + (a.need === "optional" ? " opt" : "") + '">' +
+        (a.need === "required" ? "필수" : "선택") + '</span></div>';
+  }).join("");
+
   const rows =
-    '<div class="pop-row"><span class="ic">👥</span><span class="val">참석자 ' + h.people + '명</span></div>' +
+    '<div class="pop-row"><span class="ic">👥</span><span class="val">' +
+      '<div>참석자 ' + h.people + '명</div>' + list + '</span></div>' +
     (h.confirmed
-      ? '<div class="pop-row"><span class="ic">✓</span><span class="val">확정 · 초대 발송됨</span></div>'
+      ? '<div class="pop-row"><span class="ic">✓</span><span class="val">확정 · 참석자 전원에게 초대 발송됨</span></div>'
+      : state.holdAnswer === "yes"
+      ? '<div class="pop-row"><span class="ic">✓</span><span class="val">' +
+          '<b>' + h.askers.join(", ") + '</b>님이 <b>가능</b>으로 답했습니다.' +
+          '<div class="pop-org">겹쳤던 일정을 옮길 수 있습니다 · 확정하면 전원에게 초대가 나갑니다</div>' +
+        '</span></div>'
       : '<div class="pop-row"><span class="ic">💬</span><span class="val">' +
           '<b>' + h.askers.join(", ") + '</b>님에게 조율 요청' +
           '<div class="pop-org">' + (state.reminders
@@ -1817,28 +2002,56 @@ function openHoldPop(anchor){
             : "응답 대기 중") + '</div></span></div>' +
         '<div class="pop-row"><span class="ic">🔒</span><span class="val">' +
           '다른 참석자에게는 알림 없음 · 자리만 확보</span></div>');
-  pop.innerHTML = popShell(h.confirmed ? "#a8c7fa" : "#fdd663",
+  pop.innerHTML = popShell(h.confirmed ? "#a8c7fa" : (state.holdAnswer === "yes" ? "#81c995" : "#fdd663"),
     (h.confirmed ? "" : "[미정] ") + (h.title || "제목 없음"),
     (h.d != null ? fmt(h) : ""), rows) +
     (h.confirmed ? "" :
       '<div class="pop-row" style="padding-top:14px">' +
-        '<button class="btn primary" id="holdRemind" style="flex:1;padding:9px 0;font-size:13px">' +
-          (state.reminders ? "리마인드 다시 보내기" : "리마인드 보내기") + '</button>' +
+        (state.holdAnswer === "yes"
+          ? '<button class="btn primary" id="holdConfirm" style="flex:1;padding:9px 0;font-size:13px">전원 확정하기</button>'
+          : '<button class="btn primary" id="holdRemind" style="flex:1;padding:9px 0;font-size:13px">' +
+            (state.reminders ? "리마인드 다시 보내기" : "리마인드 보내기") + '</button>') +
         '<button class="btn" id="holdDrop" style="padding:9px 16px;font-size:13px">확보 취소</button>' +
       '</div>');
   placePop(anchor);
+  const c = document.getElementById("holdConfirm");
+  if(c) c.onclick = confirmHold;
   const r = document.getElementById("holdRemind");
   if(r) r.onclick = () => { sendRemind(); closePop(); };
   const d = document.getElementById("holdDrop");
   if(d) d.onclick = () => {
-    state.hold = null; closePop(); paintCandidates();
+    state.hold = null; state.holdAnswer = null; clearTimeout(replyTimer);
+    closePop(); paintCandidates();
     toast("확보한 시간을 취소했습니다.");
   };
 }
 
 function sendRemind(){
+  onbMark("send");
   state.reminders++;
   toast(state.hold.askers.join(", ") + "님에게 리마인드를 보냈습니다.");
+  scheduleReply();
+}
+
+/* 리마인드를 받은 사람이 답을 보내온다 */
+let replyTimer = null;
+function scheduleReply(){
+  clearTimeout(replyTimer);
+  replyTimer = setTimeout(() => {
+    if(!state.hold || state.hold.confirmed || state.holdAnswer) return;
+    state.holdAnswer = "yes";
+    paintCandidates();
+    toast(state.hold.askers.join(", ") + "님이 ‘가능’으로 답했습니다.", "전원 확정하기", confirmHold);
+  }, 4000);
+}
+
+/* 겹쳤던 한 명이 옮겨주면, 그 자리에서 참석자 전원의 일정이 확정된다 */
+function confirmHold(){
+  if(!state.hold) return;
+  state.hold.confirmed = true;
+  state.holdAnswer = null;
+  closePop(); paintCandidates();
+  toast("일정이 확정됐습니다 · 참석자 " + state.hold.people + "명 전원 캘린더에 등록되었습니다.");
 }
 
 /* 캘린더의 빈 칸이 조율의 시작점이 된다 */
@@ -1856,11 +2069,52 @@ function openQuick(dt, h, anchor){
         '참석자를 넣으면 다음 주 전체에서 잡을 수 있는 시간을 순위로 찾아옵니다.</div>' +
     '</div>';
   placePop(anchor);
-  document.getElementById("qMake").onclick = closePop;
+  document.getElementById("qMake").onclick = () => openCreate(dt, h, 1, anchor);
   document.getElementById("qAuto").onclick = () => {
     closePop();
     document.getElementById("autoBtn").click();
   };
+}
+
+/* 빠른 일정 만들기 */
+const DURS = [[0.5,"30분"],[1,"1시간"],[1.5,"1시간 30분"],[2,"2시간"]];
+function openCreate(dt, h, dur, anchor, keep){
+  const end = Math.min(h + dur, END_H);
+  pop.innerHTML =
+    '<div class="pop-tools"><button title="닫기" id="popClose">✕</button></div>' +
+    '<div class="quick">' +
+      '<input class="text-input" id="qTitle" placeholder="제목 추가" value="' + esc(keep || "") + '">' +
+      '<div class="w" style="margin:10px 0 8px">' +
+        (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 (' + DOW7[wdIndex(dt)] + '요일) · ' +
+        ampm(h) + ' – ' + ampm(end) + '</div>' +
+      '<div class="seg" style="margin-bottom:12px">' +
+        DURS.map(d => '<button data-dur="' + d[0] + '" class="' + (d[0] === dur ? "on" : "") + '">' +
+          d[1] + '</button>').join("") + '</div>' +
+      '<div class="acts">' +
+        '<button id="qBack">뒤로</button>' +
+        '<button class="pri" id="qSave">저장</button>' +
+      '</div>' +
+      '<div class="note">정슬기 캘린더에 만들어집니다.</div>' +
+    '</div>';
+  placePop(anchor);
+  const ti = document.getElementById("qTitle");
+  ti.focus();
+  ti.onkeydown = e => { if(e.key === "Enter") save(); };
+  pop.querySelectorAll("[data-dur]").forEach(b => {
+    b.onclick = () => openCreate(dt, h, +b.dataset.dur, anchor, ti.value);
+  });
+  document.getElementById("qBack").onclick = () => openQuick(dt, h, anchor);
+  document.getElementById("qSave").onclick = save;
+
+  function save(){
+    const t = ti.value.trim() || "제목 없음";
+    state.userEvents.push({
+      key:isoOf(dt), d:wdIndex(dt), s:h, e:end, t, w:["me"],
+      _k:"u" + state.userEvents.length,
+    });
+    closePop(); buildGrid(); paintCandidates();
+    toast('「' + t + '」 일정을 만들었습니다.');
+  }
 }
 
 function placePop(anchor){
@@ -2002,9 +2256,9 @@ function applyAnalysis(){
   fx.people.forEach(sp => {
     const cur = state.attendees.find(a => a.id === sp.id);
     if(cur){
-      if(!cur.edited){ cur.need = sp.need; cur.reason = sp.reason; cur.auto = true; }
+      if(!cur.edited) Object.assign(cur, sp, { auto:true });
     }else{
-      state.attendees.push({ id:sp.id, need:sp.need, reason:sp.reason, auto:true });
+      state.attendees.push(Object.assign({}, sp, { auto:true }));
     }
   });
   state.analyzing = null;
@@ -2025,22 +2279,34 @@ const sub = document.getElementById("sheetSub");
 
 function render(){
   syncGrid();
+  if(state.attendees.length) onbMark("people");
   if(state.step === 1)      renderSetup();
   else if(state.step === 2) renderScan();
   else if(state.step === 3) renderResults();
   else                      renderDone();
   paintCandidates();
+
+  /* 그 화면에 처음 왔을 때만 한 줄 */
+  if(coordMode())
+    tip("filter", "#calList",
+      "이 회의 <b>참석자의 캘린더만</b> 남았습니다. 어느 시간이 왜 막혔는지가 그제야 읽힙니다.", "right");
+  if(state.step === 4 && state.hold && !state.hold.confirmed)
+    setTimeout(() => tip("hold", ".ev-hold",
+      "확정이 아니라 <b>자리만 잡아둔 상태</b>입니다. 블록을 누르면 리마인드하거나 취소할 수 있어요.", "left"), 500);
 }
 
 /* --------- 1. 인원 지정 --------- */
 function renderSetup(){
   title.textContent = "자동 조율";
-  sub.textContent = "AI가 참석자와 필수 / 선택을 뽑고, 주최자가 고칩니다.";
+  sub.textContent = "회의 이야기가 오간 곳을 알려주시면, 거기서 올 사람을 찾아옵니다.";
 
   body.innerHTML =
     (state.restored
       ? '<div class="banner">새로고침 전에 작성하던 내용을 불러왔습니다.' +
         '<button class="btn ghost" id="newDraft" style="padding:4px 10px;font-size:12px;margin-left:6px">새로 시작</button></div>'
+      : state.seeded && state.attendees.some(a => a.from === "calendar")
+      ? '<div class="banner">내 캘린더에서 켜 둔 <b>' + state.seeded + '명</b>을 그대로 가져왔습니다. ' +
+        '링크를 붙여넣으면 여기에 근거가 채워지고 필수 / 선택이 다시 나뉩니다.</div>'
       : '') +
     linkBlock() +
     '<div class="field">' +
@@ -2154,12 +2420,12 @@ function linkBlock(){
         '<button class="rm" id="clearSrc" title="링크 제거">✕</button></div></div>';
   }
   return '<div class="field">' +
-    '<div class="label">슬랙 스레드 · 노션 링크<span class="tag-ai">AI 분석</span></div>' +
+    '<div class="label">이 회의, 어디서 이야기가 나왔나요?<span class="tag-ai">AI 분석</span></div>' +
     '<div class="link-row">' +
-      '<input class="text-input" id="linkInput" placeholder="링크를 붙여넣으면 참석자를 뽑습니다" autocomplete="off">' +
+      '<input class="text-input" id="linkInput" placeholder="그 대화가 있는 슬랙 스레드나 노션 문서 주소" autocomplete="off">' +
       '<button class="btn sm" id="analyzeBtn">분석</button>' +
     '</div>' +
-    '<div class="link-ex">데모용 링크 — 클릭하면 바로 분석합니다<br>' +
+    '<div class="link-ex">지금 링크가 없다면 — 예시로 열어보기<br>' +
       '<code data-demo-url="https://company.slack.com/archives/C01PRODUCT/p1754112233">슬랙 스레드</code> ' +
       '<code data-demo-url="https://www.notion.so/company/3Q-roadmap-draft-9f2a1">노션 문서</code></div>' +
   '</div>';
@@ -2170,8 +2436,12 @@ function attRow(a){
   if(!p) return "";
   const why = a.reason
     ? '<span class="why"><span class="src-mark">✦</span>' + esc(a.reason) +
-      (a.edited ? '<span class="chip-edit">주최자 수정</span>' : '') + '</span>'
-    : '<span class="why">주최자가 직접 추가</span>';
+      (a.edited ? '<span class="chip-edit">주최자 수정</span>' : '') + '</span>' +
+      (a.q ? '<span class="quote">“' + esc(a.q) + '”' +
+        '<span class="by">— ' + esc(a.by) + ' · ' + esc(a.at) + '</span>' +
+        (a.note ? '<span class="by">' + esc(a.note) + '</span>' : '') + '</span>' : '')
+    : '<span class="why">' +
+      (a.from === "calendar" ? "내 캘린더에서 선택함" : "주최자가 직접 추가") + '</span>';
   return '<div class="att">' + avatar(p) +
     '<span class="meta">' +
       '<span class="nm">' + p.name + ' · ' + p.role +
@@ -2188,6 +2458,7 @@ function attRow(a){
 
 /* --------- 2. 스캔 --------- */
 function startScan(){
+  onbMark("scan");
   state.step = 2;
   state.selectedSlot = null;
   state.slots = computeSlots();
@@ -2203,6 +2474,7 @@ function startScan(){
     state.hold = {
       d:sl.d, s:sl.s, e:sl.e, rank:sl.rank, confirmed:sl.rank <= 2,
       title:state.title, people:state.attendees.length,
+      att:state.attendees.map(a => ({ id:a.id, need:a.need })),
       askers:sl.conflicts.map(c => P(c.who).name),
     };
     state.holdReplies = {};
@@ -2492,15 +2764,29 @@ document.addEventListener("click", e => {
 document.getElementById("autoBtn").onclick = () => {
   menu.classList.remove("open");
   state.step = 1; state.sent = null; state.selectedSlot = null; state.slots = [];
-  state.hold = null; state.holdReplies = {}; state.reminders = 0;
+  state.hold = null; state.holdReplies = {}; state.reminders = 0; state.holdAnswer = null;
+  clearTimeout(replyTimer);
+
+  /* 내 캘린더에서 이미 사람을 골라 뒀다면 그 선택을 그대로 이어받는다 */
+  const visible = PEOPLE.filter(p => !state.hidden[p.id]);
+  if(visible.length && visible.length < PEOPLE.length){
+    state.attendees = visible.map(p => ({ id:p.id, need:"required", from:"calendar" }));
+    state.seeded = visible.length;
+  }else state.seeded = 0;
+
   state.sheetOpen = true;
   state.view = "week"; paintViewBtn();
   gotoWeek(0);                       /* 조율 대상은 다음 주 */
   render();
+  onbMark("open");
+  setTimeout(() => tip("link", "#linkInput",
+    "<b>슬랙 스레드나 노션 문서 링크</b>를 붙여넣으면 참석자와 필수 / 선택을 근거까지 뽑아 옵니다.", "left"), 400);
   sheet.classList.add("on"); appEl.classList.add("shifted");
+  document.body.classList.add("sheet-open");
 };
 function closeSheet(){
   sheet.classList.remove("on"); appEl.classList.remove("shifted");
+  document.body.classList.remove("sheet-open");
   state.step = 1; state.selectedSlot = null; state.sent = null; state.slots = [];
   state.replies = {};
   state.sheetOpen = false;   /* 확보한 시간(state.hold)은 캘린더에 남긴다 */
@@ -2593,17 +2879,14 @@ document.querySelectorAll("[data-other]").forEach(r => {
 /* 일정 검색 */
 const topSearch = document.getElementById("topSearch");
 const searchEv = document.getElementById("searchEv");
-document.getElementById("btnSearch").onclick = () => {
-  topSearch.classList.add("open");
-  searchEv.focus();
-};
 searchEv.oninput = () => {
   state.query = searchEv.value.trim().toLowerCase();
+  topSearch.classList.toggle("has", !!state.query);
   buildGrid(); paintCandidates();
 };
 document.getElementById("btnSearchX").onclick = () => {
   searchEv.value = ""; state.query = "";
-  topSearch.classList.remove("open");
+  topSearch.classList.remove("has");
   buildGrid(); paintCandidates();
 };
 
@@ -2674,6 +2957,7 @@ function setView(v){
   state.view = v;
   paintViewBtn();
   repaint();
+  persist();
 }
 btnView.onclick = openViewMenu;
 
@@ -2706,154 +2990,188 @@ btnAccount.onclick = () => openMenu(btnAccount,
     '<span><div class="nm">정슬기</div><div class="em">seulgi@company.co.kr</div></span></div>' +
   '<div class="tsep"></div>' + item("다른 계정 추가") + item("로그아웃"));
 
-/* ===================== 둘러보기 =====================
-   화면을 덮지 않는다 — 대상에 링만 씌우고 옆에 작은 카드를 붙인다. */
+/* ===================== 시작하기 =====================
+   긴 투어 대신, 꼭 해봐야 할 것만 체크리스트로 두고
+   나머지는 그 화면에 도달했을 때 한 줄 힌트로 알려준다. */
 const SLACK_URL = "https://company.slack.com/archives/C01PRODUCT/p1754112233";
-const TOUR = [
-  { at:"#createBtn", side:"right",
-    t:"여기서 시작합니다",
-    d:"일정을 직접 만들지 않고 <b>자동 조율</b>을 씁니다. 팝업이 바로 뜨는 대신 만들기 메뉴 안에 들어 있습니다.",
-    go:() => { menu.classList.add("open"); createBtn.classList.remove("ring"); } },
-
-  { at:"#autoBtn", side:"right",
-    t:"자동 조율",
-    d:"참석자를 고르면 다음 주에서 잡을 수 있는 시간을 대신 찾아줍니다.",
-    go:() => document.getElementById("autoBtn").click(), wait:260 },
-
-  { at:"#linkInput", side:"left",
-    t:"링크를 붙여넣으면 됩니다",
-    d:"슬랙 스레드나 노션 문서를 넣으면 AI가 읽고 <b>참석자와 필수 / 선택</b>을 뽑습니다. 누가 와야 하는지 직접 고를 필요가 없습니다.",
-    go:() => startAnalyze(SLACK_URL), wait:2600 },
-
-  { at:".att", side:"left",
-    t:"근거가 함께 나옵니다",
-    d:"“스레드를 열고 결정을 요청함” 처럼 <b>왜 필수인지</b>가 줄마다 붙습니다. 주최자가 누르면 바로 바뀌고 “주최자 수정”으로 표시됩니다." },
-
-  { at:".daycol[data-day='1']", side:"left",
-    t:"참석자 캘린더만 남습니다",
-    d:"팀 전체가 아니라 이 회의와 관계있는 사람의 일정만 보입니다. 어느 시간이 왜 막혔는지가 그제야 읽힙니다." },
-
-  { at:"#scanBtn", side:"left",
-    t:"가능한 일정 뽑기",
-    d:"“이 시간에 일정이 있는가”가 아니라 <b>“그 일정을 옮길 수 있는가”</b>로 훑고, 고르는 것까지 끝냅니다.",
-    go:() => { const b = document.getElementById("scanBtn"); if(b) b.click(); }, wait:1900 },
-
-  { at:".done-wrap h3", side:"left",
-    t:"고르는 것도 보내는 것도 AI가",
-    d:"전원이 비는 시간이 없으면 <b>옮길 수 있는 일정과 겹치는 시간</b>까지 보고, 물어볼 사람이 가장 적은 자리를 골라 바로 처리합니다. 확정이 아니라 <b>시간 확보</b>입니다." },
-
-  { at:".recap", side:"left",
-    t:"왜 이 시간인지 남깁니다",
-    d:"고른 이유와 확정 조건이 함께 적힙니다. 마음에 안 들면 아래 <b>다른 시간으로</b>에서 바꿀 수 있습니다." },
-
-  { at:".slack", side:"left",
-    t:"이 슬랙이 한 명에게만 갑니다",
-    d:"참여자가 낼 답은 <b>가능 / 불가능</b> 둘뿐입니다. 답이 없으면 주최자가 아래 <b>리마인드 보내기</b>를 누릅니다." },
-
-  { at:"#remindBtn", side:"left",
-    t:"주최자에게 남은 행동은 하나",
-    d:"답이 없으면 <b>리마인드 보내기</b>. 누르면 시트가 닫히고, 확보한 시간이 캘린더에 남습니다.",
-    go:() => { const b = document.getElementById("remindBtn"); if(b) b.click(); }, wait:400 },
-
-  { at:".ev-hold", side:"left",
-    t:"캘린더에 미정으로 남습니다",
-    d:"초대장이 아니라 가예약이라 아무도 수락·거절을 판단하지 않습니다. 블록을 누르면 상태를 보고 <b>리마인드</b>나 <b>확보 취소</b>를 할 수 있습니다." },
-
-  { at:"#btnTour", side:"bottom",
-    t:"끝났습니다",
-    d:"슬랙 카드의 <b>가능</b>을 눌러 확정까지 이어보세요. 언제든 이 버튼으로 다시 볼 수 있습니다." },
+const ONB = [
+  { k:"open",   t:"자동 조율 열기",   h:"만들기 → 자동 조율" },
+  { k:"people", t:"참석자 넣기",     h:"슬랙·노션 링크를 붙여넣으면 자동으로" },
+  { k:"scan",   t:"가능한 일정 뽑기", h:"옮길 수 있는 시간까지 찾습니다" },
+  { k:"send",   t:"조율 요청 보내기", h:"겹친 한 명에게만 갑니다" },
 ];
+const onbEl = document.getElementById("onb");
+let onbTimer = null;
 
-const tourRing = document.getElementById("tourRing");
-const tourTip = document.getElementById("tourTip");
-const btnTour = document.getElementById("btnTour");
-let tourIdx = -1, tourBusy = false;
-
-function tourPlace(el){
-  const r = el.getBoundingClientRect();
-  tourRing.style.display = "block";
-  tourRing.style.left = (r.left - 4) + "px";
-  tourRing.style.top = (r.top - 4) + "px";
-  tourRing.style.width = (r.width + 8) + "px";
-  tourRing.style.height = (r.height + 8) + "px";
-
-  const w = 286, h = tourTip.offsetHeight || 150, gap = 16;
-  const side = TOUR[tourIdx].side;
-  let left = side === "right" ? r.right + gap
-           : side === "left"  ? r.left - w - gap
-           : r.left;
-  let top  = side === "bottom" ? r.bottom + gap : r.top - 6;
-  if(left < 12) left = r.right + gap;
-  if(left + w > window.innerWidth - 12) left = r.left - w - gap;
-  if(left < 12) left = 12;
-  if(top + h > window.innerHeight - 12) top = window.innerHeight - h - 12;
-  if(top < 12) top = 12;
-  tourTip.style.left = left + "px";
-  tourTip.style.top = top + "px";
+/* 언제든 처음부터 다시 해볼 수 있다 */
+function onbReset(){
+  state.onbDone = {};
+  state.tipSeen = {};
+  persist();
 }
 
-function tourShow(){
-  const s = TOUR[tourIdx];
-  const el = document.querySelector(s.at);
-  if(!el){ tourNext(); return; }
-  tourTip.innerHTML =
-    '<div class="step">' + (tourIdx + 1) + ' / ' + TOUR.length + '</div>' +
-    '<h4>' + s.t + '</h4><p>' + s.d + '</p>' +
-    '<div class="row"><span class="dots">' +
-      TOUR.map((_, i) => '<i class="' + (i <= tourIdx ? "on" : "") + '"></i>').join("") +
-    '</span>' +
-    (tourIdx < TOUR.length - 1
-      ? '<button class="sk" id="tourSkip">건너뛰기</button><button class="nx" id="tourNext">다음</button>'
-      : '<button class="nx" id="tourNext">직접 해보기</button>') +
+function onbMark(k){
+  if(state.onbDone[k]) return;
+  state.onbDone[k] = true;
+  persist();
+  if(state.onbOpen) paintOnb();
+}
+
+function paintOnb(){
+  const done = ONB.filter(i => state.onbDone[i.k]).length;
+  const next = ONB.find(i => !state.onbDone[i.k]);
+
+  if(!next){
+    onbEl.innerHTML =
+      '<div class="onb-done"><h4>다 해보셨습니다</h4>' +
+      '<p>남은 기능은 그 화면에 갔을 때<br>한 줄로 알려드릴게요.</p>' +
+      '<button class="onb-again" id="onbAgain">↺ 처음부터 다시</button></div>';
+    onbEl.classList.add("on");
+    clearTimeout(onbTimer);
+    onbTimer = setTimeout(() => {
+      state.onbOpen = false;
+      btnTour.classList.remove("on");
+      onbEl.classList.remove("on");
+      persist();
+    }, 3600);
+    document.getElementById("onbAgain").onclick = () => {
+      clearTimeout(onbTimer);
+      onbReset();
+      paintOnb();
+    };
+    return;
+  }
+  clearTimeout(onbTimer);
+
+  onbEl.innerHTML =
+    '<div class="onb-h"><span class="t">시작하기</span>' +
+      '<span class="n">' + done + ' / ' + ONB.length + '</span>' +
+      '<button id="onbClose" title="닫기">✕</button></div>' +
+    '<div class="onb-bar"><i style="width:' + (done / ONB.length * 100) + '%"></i></div>' +
+    '<div class="onb-list">' + ONB.map(i =>
+      '<button class="onb-i' + (state.onbDone[i.k] ? " done" : i === next ? " next" : "") + '"' +
+        (state.onbDone[i.k] ? "" : ' data-onb="' + i.k + '"') + '>' +
+        '<span class="bx">✓</span>' +
+        '<span><span class="lb">' + i.t + '</span>' +
+        '<span class="hint">' + i.h + '</span></span>' +
+        '<span class="go">해보기 →</span></button>').join("") +
     '</div>';
-  tourTip.classList.add("on");
-  tourPlace(el);
-  const nx = document.getElementById("tourNext");
-  if(nx) nx.onclick = tourNext;
-  const sk = document.getElementById("tourSkip");
-  if(sk) sk.onclick = tourEnd;
-}
-
-function tourNext(){
-  if(tourBusy) return;
-  const prev = TOUR[tourIdx];
-  tourIdx++;
-  if(tourIdx >= TOUR.length){ tourEnd(); return; }
-  if(prev && prev.go){
-    tourBusy = true;
-    tourTip.innerHTML = '<div class="wait">진행 중…</div>';
-    /* 클릭이 문서까지 버블링된 뒤에 실행해야 메뉴가 닫히지 않는다 */
-    setTimeout(() => {
-      prev.go();
-      setTimeout(() => { tourBusy = false; tourShow(); }, prev.wait || 120);
-    }, 0);
-  }else tourShow();
-}
-
-function tourEnd(){
-  tourIdx = -1;
-  tourTip.classList.remove("on");
-  tourRing.style.display = "none";
-  btnTour.classList.remove("on");
+  onbEl.classList.add("on");
+  onbEl.querySelectorAll("[data-onb]").forEach(b => {
+    b.onclick = () => onbRun(b.dataset.onb);
+  });
+  document.getElementById("onbClose").onclick = () => {
+    state.onbOpen = false;
+    btnTour.classList.remove("on");
+    onbEl.classList.remove("on");
+    persist();
+  };
 }
 
 btnTour.onclick = () => {
-  if(tourIdx >= 0){ tourEnd(); return; }
-  /* 조율 요청 분기를 보여주기 위해 꽉 찬 주에서 시작한다 */
-  closeSheet();
-  state.scenario = "B";
-  gotoWeek(0);
-  render();
-  btnTour.classList.add("on");
-  tourIdx = -1;
-  tourNext();
+  state.onbOpen = !state.onbOpen;
+  btnTour.classList.toggle("on", state.onbOpen);
+  if(state.onbOpen){
+    /* 이미 다 해본 뒤에 다시 열면 처음부터 */
+    if(ONB.every(i => state.onbDone[i.k])) onbReset();
+    paintOnb();
+  }else{
+    clearTimeout(onbTimer);
+    onbEl.classList.remove("on");
+  }
+  persist();
 };
-window.addEventListener("resize", () => {
-  if(tourIdx < 0) return;
-  const el = document.querySelector(TOUR[tourIdx].at);
-  if(el) tourPlace(el);
-});
 
+/* 어디를 눌러서 이렇게 됐는지 이름표와 함께 짚어준다 */
+function flash(sel, label, delay){
+  setTimeout(() => {
+    const el = document.querySelector(sel);
+    if(!el) return;
+    const r = el.getBoundingClientRect();
+    const br = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 8;
+    const n = document.createElement("div");
+    n.className = "flash-ring";
+    n.style.left = (r.left - 3) + "px";
+    n.style.top = (r.top - 3) + "px";
+    n.style.width = (r.width + 6) + "px";
+    n.style.height = (r.height + 6) + "px";
+    n.style.borderRadius = Math.min(br + 3, r.height / 2 + 3) + "px";
+    if(label)
+      n.innerHTML = '<span class="flash-lb ' + (r.top < 54 ? "down" : "up") + '">' + label + '</span>';
+    document.body.appendChild(n);
+    setTimeout(() => n.remove(), 2600);
+  }, delay || 0);
+}
+
+/* 체크리스트 항목을 누르면 그 단계가 실제로 실행된다.
+   앞 단계가 안 돼 있으면 거기서부터 이어서 진행한다. */
+/* 이름표를 읽을 시간을 준 뒤에 실제로 누른다 */
+const READ = 1200;
+function ensureSheet(cb){
+  if(state.sheetOpen) return cb();
+  flash("#createBtn", "만들기 → 자동 조율");
+  setTimeout(() => {
+    document.getElementById("autoBtn").click();
+    setTimeout(cb, 400);
+  }, READ);
+}
+function ensurePeople(cb){
+  ensureSheet(() => {
+    if(state.attendees.length) return cb();
+    flash("#linkInput", "슬랙 스레드 링크 붙여넣기");
+    setTimeout(() => startAnalyze(SLACK_URL), READ);
+    setTimeout(cb, READ + 2700);
+  });
+}
+function ensureScan(cb){
+  ensurePeople(() => {
+    if(state.step === 4) return cb();
+    const b = document.getElementById("scanBtn");
+    if(!b) return;
+    flash("#scanBtn", "가능한 일정 뽑기");
+    setTimeout(() => b.click(), READ);
+    setTimeout(cb, READ + 1900);
+  });
+}
+function onbRun(k){
+  if(k === "open")   return ensureSheet(() => flash(".sheet-head", "자동 조율이 열렸습니다", 300));
+  if(k === "people") return ensurePeople(() => flash(".att", "대화에서 참석자를 찾아왔습니다", 300));
+  if(k === "scan")   return ensureScan(() => flash(".done-wrap h3", "AI가 고르고 보냈습니다", 300));
+  if(k === "send")   return ensureScan(() => {
+    const b = document.getElementById("remindBtn");
+    if(!b) return;
+    flash("#remindBtn", "리마인드 보내기");
+    setTimeout(() => {
+      b.click();
+      flash(".ev-hold", "캘린더에 확보됨", 500);
+    }, READ);
+  });
+}
+
+/* ---- 점진적 공개 — 그 자리에 처음 왔을 때만 한 줄 ---- */
+const tipEl = document.getElementById("tip");
+let tipTimer = null;
+function tip(key, sel, html, side){
+  if(state.tipSeen[key]) return;
+  const el = document.querySelector(sel);
+  if(!el) return;
+  state.tipSeen[key] = true;
+  persist();
+  tipEl.innerHTML = html + '<button class="x" id="tipX">✕</button>';
+  tipEl.classList.add("on");
+  const r = el.getBoundingClientRect();
+  const w = tipEl.offsetWidth, h = tipEl.offsetHeight;
+  let left = side === "left" ? r.left - w - 12 : r.right + 12;
+  if(left < 12 || left + w > window.innerWidth - 12) left = Math.max(12, r.left);
+  let top = r.top;
+  if(top + h > window.innerHeight - 12) top = window.innerHeight - h - 12;
+  tipEl.style.left = Math.max(12, left) + "px";
+  tipEl.style.top = Math.max(12, top) + "px";
+  document.getElementById("tipX").onclick = hideTip;
+  clearTimeout(tipTimer);
+  tipTimer = setTimeout(hideTip, 7000);
+}
+function hideTip(){ tipEl.classList.remove("on"); }
 /* 데모 전용 · 화면에 노출하지 않는 단축키.
    Shift+D — 캘린더가 꽉 찬 주 ↔ 여유 있는 주 전환 */
 document.addEventListener("keydown", e => {
@@ -2867,10 +3185,12 @@ document.addEventListener("keydown", e => {
 
 /* ===================== 시작 ===================== */
 load();
+loadPersist();
 paintViewBtn();
 paintHead();
 paintMini();
 render();
+if(state.onbOpen){ paintOnb(); btnTour.classList.add("on"); }
 </script>
 </body>
 </html>
