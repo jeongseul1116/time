@@ -92,24 +92,7 @@
   }
   .create-btn:hover{background:#3a3c3f;box-shadow:0 1px 3px rgba(0,0,0,.4),0 4px 8px 3px rgba(0,0,0,.15)}
   .create-btn .plus{font-size:22px;line-height:1;font-weight:400}
-  .create-btn .caret{font-size:9px;color:var(--text-dim)}
-
-  .menu{
-    position:absolute;top:calc(100% + 4px);left:0;width:212px;z-index:60;
-    background:#2d2f31;border-radius:8px;padding:8px 0;
-    box-shadow:0 4px 8px 3px rgba(0,0,0,.3),0 1px 3px rgba(0,0,0,.5);
-    display:none;
-  }
-  .menu.open{display:block;animation:pop .12s ease-out}
   @keyframes pop{from{opacity:0;transform:scale(.97);transform-origin:top left}to{opacity:1;transform:none}}
-  .menu-item{display:flex;align-items:center;gap:10px;width:100%;padding:11px 20px;text-align:left;font-size:14px}
-  .menu-item:hover{background:rgba(232,234,237,.08)}
-  .menu-item .badge-new{
-    font-size:10px;font-weight:700;color:var(--on-accent);background:var(--accent);
-    border-radius:999px;padding:2px 7px;margin-left:auto;
-  }
-  .menu-item.primary{color:var(--accent)}
-  .menu-sep{height:1px;background:var(--line);margin:8px 0}
 
   /* ---------- 미니 캘린더 ---------- */
   .mini{padding:0 8px 8px}
@@ -123,10 +106,28 @@
   }
   .mini-grid .d:hover{background:rgba(232,234,237,.1)}
   .mini-grid .d.out{color:#5f6368}
+  /* 주말은 조율 대상이 아니다 — 빗금으로 잡을 수 없는 날임을 말한다 */
+  .mini-grid .d.wknd{
+    color:#5f6368;
+    background:repeating-linear-gradient(-45deg,
+      rgba(255,255,255,.05) 0 3px, transparent 3px 6px);
+  }
+  .mini-grid .d.wknd:hover{background:rgba(232,234,237,.1)}
+  .mini-grid .dw.wknd{color:#5f6368}
   .mini-grid .d.today{background:#0b57d0;color:#fff}
   .mini-grid .d.week{background:rgba(138,180,248,.18);border-radius:0;color:#d3e3fd}
   .mini-grid .d.week.w0{border-radius:12px 0 0 12px}
   .mini-grid .d.week.w1{border-radius:0 12px 12px 0}
+  .mini-note{
+    display:flex;align-items:center;gap:7px;margin:8px 2px 0;
+    font-size:10.5px;color:var(--text-faint);
+  }
+  .mini-note i{
+    width:12px;height:12px;border-radius:3px;flex:none;
+    background:repeating-linear-gradient(-45deg,
+      rgba(255,255,255,.16) 0 3px, transparent 3px 6px);
+    box-shadow:inset 0 0 0 1px #3c4043;
+  }
 
   /* ---------- 사이드바 목록 ---------- */
   .side-search{
@@ -170,6 +171,12 @@
     margin-left:auto;font-size:10px;color:var(--text-faint);opacity:0;transition:opacity .12s;
   }
   .cal-row:hover .only{opacity:1}
+
+  /* 리소스 — 회의실 캘린더 */
+  .res-cap{font-size:10.5px;color:var(--text-faint)}
+  .res-only-row{margin-top:2px;font-size:12px;color:var(--text-dim)}
+  .res-only-row.off{opacity:.4}
+  .res-only-row .cbox{border-radius:3px}
 
   /* 떠 있는 메뉴 */
   .tmenu{
@@ -379,6 +386,10 @@
   .daycol{position:relative;border-left:1px solid var(--grid-line)}
   .daycol .slot{height:var(--rowH);border-bottom:1px solid var(--grid-line)}
   .daycol .slot:hover{background:rgba(232,234,237,.03)}
+  /* 주말 — 회의를 잡지 않는 날 */
+  .daycol.wknd{background:repeating-linear-gradient(-45deg,
+    rgba(255,255,255,.022) 0 5px, transparent 5px 10px)}
+  .dayhead.wknd .dow,.dayhead.wknd .num:not(.on){color:#5f6368}
   .lunch{position:absolute;left:0;right:0;background:repeating-linear-gradient(
     45deg,transparent,transparent 6px,rgba(255,255,255,.022) 6px,rgba(255,255,255,.022) 12px);
     pointer-events:none;}
@@ -418,6 +429,10 @@
   .mv-cell{border-left:1px solid var(--grid-line);border-top:1px solid var(--grid-line);
     padding:2px 4px 4px;overflow:hidden;cursor:pointer;min-height:0}
   .mv-cell:hover{background:rgba(232,234,237,.03)}
+  .mv-head div.wknd{color:#5f6368}
+  .mv-cell.wknd{background:repeating-linear-gradient(-45deg,
+    rgba(255,255,255,.022) 0 5px, transparent 5px 10px)}
+  .mv-cell.wknd .n:not(.today){color:#5f6368}
   .mv-cell .n{
     font-size:11px;color:#c4c7c5;text-align:center;width:22px;height:22px;line-height:22px;
     margin:1px auto 3px;border-radius:50%;
@@ -509,6 +524,19 @@
   }
   .sheet-head h2{margin:0;font-size:16px;font-weight:600;letter-spacing:-.2px}
   .sheet-head p{margin:4px 0 0;font-size:12px;color:var(--text-dim);line-height:1.6}
+  /* 기본 일정 ↔ 자동 조율 — 넣은 값은 그대로 두고 화면만 바꾼다 */
+  .sheet-tabs{
+    display:flex;gap:8px;padding:12px 18px 0;flex:none;
+  }
+  .sheet-tabs.off{display:none}
+  .sheet-tabs button{
+    font-size:12.5px;font-weight:600;border-radius:999px;padding:7px 16px;
+    color:var(--text-dim);border:1px solid var(--line);
+  }
+  .sheet-tabs button:hover{background:rgba(232,234,237,.06);color:var(--text)}
+  .sheet-tabs button.on{
+    background:var(--accent);border-color:var(--accent);color:var(--on-accent);
+  }
   .sheet-body{flex:1;overflow:auto;padding:16px 18px 24px}
   .sheet-foot{
     padding:12px 18px;border-top:1px solid #313234;
@@ -540,8 +568,75 @@
   .sw-dot:hover{transform:scale(1.15)}
   .quick .note{font-size:11px;color:var(--text-faint);margin-top:9px;line-height:1.6}
 
+  /* 일정 만들기 안에 들어온 자동 조율 입구 */
+  .with-others{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin-bottom:12px;
+    padding:10px 12px;border-radius:10px;
+    border:1px solid rgba(168,199,250,.35);background:rgba(168,199,250,.08);
+  }
+  .with-others:hover{background:rgba(168,199,250,.16);border-color:var(--accent)}
+  .with-others .ic{font-size:14px;flex:none}
+  .with-others b{display:block;font-size:12.5px;font-weight:600;color:var(--text)}
+  .with-others i{display:block;font-style:normal;font-size:10.5px;color:var(--text-dim);
+    margin-top:2px;line-height:1.5}
+  .with-others .go{margin-left:auto;flex:none;font-size:11px;color:var(--accent);font-weight:600}
+
+  /* ---------- 일정 만들기 (사이드바) ---------- */
+  .ed-title{
+    width:100%;background:none;border:none;outline:none;color:var(--text);
+    font-size:22px;font-weight:400;letter-spacing:-.3px;
+    padding:2px 0 8px;border-bottom:2px solid var(--accent);margin-bottom:22px;
+  }
+  .ed-title::placeholder{color:var(--text-faint);font-weight:300}
+  .ed-row{display:flex;gap:16px;padding:9px 0;font-size:13.5px;color:#c4c7c5}
+  .ed-row .ic{width:18px;flex:none;text-align:center;font-size:14px;margin-top:2px;opacity:.85}
+  .ed-row .v{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .ed-when{font-size:13.5px;color:var(--text);width:100%}
+  .ed-seg{width:100%;margin-top:9px;display:flex;background:var(--surface-2);border-radius:999px;padding:2px}
+  .ed-seg button{flex:1;font-size:11.5px;padding:6px 0;border-radius:999px;color:var(--text-dim)}
+  .ed-seg button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
+  .ed-add{
+    text-align:left;font-size:13.5px;color:var(--text-dim);padding:2px 0;
+    display:flex;align-items:center;gap:10px;width:100%;
+  }
+  .ed-add:hover{color:var(--text)}
+  .ed-add.accent{color:var(--accent);font-weight:500}
+  .ed-add .go{
+    margin-left:auto;flex:none;font-size:10.5px;font-weight:700;
+    color:var(--on-accent);background:var(--accent);border-radius:999px;padding:2px 9px;
+  }
+  .ed-hint{width:100%;font-size:11.5px;color:var(--text-faint);line-height:1.6;margin-top:3px}
+  .ed-people{
+    border:1px solid rgba(168,199,250,.35);background:rgba(168,199,250,.08);
+    border-radius:10px;padding:11px 12px;margin:4px 0 6px;
+  }
+  .ed-people:hover{background:rgba(168,199,250,.14);border-color:var(--accent)}
+  .ed-on{color:var(--text);display:flex;align-items:center;gap:8px}
+  .ed-dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .ed-x{margin-left:auto;flex:none;color:var(--text-faint);padding:0 4px;font-size:12px}
+  .ed-x:hover{color:var(--text)}
+  .ed-input{
+    width:100%;background:var(--surface-2);border:none;border-bottom:1px solid var(--line);
+    border-radius:6px 6px 0 0;padding:9px 11px;color:var(--text);outline:none;
+    font-family:inherit;font-size:13.5px;line-height:1.6;resize:none;
+  }
+  .ed-input:focus{border-bottom-color:var(--accent)}
+  .ed-sub{margin:0 0 6px 34px}
+  .ed-sub .rooms{margin-top:0;border-top:none;padding-top:0}
+  .ed-status{font-size:11.5px;color:var(--text-faint);margin-top:2px}
+  .ed-status:hover{color:var(--text-dim)}
+  .ed-status .chev{margin-left:auto;font-size:9px}
+  .ed-opts{width:100%;margin:9px 0 2px;padding:2px 0 4px;border-top:1px solid var(--line)}
+  .ed-opt{display:flex;align-items:center;gap:10px;margin-top:9px}
+  .ed-opt .l{width:56px;flex:none;font-size:11.5px;color:var(--text-dim)}
+  .opt-seg{flex:1;display:flex;background:var(--surface-2);border-radius:999px;padding:2px}
+  .opt-seg button{flex:1;font-size:11px;padding:5px 0;border-radius:999px;color:var(--text-dim)}
+  .opt-seg button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
+
   .field{margin-bottom:18px}
   .label{font-size:12px;color:var(--text-dim);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+  .field-note{font-size:11.5px;color:var(--text-faint);margin-top:7px}
+  .field-note b{color:var(--text-dim);font-weight:600}
   .text-input{
     width:100%;background:var(--surface-2);border:none;border-bottom:1px solid var(--line);
     border-radius:6px 6px 0 0;padding:11px 12px;color:var(--text);outline:none;
@@ -689,6 +784,7 @@
     position:fixed;z-index:120;width:352px;background:#2d2f31;border-radius:12px;
     box-shadow:0 8px 10px 1px rgba(0,0,0,.3),0 3px 14px 2px rgba(0,0,0,.35);
     padding:8px 8px 16px;display:none;animation:pop .12s ease-out;
+    max-height:min(78vh,660px);overflow-y:auto;
   }
   .pop.on{display:block}
   .pop-tools{display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px}
@@ -724,6 +820,41 @@
   .pop-att.no .avatar{opacity:.45}
   .pop-tag.no{background:transparent;color:#f6aaa4;border:1px solid rgba(242,139,130,.5);font-weight:400}
   .pop-org{font-size:11.5px;color:var(--text-faint);margin-top:2px}
+
+  /* 화상회의 · 회의실 · 참석 응답 */
+  .pop-row .val{flex:1}
+  .pop-row .act{
+    flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    color:var(--text-dim);font-size:15px;margin-top:-4px;
+  }
+  .pop-row .act:hover{background:rgba(232,234,237,.12);color:var(--text)}
+  .meet-btn{
+    background:var(--accent);color:var(--on-accent);border-radius:999px;
+    padding:10px 22px;font-size:14px;font-weight:600;
+  }
+  .meet-btn:hover{background:#bcd5fb}
+  .meet-link{font-size:12.5px;color:var(--text-dim);margin-top:9px;word-break:break-all}
+  .pop-link{color:var(--accent);font-weight:500}
+  .pop-link:hover{text-decoration:underline}
+  .pop-sub{font-size:12px;color:var(--text-faint);margin-top:1px;line-height:1.55}
+  .pop-att .who{min-width:0;flex:1}
+  .ava-wrap{position:relative;flex:none;display:inline-flex}
+  .rsvp-mark{
+    position:absolute;right:-3px;bottom:-3px;width:14px;height:14px;border-radius:50%;
+    background:#81c995;color:#10233f;font-size:8px;display:grid;place-items:center;
+    border:2px solid #2d2f31;
+  }
+  .rsvp-mark.no{background:#f28b82}
+  .rsvp{
+    display:flex;align-items:center;gap:8px;
+    margin:16px -8px -16px;padding:13px 24px 15px;
+    border-top:1px solid var(--line);border-radius:0 0 12px 12px;
+    position:sticky;bottom:0;background:#2d2f31;
+  }
+  .rsvp .lb{font-size:13px;color:#c4c7c5;margin-right:auto}
+  .rsvp button{border:1px solid var(--line);border-radius:999px;padding:7px 15px;font-size:13px;color:#c4c7c5}
+  .rsvp button:hover{background:rgba(232,234,237,.08)}
+  .rsvp button.on{background:#0842a0;border-color:#0842a0;color:#d3e3fd}
 
   .btn{border-radius:999px;padding:11px 20px;font-size:14px;font-weight:600;background:var(--surface-3);color:var(--text)}
   .btn:hover{background:#3a3c3f}
@@ -784,6 +915,44 @@
   .conflict{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--text-dim);line-height:1.7}
   .conflict .row{display:flex;align-items:center;gap:7px;padding:2px 0;flex-wrap:wrap}
   .conflict .blk{color:#e0c98a}
+
+  /* ---------- 회의실 ---------- */
+  .rooms{margin-top:14px;border-top:1px solid #313234;padding-top:12px}
+  .rooms-h{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .rooms-h .t{font-size:12px;font-weight:600;color:var(--text)}
+  .rooms-h .c{font-size:11.5px;color:var(--text-dim)}
+  .rooms-h .auto{margin-left:auto;font-size:10.5px;color:var(--accent);
+    border:1px solid rgba(168,199,250,.35);border-radius:999px;padding:2px 8px}
+  .room-row{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    padding:9px 11px;border-radius:9px;border:1px solid var(--line);margin-bottom:6px;
+  }
+  .room-row:not([disabled]):hover{border-color:#5a5e63;background:var(--surface-2)}
+  .room-row[disabled]{opacity:.42;cursor:default}
+  .room-row.on{border-color:var(--accent);background:rgba(168,199,250,.1)}
+  .room-mark{
+    width:16px;height:16px;border-radius:50%;border:1.5px solid #5a5e63;flex:none;
+    display:grid;place-items:center;font-size:10px;color:transparent;
+  }
+  .room-row.on .room-mark{border-color:var(--accent);background:var(--accent);color:#10233f}
+  .room-n{font-size:12.5px;display:flex;align-items:center;gap:7px;min-width:0}
+  .room-cap{font-size:11px;color:var(--text-faint)}
+  .room-st{margin-left:auto;font-size:11px;flex:none;color:var(--text-dim);
+    max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .room-st.ok{color:var(--p1)}
+  .room-st.busy{color:#e0c98a}
+
+  .done-rooms{margin-top:12px}
+  .done-rooms > .pop-room-btn{margin:0}
+  .done-rooms .rooms{text-align:left;margin-top:10px;padding-top:12px}
+
+  /* 팝오버 안에서는 한 단계 좁게 */
+  .pop-room-btn{font-size:11px;color:var(--accent);margin-left:8px}
+  .pop-room-btn:hover{text-decoration:underline}
+  .pop-row .rooms{margin-top:9px;padding-top:9px;border-top-color:var(--line)}
+  .pop-row .rooms-h{margin-bottom:7px}
+  .pop-row .room-row{padding:7px 9px;margin-bottom:4px}
+
   .done-wrap{text-align:center;padding:24px 6px}
   .done-mark{width:56px;height:56px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;background:rgba(129,201,149,.15);color:var(--p1);font-size:26px}
   .done-wrap h3{margin:0 0 8px;font-size:17px}
@@ -809,6 +978,29 @@
     background:rgba(129,201,149,.24) !important;color:#c8ecd2 !important;
     border:2px solid var(--p1);
   }
+  /* 자동 조율로 잡힌 일정은 확정된 뒤에도 표가 난다 */
+  .ev.hold-done{box-shadow:inset 0 0 0 2px rgba(129,201,149,.85)}
+
+  /* 결과를 보는 동안엔 잡힌 자리만 남기고 나머지는 물러난다 */
+  .time-view.focus-hold .ev:not(.just){opacity:.16}
+  .time-view.focus-hold .cand{opacity:.25}
+  .time-view.focus-hold .allday .cell > span{opacity:.3}
+  .ev.just{
+    outline:3px solid var(--accent);outline-offset:3px;z-index:9 !important;
+    box-shadow:0 0 0 9px rgba(168,199,250,.16), 0 8px 24px rgba(0,0,0,.55);
+  }
+  /* 어느 칸인지 눈으로 짚어 준다 */
+  .just-mark{
+    position:absolute;z-index:10;pointer-events:none;
+    left:0;right:0;display:flex;justify-content:center;
+  }
+  .just-mark span{
+    transform:translateY(-100%);margin-bottom:9px;
+    background:var(--accent);color:var(--on-accent);
+    font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 10px;
+    box-shadow:0 3px 10px rgba(0,0,0,.5);white-space:nowrap;
+  }
+  .just-mark.below span{transform:none;margin:9px 0 0}
 
 </style>
 </head>
@@ -839,15 +1031,8 @@
   <aside class="sidebar">
     <div class="create-wrap">
       <button class="create-btn" id="createBtn">
-        <span class="plus">＋</span><span>만들기</span><span class="caret">▼</span>
+        <span class="plus">＋</span><span>만들기</span>
       </button>
-      <div class="menu" id="createMenu">
-        <button class="menu-item">일정</button>
-        <button class="menu-item">할 일</button>
-        <button class="menu-item">약속 일정</button>
-        <div class="menu-sep"></div>
-        <button class="menu-item primary" id="autoBtn">자동 조율<span class="badge-new">New</span></button>
-      </div>
     </div>
 
     <button class="tour-btn" id="btnTour">💡<span class="lb">처음 이용해봐요!</span></button>
@@ -859,6 +1044,7 @@
         <button class="icon-btn sm" id="miniNext">›</button>
       </div>
       <div class="mini-grid" id="miniGrid"></div>
+      <div class="mini-note"><i></i>주말은 회의를 잡지 않습니다</div>
     </div>
 
     <div class="side-search">
@@ -871,10 +1057,14 @@
       <span class="h-act"><button class="all" id="calAll"></button><span class="chev">⌃</span></span>
     </div>
     <div id="calList"></div>
+    <div class="side-h" id="resHead"><span>리소스</span>
+      <span class="h-act"><button class="all" id="resAll"></button><span class="chev">⌃</span></span>
+    </div>
+    <div id="resList"></div>
+
     <div class="side-h" id="otherCalHead"><span>다른 캘린더</span><span class="chev">⌃</span></div>
     <div id="otherList">
       <div class="cal-row" data-other="hol"><span class="cbox" style="background:#f6aea9;color:#202124">✓</span>대한민국의 휴일</div>
-      <div class="cal-row" data-other="room"><span class="cbox" style="background:#dadce0;color:#202124">✓</span>회의실 예약</div>
     </div>
 
   </aside>
@@ -913,6 +1103,10 @@
       <p id="sheetSub"></p>
     </div>
     <button class="icon-btn" id="closeSheet">✕</button>
+  </div>
+  <div class="sheet-tabs" id="sheetTabs">
+    <button data-mode="0">기본 일정</button>
+    <button data-mode="1">자동 조율</button>
   </div>
   <div class="sheet-body" id="sheetBody"></div>
   <div class="sheet-foot" id="sheetFoot"></div>
@@ -1189,22 +1383,85 @@ const ROOMS = [
   { id:"D", n:"회의실 D", cap:10 },
   { id:"E", n:"회의실 E", cap:16 },
 ];
+/* 회의실도 캘린더처럼 켜고 끌 수 있는 리소스다 */
+const RES_COLOR = "#8e918f";      /* 구글의 리소스 캘린더와 같은 무채색 */
+const resOn = id => !!state.res[id];
+const anyRes = () => ROOMS.some(r => resOn(r.id));
+
 /* 어떤 일정이 어느 방을 쓰는지는 일정마다 고정된다 */
 function roomOf(ev){
+  if(ev.hold) return state.hold ? state.hold.roomId : null;   /* 잡아둔 시간은 실제 예약한 방 */
+  if(ev.roomId !== undefined) return ev.roomId;               /* 내가 직접 고른 방 */
   if(ev.w.length < 2) return null;
   let h = 0;
   for(let i = 0; i < ev._k.length; i++) h = (h * 31 + ev._k.charCodeAt(i)) % 9973;
   return ROOMS[h % ROOMS.length].id;
 }
-/* 그 시간에 비어 있는 방 중 인원에 맞는 가장 작은 방 */
-function freeRoom(d, s, e, people){
-  const taken = {};
+/* 회의실 이름 — 구글처럼 층과 정원까지 */
+function roomLabel(ev){
+  const id = roomOf(ev);
+  if(!id) return null;
+  const r = ROOMS.filter(x => x.id === id)[0];
+  return "본사 4F · " + r.n + " (" + r.cap + ")";
+}
+
+/* 화상회의 — 2명 이상 모이는 일정에는 링크가 붙는다 */
+const MEET_AB = "abcdefghijkmnopqrstuvwxyz";
+function meetLink(seed){
+  let h = 7;
+  const s0 = String(seed);
+  for(let i = 0; i < s0.length; i++) h = (h * 31 + s0.charCodeAt(i)) % 99991;
+  const next = () => (h = (h * 1103515245 + 12345) % 2147483647);
+  const seg = n => { let s = ""; for(let i = 0; i < n; i++) s += MEET_AB[next() % MEET_AB.length]; return s; };
+  const code = seg(3) + "-" + seg(4) + "-" + seg(3);
+  const pin = [0,1,2].map(() => 100 + next() % 900).join(" ");
+  const tel = "+82 2-6022-" + (1000 + next() % 9000);
+  return { code, pin, tel };
+}
+const meetCode = seed => meetLink(seed).code;
+/* 화상회의는 여럿이 모일 때 기본으로 붙고, 만들 때 직접 켤 수도 있다 */
+function meetOf(ev){
+  if(ev.meet === false) return null;
+  if(!ev.meet && ev.w.length < 2) return null;
+  return meetLink(ev._k);
+}
+
+/* 참석 응답 — 주최자는 늘 수락, 내 답은 내가 고른 값이 이긴다 */
+function rsvpOf(ev, id){
+  if(id === "me" && state.rsvp[ev._k]) return state.rsvp[ev._k];
+  if(Array.isArray(ev.dec) && ev.dec.indexOf(id) >= 0) return "no";
+  if(id === ev.w[0]) return "yes";
+  let h = 0;
+  const s = ev._k + "|" + id;
+  for(let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 9973;
+  return h % 3 === 0 ? "wait" : "yes";
+}
+const declinedBy = (ev, id) => rsvpOf(ev, id) === "no";
+
+/* 그 시간의 회의실 현황 — 비어 있는 방이 먼저, 그다음 정원 순 */
+function roomStatus(d, s, e, people){
+  const busy = {};
   scanEvents().forEach(ev => {
     if(ev.d !== d || ev.s >= e || ev.e <= s) return;
     const r = roomOf(ev);
-    if(r) taken[r] = true;
+    if(r && !busy[r]) busy[r] = ev.t;
   });
-  const fit = ROOMS.filter(r => !taken[r.id] && r.cap >= people);
+  const h = state.hold;                       /* 내가 잡아둔 시간도 방을 하나 물고 있다 */
+  if(h && h.roomId && !(h.d === d && h.s === s && h.e === e) &&
+     h.d === d && h.s < e && h.e > s && !busy[h.roomId])
+    busy[h.roomId] = h.title || "잡아둔 시간";
+  return ROOMS.map(r => ({
+    id:r.id, n:r.n, cap:r.cap,
+    busy:busy[r.id] || null,
+    fits:r.cap >= people,
+  })).sort((a, b) => {
+    const w = x => x.busy ? 2 : x.fits ? 0 : 1;
+    return (w(a) - w(b)) || (a.cap - b.cap);
+  });
+}
+/* 그 시간에 비어 있는 방 중 인원에 맞는 가장 작은 방 */
+function freeRoom(d, s, e, people){
+  const fit = roomStatus(d, s, e, people).filter(r => !r.busy && r.fits);
   return fit.length ? fit[0] : null;
 }
 
@@ -1413,7 +1670,8 @@ const state = {
   hidden:{}, query:"", sidebar:true, userEvents:[], seeded:0, edits:{}, deleted:{},
   onbOpen:true, onbDone:{}, tipSeen:{}, picker:null, linkOpen:false, importOpen:false, hostJoins:true,
   hold:null, reminders:0, holdAnswer:null,
-  blockedCount:0, blockedDays:[], showAlts:false,
+  blockedCount:0, blockedDays:[], showAlts:false, room:null, roomOpen:false, rsvp:{},
+  res:{}, roomsOnly:false, draft:null,
 };
 
 function save(){
@@ -1444,6 +1702,7 @@ function persist(){
     localStorage.setItem(PERSIST_KEY, JSON.stringify({
       hold:state.hold, holdAnswer:state.holdAnswer, reminders:state.reminders,
       userEvents:state.userEvents, hidden:state.hidden, edits:state.edits, deleted:state.deleted,
+      rsvp:state.rsvp, res:state.res, roomsOnly:state.roomsOnly,
       onbDone:state.onbDone, tipSeen:state.tipSeen, onbOpen:state.onbOpen,
       view:state.view, weekend:state.weekend, showDeclined:state.showDeclined,
     }));
@@ -1454,6 +1713,11 @@ function loadPersist(){
     const d = JSON.parse(localStorage.getItem(PERSIST_KEY) || "null");
     if(!d) return;
     state.hold = d.hold || null;
+    /* 이 기능이 생기기 전에 저장된 확보 시간에는 방 번호가 없다 */
+    if(state.hold && state.hold.room && !state.hold.roomId){
+      const r = ROOMS.filter(x => x.n === state.hold.room)[0];
+      state.hold.roomId = r ? r.id : null;
+    }
     state.holdAnswer = d.holdAnswer || null;
     state.reminders = d.reminders || 0;
     state.userEvents = Array.isArray(d.userEvents) ? d.userEvents : [];
@@ -1461,6 +1725,9 @@ function loadPersist(){
     state.hidden = d.hidden || {};
     state.edits = d.edits || {};
     state.deleted = d.deleted || {};
+    state.rsvp = d.rsvp || {};
+    state.res = d.res || {};
+    state.roomsOnly = !!d.roomsOnly && ROOMS.some(r => state.res[r.id]);
     state.onbDone = d.onbDone || {};
     state.tipSeen = d.tipSeen || {};
     state.onbOpen = d.onbOpen !== false;
@@ -1508,12 +1775,17 @@ function instancesFor(dt){
   eventsForDate(dt).forEach(ev => {
     const owners = ev.w.filter(id => {
       if(state.hidden[id]) return false;
-      if(ev.dec && ev.dec.indexOf(id) >= 0 && !state.showDeclined) return false;
+      if(declinedBy(ev, id) && !state.showDeclined) return false;
       if(filtering() && !needOf(id)) return false;
       return true;
     });
-    if(!owners.length) return;
-    out.push(Object.assign({}, ev, { _owner:owners[0], _owners:owners }));
+    if(owners.length && !state.roomsOnly)
+      out.push(Object.assign({}, ev, { _owner:owners[0], _owners:owners }));
+
+    /* 리소스로 켜 둔 회의실은 그 방의 일정으로 한 번 더 선다 */
+    const rid = roomOf(ev);
+    if(rid && resOn(rid))
+      out.push(Object.assign({}, ev, { _owner:ev.w[0], _owners:ev.w.slice(), _res:rid }));
   });
   return out;
 }
@@ -1547,10 +1819,13 @@ function paintHead(){
 
   const head = document.getElementById("gridHead");
   head.innerHTML = '<div class="tz">GMT+09</div>' +
-    ds.map(dt =>
-      '<div class="dayhead"><div class="dow">' + DOW7[wdIndex(dt)] + '</div>' +
-      '<div class="num' + (sameDay(dt, TODAY) ? " on" : "") + '">' + dt.getDate() + '</div></div>'
-    ).join("");
+    ds.map(dt => {
+      const wknd = wdIndex(dt) > 4;
+      return '<div class="dayhead' + (wknd ? " wknd" : "") + '"' +
+        (wknd ? ' title="주말 · 회의를 잡지 않는 날"' : '') +
+        '><div class="dow">' + DOW7[wdIndex(dt)] + '</div>' +
+        '<div class="num' + (sameDay(dt, TODAY) ? " on" : "") + '">' + dt.getDate() + '</div></div>';
+    }).join("");
 
   const items = allDayOf(weekOff());
   const ad = document.getElementById("allDay");
@@ -1580,15 +1855,20 @@ function paintMini(){
   const start = addDays(first, -lead);
   const wk0 = dayOf(0), wk4 = dayOf(4);
 
-  let html = ["월","화","수","목","금","토","일"].map(d => '<div class="dw">' + d + '</div>').join("");
+  let html = ["월","화","수","목","금","토","일"].map((d, i) =>
+    '<div class="dw' + (i > 4 ? " wknd" : "") + '">' + d + '</div>').join("");
   for(let i = 0; i < 42; i++){
     const dt = addDays(start, i);
     const out = dt.getMonth() !== m;
+    /* 조율은 월–금만 본다 — 주말은 후보가 될 수 없는 날이다 */
+    const wknd = wdIndex(dt) > 4;
     const inWeek = dt >= new Date(wk0.getFullYear(), wk0.getMonth(), wk0.getDate())
                 && dt <= new Date(wk4.getFullYear(), wk4.getMonth(), wk4.getDate());
-    html += '<div class="d' + (out ? " out" : "") + (sameDay(dt, TODAY) ? " today" : "") +
+    html += '<div class="d' + (out ? " out" : "") + (wknd ? " wknd" : "") +
+      (sameDay(dt, TODAY) ? " today" : "") +
       (inWeek ? " week" : "") + (inWeek && sameDay(dt, wk0) ? " w0" : "") +
-      (inWeek && sameDay(dt, wk4) ? " w1" : "") + '" data-iso="' +
+      (inWeek && sameDay(dt, wk4) ? " w1" : "") + '"' +
+      (wknd ? ' title="주말 · 회의를 잡지 않는 날"' : '') + ' data-iso="' +
       dt.getFullYear() + "-" + dt.getMonth() + "-" + dt.getDate() + '">' + dt.getDate() + '</div>';
   }
   const mini = document.getElementById("miniGrid");
@@ -1633,7 +1913,7 @@ function monthViewHTML(){
           hhmm(e.s) + ' ' + e.t + '</div>';
       }).join("");
       cells += '<div class="mv-cell' + (dt.getMonth() !== m ? " out" : "") +
-        '" data-goday="' + isoOf(dt) + '">' +
+        (c > 4 ? " wknd" : "") + '" data-goday="' + isoOf(dt) + '">' +
         '<div class="n' + (sameDay(dt, TODAY) ? " today" : "") + '">' + dt.getDate() + '</div>' +
         chips + (evs.length > 3 ? '<div class="mv-more">+' + (evs.length - 3) + '개 더</div>' : '') +
         '</div>';
@@ -1641,7 +1921,7 @@ function monthViewHTML(){
     rows += '<div class="mv-row">' + cells + '</div>';
   }
   return '<div class="mv"><div class="mv-head">' +
-    DOW7.map(d => '<div>' + d + '</div>').join("") + '</div>' +
+    DOW7.map((d, i) => '<div' + (i > 4 ? ' class="wknd"' : '') + '>' + d + '</div>').join("") + '</div>' +
     '<div class="mv-body">' + rows + '</div></div>';
 }
 
@@ -1720,6 +2000,9 @@ function fitRowH(){
 function buildGrid(){
   paintHead();                       /* 종일 행의 🔒 표시가 조율 상태를 따라가도록 */
   fitRowH();
+  /* 결과를 보는 동안에는 잡힌 자리 하나만 또렷하게 남긴다 */
+  document.getElementById("timeView").classList.toggle("focus-hold",
+    !!(state.sheetOpen && state.step === 4 && state.hold));
   const shell = document.getElementById("gridShell");
   const alt = state.view === "month" || state.view === "year" || state.view === "schedule";
   shell.classList.toggle("alt", alt);
@@ -1736,7 +2019,7 @@ function buildGrid(){
         paintMini(); buildGrid();
       };
     });
-    paintCalList();
+    paintCalList(); paintResList();
     return;
   }
 
@@ -1756,13 +2039,14 @@ function buildGrid(){
   dates.forEach((dt, ci) => {
     const d = wdIndex(dt);
     const col = document.createElement("div");
-    col.className = "daycol";
+    /* 주말은 스캔이 보지 않는 날 — 그리드에서도 그렇게 보인다 */
+    col.className = "daycol" + (d > 4 ? " wknd" : "");
     col.dataset.day = d;
     col.dataset.col = ci;
     for(let h = START_H; h < END_H; h++){
       const s = document.createElement("div");
       s.className = "slot";
-      s.onclick = e => { e.stopPropagation(); openQuick(dt, h, s); };
+      s.onclick = e => { e.stopPropagation(); openCreate(dt, h, 1, s); };
       col.appendChild(s);
     }
     const lunch = document.createElement("div");
@@ -1802,11 +2086,19 @@ function buildGrid(){
       el.dataset.owner = ev._owner;
       el.style.backgroundColor = ev.color || cal.color;
       el.style.color = ev.color ? inkFor(ev.color) : cal.ink;
-      if(ev.dec && ev.dec.indexOf("me") >= 0 && ev._owners.indexOf("me") >= 0){
+      if(declinedBy(ev, "me") && !ev._res && ev._owners.indexOf("me") >= 0){
         el.classList.add("dec");
         el.style.color = tint(cal.color, 0.45);   /* 어두운 바탕에서도 읽히게 */
       }
-      const sub = ev.w.length > 1 ? cal.name + " 외 " + (ev.w.length - 1) + "명" : cal.name;
+      /* 회의실 캘린더의 일정은 사람 색이 아니라 리소스 색으로 선다 */
+      if(ev._res){
+        el.classList.add("ev-res");
+        el.style.backgroundColor = RES_COLOR;
+        el.style.color = "#202124";
+      }
+      const room = ev._res && ROOMS.filter(r => r.id === ev._res)[0];
+      const sub = room ? room.n + " · " + ev.w.length + "명"
+        : ev.w.length > 1 ? cal.name + " 외 " + (ev.w.length - 1) + "명" : cal.name;
       el.innerHTML = '<div class="tt">' + ev.t + '</div>' +
         (dur > 0.5 ? '<div class="wh">' + sub + '</div>' : '');
 
@@ -1832,6 +2124,17 @@ function buildGrid(){
       if(ev.hold){
         const h = state.hold, ok = !h.confirmed && state.holdAnswer === "yes";
         el.classList.add(h.confirmed ? "hold-done" : ok ? "hold-ok" : "hold-wait");
+        /* 방금 잡힌 자리는 결과 화면이 열려 있는 동안 눈에 띄게 둔다 */
+        if(state.sheetOpen && state.step === 4 && !ev._res){
+          el.classList.add("just");
+          /* 맨 윗줄이면 이름표가 잘리므로 아래에 붙인다 */
+          const low = ev.s - START_H < 0.75;
+          const mk = document.createElement("div");
+          mk.className = "just-mark" + (low ? " below" : "");
+          mk.style.top = ((low ? ev.e : ev.s) - START_H) * rowH + "px";
+          mk.innerHTML = '<span>' + (h.confirmed ? "여기로 잡혔습니다" : "여기를 잡아뒀습니다") + '</span>';
+          col.appendChild(mk);
+        }
         if(!h.confirmed){
           el.querySelector(".tt").textContent = "[미정] " + ev.t;
           const s = el.querySelector(".wh");
@@ -1845,7 +2148,7 @@ function buildGrid(){
     });
     inner.appendChild(col);
   });
-  paintCalList();
+  paintCalList(); paintResList();
 }
 
 function needOf(id){
@@ -1854,55 +2157,143 @@ function needOf(id){
 }
 /* 참석자를 한 명이라도 고른 뒤부터 조율용 표시로 바뀐다 */
 const coordMode = () => state.sheetOpen && state.attendees.length > 0;
+/* 인원을 고르는 동안에는 사이드바 체크가 곧 부를 사람이다 */
+const pickingPeople = () => state.sheetOpen && state.step === 1;
 /* 자동 조율을 여는 동안에만 참석자 캘린더만 남긴다 */
 const filtering = () => coordMode() && state.onlyAttendees;
 
+/* 인원 지정 중의 체크 상태 — 켜져 있다 = 부른다 */
+function calOn(p){
+  if(!pickingPeople()) return !state.hidden[p.id];
+  return p.id === "me" ? state.hostJoins : !!needOf(p.id);
+}
+/* 사이드바에서 한 명을 넣거나 뺀다 — 캘린더 표시도 같이 따라간다 */
+function setPicked(id, on){
+  if(id === "me"){ state.hostJoins = on; return; }
+  state.attendees = state.attendees.filter(a => a.id !== id);
+  if(on) state.attendees.push({ id, need:"required", from:"calendar" });
+  state.hidden[id] = !on;
+}
+/* 시트에서 사람이 바뀌면 그 사람들의 캘린더는 켜 둔다 — 꺼져 있으면 일정이 안 보인다 */
+function syncCalWithAttendees(){
+  state.attendees.forEach(a => { state.hidden[a.id] = false; });
+}
+
 function paintCalList(){
-  /* 자동 조율 중에는 이 회의 참석자의 캘린더만 남긴다 */
-  const list = filtering() ? PEOPLE.filter(p => needOf(p.id)) : PEOPLE;
+  const picking = pickingPeople();
+  /* 인원을 고르는 중에는 전원이 보여야 부를 사람을 더할 수 있다 */
+  const list = picking ? PEOPLE : filtering() ? PEOPLE.filter(p => needOf(p.id)) : PEOPLE;
+  /* 주최자는 부르고 말고의 대상이 아니라 늘 목록에 있다 */
+  const bulk = picking ? list.filter(p => p.id !== "me") : list;
+  /* 체크가 뜻하는 바가 달라지므로 제목도 바꾼다 */
+  document.querySelector("#myCalHead span").textContent = picking ? "부를 사람" : "내 캘린더";
 
   /* 전체 선택 / 전체 해제 */
-  const allOn = list.length > 0 && list.every(p => !state.hidden[p.id]);
+  const allOn = bulk.length > 0 && bulk.every(calOn);
   const ab = document.getElementById("calAll");
   ab.textContent = allOn ? "전체 해제" : "전체 선택";
   ab.onclick = e => {
     e.stopPropagation();               /* 섹션이 접히지 않도록 */
-    list.forEach(p => { state.hidden[p.id] = allOn; });
-    paintCalList(); buildGrid(); paintCandidates();
+    if(picking) bulk.forEach(p => setPicked(p.id, !allOn));
+    else bulk.forEach(p => { state.hidden[p.id] = allOn; });
+    afterCalToggle();
   };
 
   const el = document.getElementById("calList");
   el.innerHTML = list.map(p => {
-    const off = state.hidden[p.id];
+    const off = !calOn(p);
     return '<div class="cal-row' + (off ? " hid" : "") + '" data-cal="' + p.id + '">' +
       '<span class="cbox"' + (off ? '' : ' style="background:' + p.color + ';color:' + p.ink + '"') + '>' +
         (off ? '' : '✓') + '</span>' +
-      p.name + '<span class="only" data-only="' + p.id + '">이 캘린더만</span></div>';
+      p.name + '<span class="only" data-only="' + p.id + '">' +
+        (picking ? "이 사람만" : "이 캘린더만") + '</span></div>';
   }).join("");
 
   el.querySelectorAll("[data-cal]").forEach(r => {
     r.onclick = e => {
-      if(e.target.dataset.only){
-        const id = e.target.dataset.only;
+      const only = e.target.dataset.only;
+      const id = only || r.dataset.cal;
+      if(picking){
+        if(only) bulk.forEach(p => setPicked(p.id, p.id === id));
+        else setPicked(id, !calOn(P(id)));
+      }else if(only){
         const alone = list.every(p => p.id === id ? !state.hidden[p.id] : state.hidden[p.id]);
         list.forEach(p => { state.hidden[p.id] = alone ? false : p.id !== id; });
       }else{
-        const id = r.dataset.cal;
         state.hidden[id] = !state.hidden[id];
       }
-      paintCalList(); buildGrid(); paintCandidates();
+      afterCalToggle();
     };
   });
+}
+
+/* ---- 리소스 — 회의실을 캘린더처럼 켜고 끈다 ---- */
+function paintResList(){
+  const allOn = ROOMS.every(r => resOn(r.id));
+  const ab = document.getElementById("resAll");
+  ab.textContent = allOn ? "전체 해제" : "전체 선택";
+  ab.onclick = e => {
+    e.stopPropagation();
+    ROOMS.forEach(r => { state.res[r.id] = !allOn; });
+    if(!anyRes()) state.roomsOnly = false;
+    persist(); buildGrid(); paintCandidates();
+  };
+
+  const el = document.getElementById("resList");
+  el.innerHTML = ROOMS.map(r => {
+    const off = !resOn(r.id);
+    return '<div class="cal-row' + (off ? " hid" : "") + '" data-res="' + r.id + '">' +
+      '<span class="cbox"' + (off ? '' : ' style="background:' + RES_COLOR + ';color:#202124"') + '>' +
+        (off ? '' : '✓') + '</span>' +
+      r.n + '<span class="res-cap">' + r.cap + '인</span>' +
+      '<span class="only" data-resonly="' + r.id + '">이 회의실만</span></div>';
+  }).join("") +
+    /* 방 일정만 남기면 어느 시간이 비어 있는지가 바로 읽힌다 */
+    '<div class="cal-row res-only-row' + (anyRes() ? '' : ' off') + '" id="roomsOnly">' +
+      '<span class="cbox' + (state.roomsOnly ? '' : ' sw-off') + '"' +
+        (state.roomsOnly ? ' style="background:' + RES_COLOR + ';color:#202124"' : '') + '>' +
+        (state.roomsOnly ? '✓' : '') + '</span>사람 일정 숨기기</div>';
+
+  el.querySelectorAll("[data-res]").forEach(r => {
+    r.onclick = e => {
+      const only = e.target.dataset.resonly;
+      if(only) ROOMS.forEach(x => { state.res[x.id] = x.id === only; });
+      else state.res[r.dataset.res] = !resOn(r.dataset.res);
+      if(!anyRes()) state.roomsOnly = false;
+      persist(); buildGrid(); paintCandidates();
+    };
+  });
+  document.getElementById("roomsOnly").onclick = () => {
+    if(!anyRes()) return toast("먼저 볼 회의실을 골라 주세요.");
+    state.roomsOnly = !state.roomsOnly;
+    persist(); buildGrid(); paintCandidates();
+  };
+}
+
+/* 캘린더를 켜고 끈 뒤 — 인원 지정 중이면 부를 사람 목록까지 같이 바뀐다 */
+function afterCalToggle(){
+  if(pickingPeople()){
+    /* 열 때 가져온 사람이 빠지면 안내 문구의 숫자도 줄어든다 */
+    state.seeded = Math.min(state.seeded,
+      state.attendees.filter(a => a.from === "calendar").length);
+    save(); render();
+    return;
+  }
+  paintCalList(); buildGrid(); paintCandidates();
 }
 
 /* 그리드는 상태가 바뀔 때만 다시 그린다 — 호출을 빠뜨려도 render()가 맞춰준다 */
 let gridSig = null;
 function syncGrid(){
+  const h = state.hold;
   const sig = JSON.stringify([
-    state.sheetOpen, state.scenario, state.onlyAttendees, state.view,
+    state.sheetOpen, state.step, state.scenario, state.onlyAttendees, state.view,
     state.weekend, state.showDeclined, +state.focus, state.query, state.hidden,
     state.edits, state.deleted, state.userEvents.length, state.hostJoins,
-    state.attendees.map(a => a.id + ":" + a.need),
+    state.attendees.map(a => a.id + ":" + a.need), state.res, state.roomsOnly,
+    /* 잡아둔 시간도 캘린더에 서는 블록이다 — 빠지면 화면에 안 나타난다 */
+    h && [h.d, h.s, h.e, h.title, h.confirmed, h.roomId, (h.att || []).length],
+    state.holdAnswer, state.rsvp,
   ]);
   if(sig === gridSig) return;
   gridSig = sig;
@@ -1955,11 +2346,10 @@ function ampm(h){
 }
 
 function popShell(dot, title, when, rows, tools, titleHTML){
-  /* 구글 캘린더와 같은 순서 — 수정 · 삭제 · 메일 · 옵션 · 닫기 */
+  /* 구글 캘린더와 같은 순서 — 수정 · 삭제 · 옵션 · 닫기 */
   return '<div class="pop-tools">' + (tools ||
       '<button title="수정" data-soon="수정">✎</button>' +
       '<button title="삭제" data-soon="삭제">🗑</button>' +
-      '<button title="메일 보내기" data-soon="메일 보내기">✉</button>' +
       '<button title="옵션" data-soon="옵션">⋮</button>') +
       '<button title="닫기" id="popClose">✕</button></div>' +
     '<div class="pop-main"><span class="pop-dot" style="background:' + dot + '"></span>' +
@@ -1970,38 +2360,79 @@ function popShell(dot, title, when, rows, tools, titleHTML){
 
 function openEventPop(ev, anchor, when0, mode){
   const owner = P(ev._owner || ev.w[0]);
-  const dot = ev.color || owner.color;
+  const resRoom = ev._res && ROOMS.filter(r => r.id === ev._res)[0];
+  const dot = resRoom ? RES_COLOR : (ev.color || owner.color);
 
   const dt = when0 || dayOf(ev.d);
+  const noNames = ev.w.filter(id => declinedBy(ev, id)).map(id => P(id).name);
   const when = (dt.getMonth() + 1) + "월 " + dt.getDate() + "일 (" + DOW7[wdIndex(dt)] + "요일) · " +
     ampm(ev.s) + " – " + ampm(ev.e) +
-    (Array.isArray(ev.dec) && ev.dec.length
-      ? " · " + ev.dec.map(id => P(id).name).join(", ") + " 거절" : "");
+    (noNames.length ? " · " + noNames.join(", ") + " 거절" : "");
 
-  const decd = id => Array.isArray(ev.dec) && ev.dec.indexOf(id) >= 0;
+  /* 응답 표시 — 수락은 초록 체크, 거절은 빨간 ✕, 회신 전은 표시 없음 */
   const atts = ev.w.map(id => {
-    const p = P(id), no = decd(id);
+    const p = P(id), r = rsvpOf(ev, id);
     /* 필수 / 선택은 조율 중에만 의미가 있는 값 */
     const need = coordMode() ? needOf(id) : null;
-    return '<div class="pop-att' + (no ? " no" : "") + '">' + avatar(p, 26) +
-      '<span><span class="nm">' + p.name + '</span> <span class="rl">· ' + p.role + '</span></span>' +
-      (no ? '<span class="pop-tag no">거절함</span>' : "") +
+    const mark = r === "yes" ? '<span class="rsvp-mark">✓</span>'
+      : r === "no" ? '<span class="rsvp-mark no">✕</span>' : '';
+    return '<div class="pop-att' + (r === "no" ? " no" : "") + '">' +
+      '<span class="ava-wrap">' + avatar(p, 26) + mark + '</span>' +
+      '<div class="who"><span class="nm">' + p.name + '</span> <span class="rl">· ' + p.role + '</span>' +
+        (id === ev.w[0] ? '<div class="pop-sub">주최자</div>' : '') + '</div>' +
+      (r === "no" ? '<span class="pop-tag no">거절함</span>' : "") +
       (need ? '<span class="pop-tag' + (need === "optional" ? " opt" : "") + '">' +
         (need === "required" ? "필수" : "선택") + '</span>' : '') + '</div>';
   }).join("");
 
+  const yes = ev.w.filter(id => rsvpOf(ev, id) === "yes").length;
+  const wait = ev.w.filter(id => rsvpOf(ev, id) === "wait").length;
+  const sum = [yes ? "초대 수락 " + yes + "명" : "",
+    noNames.length ? "거절 " + noNames.length + "명" : "",
+    wait ? "회신 대기 중 " + wait + "명" : ""].filter(Boolean).join(", ");
+
   const dur = ev.e - ev.s;
+  /* 만들 때 정한 값이 있으면 그것이 이기고, 없으면 제목으로 짐작한다 */
+  const priv = ev.vis ? ev.vis === "priv"
+    : (ev.t.indexOf("집중") >= 0 || ev.t.indexOf("개인") >= 0);
+  const meet = priv ? null : meetOf(ev);
+  const room = priv ? null : roomLabel(ev);
+
   const rows =
-    '<div class="pop-row"><span class="ic">👥</span><span class="val">' +
-      '<div>참석자 ' + ev.w.length + '명</div>' + atts +
-      '<div class="pop-org">' + P(ev.w[0]).name + '님이 만든 일정 · ' +
-        owner.name + '님 캘린더에서 보는 중</div></span></div>' +
+    (meet
+      ? '<div class="pop-row"><span class="ic">📹</span><span class="val">' +
+          '<button class="meet-btn" data-soon="화상회의 참석">Google Meet으로 참석</button>' +
+          '<div class="meet-link">meet.google.com/' + meet.code + '</div></span>' +
+          '<button class="act" id="meetCopy" title="회의 링크 복사">⧉</button></div>' +
+        '<div class="pop-row"><span class="ic">📞</span><span class="val">' +
+          '<span class="pop-link" data-soon="전화로 참여">휴대전화로 참여하기</span>' +
+          '<div class="pop-sub">(KR) ' + meet.tel + ' PIN: ' + meet.pin + '#</div></span></div>' +
+        '<div class="pop-row"><span class="ic">↗</span><span class="val">' +
+          '<span class="pop-link" data-soon="전화번호 더보기">전화번호 더보기</span></span></div>'
+      : '') +
+    (room ? '<div class="pop-row"><span class="ic">🚪</span><span class="val">' + room + '</span></div>' : '') +
+    (ev.loc ? '<div class="pop-row"><span class="ic">📍</span><span class="val">' + esc(ev.loc) + '</span></div>' : '') +
+    (ev.desc ? '<div class="pop-row"><span class="ic">☰</span><span class="val">' + esc(ev.desc) + '</span></div>' : '') +
+    /* 혼자 하는 일정에는 게스트 줄이 없다 — 구글도 그렇다 */
+    (ev.w.length > 1
+      ? '<div class="pop-row"><span class="ic">👥</span><span class="val">' +
+          '<div>참석자 ' + ev.w.length + '명</div>' +
+          (sum ? '<div class="pop-sub">' + sum + '</div>' : '') + atts +
+          '<div class="pop-org">' +
+            (resRoom ? resRoom.n + ' 캘린더에서 보는 중' : owner.name + '님 캘린더에서 보는 중') +
+          '</div></span>' +
+          '<button class="act" id="evMailAll" title="참석자에게 메일">✉</button></div>'
+      : '') +
     '<div class="pop-row"><span class="ic">🔔</span><span class="val">' +
-      (dur >= 1 ? "10분 전 알림" : "알림 없음") + '</span></div>' +
-    (ev.t.indexOf("집중") >= 0 || ev.t.indexOf("개인") >= 0
-      ? '<div class="pop-row"><span class="ic">🔒</span><span class="val">바쁨 · 비공개</span></div>'
-      : '<div class="pop-row"><span class="ic">📍</span><span class="val">' +
-        (roomOf(ev) ? "회의실 " + roomOf(ev) : "회의실 없음 · 1인 작업") + '</span></div>');
+      (ev.remind != null ? REM_LABEL[ev.remind]
+        : dur >= 1 ? '30분 전, 이메일로 알림<div class="pop-sub">10분 전</div>' : '10분 전') +
+      '</span></div>' +
+    '<div class="pop-row"><span class="ic">📅</span><span class="val">' + P(ev.w[0]).email + '</span></div>' +
+    (priv || ev.busy === false
+      ? '<div class="pop-row"><span class="ic">🔒</span><span class="val">' +
+        (ev.busy === false ? "한가함" : "바쁨") + ' · ' +
+        (priv ? "비공개" : VIS_LABEL[ev.vis] || "기본 공개 설정") + '</span></div>'
+      : '');
 
   /* 메일 쓰기 / 색 고르기는 팝오버 안에서 바로 */
   const to = ev.w.filter(id => id !== "me").map(id => P(id).name).join(", ") || "참석자";
@@ -2028,19 +2459,50 @@ function openEventPop(ev, anchor, when0, mode){
   const titleHTML = mode === "edit"
     ? '<input class="pop-title-input" id="evTitle" value="' + esc(ev.t) + '" autocomplete="off">'
     : null;
+  /* 메일은 참석자 줄 오른쪽으로 옮겨, 위쪽은 구글처럼 세 개만 남긴다 */
   const tools =
     '<button title="수정" id="evEdit">✎</button>' +
     '<button title="삭제" id="evDel">🗑</button>' +
-    '<button title="메일 보내기" id="evMail">✉</button>' +
     '<button title="옵션" id="evMore">⋮</button>';
 
-  pop.innerHTML = popShell(dot, ev.t, when, rows + extra, tools, titleHTML);
+  /* 내가 초대받은 일정이면 답을 고를 수 있다 */
+  const mine = ev.w.indexOf("me") >= 0 && ev.w.length > 1;
+  const myR = rsvpOf(ev, "me");
+  const bar = mine
+    ? '<div class="rsvp"><span class="lb">참석 여부</span>' +
+      [["yes","예"],["no","아니요"],["wait","미정"]].map(o =>
+        '<button data-rsvp="' + o[0] + '" class="' + (myR === o[0] ? "on" : "") + '">' +
+        o[1] + '</button>').join("") + '</div>'
+    : '';
+
+  pop.innerHTML = popShell(dot, ev.t, when, rows + extra + bar, tools, titleHTML);
   placePop(anchor);
 
-  const re = m => openEventPop(ev, anchor, when0, m);
+  /* 그리드를 다시 그리면 눌렀던 블록이 사라진다 — 자리만 붙잡아 둔다 */
+  let anchorRef = anchor;
+  const freeze = () => {
+    const r = anchorRef.getBoundingClientRect();
+    anchorRef = { getBoundingClientRect: () => r };
+  };
+  const re = m => openEventPop(ev, anchorRef, when0, m);
+
   document.getElementById("evEdit").onclick = () => re(mode === "edit" ? null : "edit");
-  document.getElementById("evMail").onclick = () => re(mode === "mail" ? null : "mail");
   document.getElementById("evMore").onclick = () => re(mode === "color" ? null : "color");
+  const ma = document.getElementById("evMailAll");
+  if(ma) ma.onclick = e => { e.stopPropagation(); re(mode === "mail" ? null : "mail"); };
+  const cp = document.getElementById("meetCopy");
+  if(cp) cp.onclick = e => {
+    e.stopPropagation();
+    toast("회의 링크를 복사했습니다.");
+  };
+  pop.querySelectorAll("[data-rsvp]").forEach(b => {
+    b.onclick = e => {
+      e.stopPropagation();
+      state.rsvp[ev._k] = b.dataset.rsvp;
+      persist(); freeze(); buildGrid(); paintCandidates();
+      re(mode);
+    };
+  });
   document.getElementById("evDel").onclick = () => {
     state.deleted[ev._k] = true;
     state.userEvents = state.userEvents.filter(u => u._k !== ev._k);
@@ -2058,7 +2520,7 @@ function openEventPop(ev, anchor, when0, mode){
       const t = ti.value.trim();
       if(t && t !== ev.t){
         state.edits[ev._k] = Object.assign({}, state.edits[ev._k], { t });
-        buildGrid(); paintCandidates(); persist();
+        freeze(); buildGrid(); paintCandidates(); persist();
       }
       re(null);
     };
@@ -2077,14 +2539,14 @@ function openEventPop(ev, anchor, when0, mode){
   pop.querySelectorAll("[data-color]").forEach(b => {
     b.onclick = () => {
       state.edits[ev._k] = Object.assign({}, state.edits[ev._k], { color:b.dataset.color });
-      buildGrid(); paintCandidates(); persist();
+      freeze(); buildGrid(); paintCandidates(); persist();
       re(null);
     };
   });
   const cr = document.getElementById("colorReset");
   if(cr) cr.onclick = () => {
     if(state.edits[ev._k]) delete state.edits[ev._k].color;
-    buildGrid(); paintCandidates(); persist();
+    freeze(); buildGrid(); paintCandidates(); persist();
     re(null);
   };
 }
@@ -2112,7 +2574,7 @@ function toast(msg, actionLabel, action){
 }
 
 /* 캘린더에 잡힌 확보 시간의 상태 */
-function openHoldPop(anchor, editing){
+function openHoldPop(anchor, editing, roomOpen){
   const h = state.hold;
   const list = (h.att || []).map(a => {
     const p = P(a.id);
@@ -2123,10 +2585,14 @@ function openHoldPop(anchor, editing){
   }).join("");
 
   const rows =
-    '<div class="pop-row"><span class="ic">📍</span><span class="val">' +
-      (h.room ? h.room + ' 예약됨' : '회의실 없음 · 온라인으로 진행') + '</span></div>' +
+    '<div class="pop-row"><span class="ic">🚪</span><span class="val">' +
+      (h.room ? h.room + ' 예약됨' : '회의실 없음 · 온라인으로 진행') +
+      '<button class="pop-room-btn" id="holdRoomBtn">' + (roomOpen ? "닫기" : "회의실 바꾸기") + '</button>' +
+      (roomOpen ? roomsHTML(h, h.people, h.roomId || "none", false) : "") +
+    '</span></div>' +
     '<div class="pop-row"><span class="ic">👥</span><span class="val">' +
-      '<div>참석자 ' + h.people + '명</div>' + list + '</span></div>' +
+      '<div>참석자 ' + h.people + '명</div>' + list + '</span>' +
+      '<button class="act" data-soon="메일 보내기" title="참석자에게 메일">✉</button></div>' +
     (h.confirmed
       ? '<div class="pop-row"><span class="ic">✓</span><span class="val">확정 · 참석자 전원에게 초대 발송됨</span></div>'
       : state.holdAnswer === "yes"
@@ -2144,7 +2610,6 @@ function openHoldPop(anchor, editing){
   const tools =
     '<button title="수정" id="popEdit">✎</button>' +
     '<button title="삭제" id="popDel">🗑</button>' +
-    '<button title="메일 보내기" data-soon="메일 보내기">✉</button>' +
     '<button title="옵션" data-soon="옵션">⋮</button>';
   const titleHTML = editing
     ? '<input class="pop-title-input" id="popTitle" value="' + esc(h.title || "") +
@@ -2165,6 +2630,16 @@ function openHoldPop(anchor, editing){
 
   const ed = document.getElementById("popEdit");
   if(ed) ed.onclick = () => openHoldPop(anchor, true);
+  const rb = document.getElementById("holdRoomBtn");
+  if(rb) rb.onclick = e => { e.stopPropagation(); openHoldPop(anchor, false, !roomOpen); };
+  bindRooms(pop, id => {
+    const r = ROOMS.filter(x => x.id === id)[0];
+    state.hold.roomId = r ? r.id : null;
+    state.hold.room = r ? r.n : null;
+    persist(); syncGrid(); paintCandidates();
+    openHoldPop(anchor, false, true);
+    toast(r ? r.n + "로 바꿨습니다." : "회의실 없이 진행합니다.");
+  });
   const ti = document.getElementById("popTitle");
   if(ti){
     ti.focus(); ti.select();
@@ -2178,7 +2653,7 @@ function openHoldPop(anchor, editing){
   const del = document.getElementById("popDel");
   if(del) del.onclick = () => {
     state.hold = null; state.holdAnswer = null; clearTimeout(replyTimer);
-    closePop(); paintCandidates();
+    closePop(); persist(); syncGrid(); paintCandidates();
     toast("일정을 삭제했습니다.");
   };
 
@@ -2189,7 +2664,7 @@ function openHoldPop(anchor, editing){
   const d = document.getElementById("holdDrop");
   if(d) d.onclick = () => {
     state.hold = null; state.holdAnswer = null; clearTimeout(replyTimer);
-    closePop(); paintCandidates();
+    closePop(); persist(); syncGrid(); paintCandidates();
     toast("확보한 시간을 취소했습니다.");
   };
 }
@@ -2207,7 +2682,7 @@ function scheduleReply(){
   replyTimer = setTimeout(() => {
     if(!state.hold || state.hold.confirmed || state.holdAnswer) return;
     state.holdAnswer = "yes";
-    paintCandidates();
+    persist(); syncGrid(); paintCandidates();
     toast(state.hold.askers.join(", ") + "님이 ‘가능’으로 답했습니다.", "전원 확정하기", confirmHold);
   }, 4000);
 }
@@ -2217,33 +2692,11 @@ function confirmHold(){
   if(!state.hold) return;
   state.hold.confirmed = true;
   state.holdAnswer = null;
-  closePop(); paintCandidates();
+  closePop(); persist(); syncGrid(); paintCandidates();
   toast("일정이 확정됐습니다 · 참석자 " + state.hold.people + "명 전원 캘린더에 등록되었습니다.");
 }
 
-/* 캘린더의 빈 칸이 조율의 시작점이 된다 */
-function openQuick(dt, h, anchor){
-  const when = (dt.getMonth() + 1) + "월 " + dt.getDate() + "일 (" + DOW7[wdIndex(dt)] + "요일) · " +
-    ampm(h) + " – " + ampm(h + 1);
-  pop.innerHTML =
-    '<div class="pop-tools"><button title="닫기" id="popClose">✕</button></div>' +
-    '<div class="quick"><h5>이 시간에</h5><div class="w">' + when + '</div>' +
-      '<div class="acts">' +
-        '<button id="qMake">일정 만들기</button>' +
-        '<button class="pri" id="qAuto">자동 조율</button>' +
-      '</div>' +
-      '<div class="note">자동 조율은 이 시간을 고집하지 않습니다. ' +
-        '참석자를 넣으면 다음 주 전체에서 잡을 수 있는 시간을 순위로 찾아옵니다.</div>' +
-    '</div>';
-  placePop(anchor);
-  document.getElementById("qMake").onclick = () => openCreate(dt, h, 1, anchor);
-  document.getElementById("qAuto").onclick = () => {
-    closePop();
-    document.getElementById("autoBtn").click();
-  };
-}
-
-/* 빠른 일정 만들기 */
+/* 빠른 일정 만들기 — 캘린더의 빈 칸도, 만들기 메뉴도 여기로 온다 */
 const DURS = [[0.5,"30분"],[1,"1시간"],[1.5,"1시간 30분"],[2,"2시간"]];
 function openCreate(dt, h, dur, anchor, keep){
   const end = Math.min(h + dur, END_H);
@@ -2257,8 +2710,16 @@ function openCreate(dt, h, dur, anchor, keep){
       '<div class="seg" style="margin-bottom:12px">' +
         DURS.map(d => '<button data-dur="' + d[0] + '" class="' + (d[0] === dur ? "on" : "") + '">' +
           d[1] + '</button>').join("") + '</div>' +
+
+      /* 혼자 하는 일정이면 이 시간이 맞다. 사람이 붙는 순간부터는 아니다. */
+      '<button class="with-others" id="qWith">' +
+        '<span class="ic">👥</span>' +
+        '<span><b>다른 사람도 부를까요?</b>' +
+          '<i>그러면 이 시간은 추측입니다 — 다 되는 시간을 찾아 드립니다</i></span>' +
+        '<span class="go">자동 조율 →</span></button>' +
+
       '<div class="acts">' +
-        '<button id="qBack">뒤로</button>' +
+        '<button id="qMore">옵션 더보기</button>' +
         '<button class="pri" id="qSave">저장</button>' +
       '</div>' +
       '<div class="note">정슬기 캘린더에 만들어집니다.</div>' +
@@ -2270,8 +2731,10 @@ function openCreate(dt, h, dur, anchor, keep){
   pop.querySelectorAll("[data-dur]").forEach(b => {
     b.onclick = () => openCreate(dt, h, +b.dataset.dur, anchor, ti.value);
   });
-  document.getElementById("qBack").onclick = () => openQuick(dt, h, anchor);
+  document.getElementById("qMore").onclick = () => openEvent(dt, h, ti.value.trim());
   document.getElementById("qSave").onclick = save;
+  /* 이 시간도 초안에 담아 둔다 — 자동 조율에서 돌아와도 남아 있게 */
+  document.getElementById("qWith").onclick = () => openSheet(1, dt, h, ti.value.trim());
 
   function save(){
     const t = ti.value.trim() || "제목 없음";
@@ -2282,6 +2745,16 @@ function openCreate(dt, h, dur, anchor, keep){
     closePop(); buildGrid(); paintCandidates();
     toast('「' + t + '」 일정을 만들었습니다.');
   }
+}
+
+/* 보고 있는 날에서 내 일정이 없는 첫 시간 */
+function openHour(dt){
+  const mine = eventsForDate(dt).filter(e => e.w.indexOf("me") >= 0);
+  for(let h = START_H; h < END_H; h++){
+    if(h >= LUNCH[0] && h < LUNCH[1]) continue;
+    if(!mine.some(e => e.s < h + 1 && e.e > h)) return h;
+  }
+  return 10;
 }
 
 function placePop(anchor){
@@ -2435,12 +2908,14 @@ function applyAnalysis(){
     }
   });
   state.analyzing = null;
+  syncCalWithAttendees();
   save(); render();
 }
 function clearSource(){
   /* 링크를 떼면 AI가 넣은 사람은 빠지고, 주최자가 손댄 사람만 남는다 */
   state.source = null;
   state.attendees = state.attendees.filter(a => !a.auto || a.edited);
+  syncCalWithAttendees();
   save(); render();
 }
 
@@ -2450,17 +2925,46 @@ const foot = document.getElementById("sheetFoot");
 const title = document.getElementById("sheetTitle");
 const sub = document.getElementById("sheetSub");
 
+/* 두 화면은 같은 초안을 본다 — 탭을 옮겨도 넣은 값은 그대로다 */
+const tabs = document.getElementById("sheetTabs");
+tabs.querySelectorAll("[data-mode]").forEach(b => {
+  b.onclick = () => switchMode(+b.dataset.mode);
+});
+function switchMode(to){
+  if(state.step === to) return;
+  state.view = "week"; paintViewBtn();
+  if(to === 1){
+    gotoWeek(0);                                  /* 조율은 다음 주를 본다 */
+  }else{
+    if(!state.draft) state.draft = makeDraft(new Date(state.focus));
+    const d = state.draft;
+    state.focus = new Date(d.y, d.m, d.day);      /* 초안이 가리키는 날로 돌아온다 */
+    repaint();
+  }
+  state.step = to;
+  render();
+}
+function paintTabs(){
+  const show = state.step === 0 || state.step === 1;
+  tabs.classList.toggle("off", !show);
+  tabs.querySelectorAll("[data-mode]").forEach(b => {
+    b.classList.toggle("on", +b.dataset.mode === state.step);
+  });
+}
+
 function render(){
   syncGrid();
+  paintTabs();
   if(state.attendees.length) onbMark("people");
-  if(state.step === 1)      renderSetup();
+  if(state.step === 0)      renderEditor();
+  else if(state.step === 1) renderSetup();
   else if(state.step === 2) renderScan();
   else if(state.step === 3) renderResults();
   else                      renderDone();
   paintCandidates();
 
   /* 그 화면에 처음 왔을 때만 한 줄 */
-  if(coordMode())
+  if(!pickingPeople() && coordMode())
     tip("filter", "#calList",
       "이 회의 <b>참석자의 캘린더만</b> 남았습니다. 어느 시간이 왜 막혔는지가 그제야 읽힙니다.", "right");
   if(state.step === 4 && state.hold && !state.hold.confirmed)
@@ -2468,9 +2972,176 @@ function render(){
       "확정이 아니라 <b>자리만 잡아둔 상태</b>입니다. 블록을 누르면 리마인드하거나 취소할 수 있어요.", "left"), 500);
 }
 
+/* --------- 0. 일정 만들기 --------- */
+const VIS_LABEL = { def:"기본 공개 설정", pub:"공개", priv:"비공개" };
+const REM_LABEL = { 0:"알림 없음", 10:"알림 10분 전", 30:"알림 30분 전", 60:"알림 1시간 전" };
+const remOf = o => o.remind == null ? 10 : o.remind;
+/* 이 일정이 남에게 어떻게 보이는가 — 한 줄로 */
+const statusLine = o =>
+  (o.busy === false ? "한가함" : "바쁨") + " · " +
+  (VIS_LABEL[o.vis] || VIS_LABEL.def) + " · " + REM_LABEL[remOf(o)];
+
+function renderEditor(){
+  const d = state.draft;
+  const dt = new Date(d.y, d.m, d.day);
+  const room = d.roomId ? ROOMS.filter(r => r.id === d.roomId)[0] : null;
+  const me = P("me");
+
+  title.textContent = "일정 만들기";
+  sub.textContent = "나 혼자 쓰는 시간입니다. 이 시간이 맞다고 이미 알고 있을 때.";
+
+  const row = (ic, inner, cls) =>
+    '<div class="ed-row' + (cls ? " " + cls : "") + '"><span class="ic">' + ic + '</span>' +
+    '<div class="v">' + inner + '</div></div>';
+  const optRow = (label, name, opts, cur) =>
+    '<div class="ed-opt"><span class="l">' + label + '</span>' +
+    '<div class="seg opt-seg">' + opts.map(o =>
+      '<button data-' + name + '="' + o[0] + '" class="' + (o[0] === cur ? "on" : "") + '">' +
+      o[1] + '</button>').join("") + '</div></div>';
+
+  body.innerHTML =
+    /* 제목은 두 화면이 같이 쓴다 */
+    '<input class="ed-title" id="edTitle" placeholder="제목 추가" autocomplete="off" value="' +
+      esc(state.title) + '">' +
+
+    row("🕐",
+      '<div class="ed-when">' + (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 (' +
+        DOW7[wdIndex(dt)] + '요일) · ' + ampm(d.s) + ' – ' + ampm(d.e) + '</div>' +
+      '<div class="seg ed-seg">' + DURS.map(o =>
+        '<button data-dur="' + o[0] + '" class="' + (o[0] === d.e - d.s ? "on" : "") + '">' +
+        o[1] + '</button>').join("") + '</div>') +
+
+    /* 사람이 붙는 순간 이 시간은 추측이 된다 — 그때는 자동 조율이 맞다 */
+    row("👥",
+      '<button class="ed-add" id="edPeople">참석자 추가' +
+        '<span class="go">자동 조율로</span></button>' +
+      '<div class="ed-hint">다른 사람이 오면 이 시간은 추측이 됩니다.</div>') +
+
+    row("📹", d.meet
+      ? '<div class="ed-on">Google Meet 화상 회의' +
+          '<div class="ed-hint">meet.google.com/' + d.meetCode + '</div></div>' +
+        '<button class="ed-x" data-off="meet">✕</button>'
+      : '<button class="ed-add" data-on="meet">Google Meet 화상 회의 추가</button>') +
+
+    row("🚪", room
+      ? '<div class="ed-on">' + room.n + ' (' + room.cap + '인)</div>' +
+        '<button class="ed-x" data-off="room">✕</button>'
+      : '<button class="ed-add" id="edRoom">회의실 추가</button>') +
+    (d.roomOpen ? '<div class="ed-sub">' +
+      roomsHTML(d, 1, d.roomId || "none", false) + '</div>' : '') +
+
+    row("📍", d.showLoc || d.loc
+      ? '<input class="ed-input" id="edLoc" placeholder="위치" value="' + esc(d.loc) + '">'
+      : '<button class="ed-add" data-show="loc">위치 추가</button>') +
+
+    row("☰", d.showDesc || d.desc
+      ? '<textarea class="ed-input" id="edDesc" rows="3" placeholder="설명">' + esc(d.desc) + '</textarea>'
+      : '<button class="ed-add" data-show="desc">설명 추가</button>') +
+
+    row("📅",
+      '<div class="ed-on">' + me.name +
+        '<i class="ed-dot" style="background:' + me.color + '"></i></div>' +
+      '<button class="ed-add ed-status" id="edOpts">' + statusLine(d) +
+        '<span class="chev">' + (d.optsOpen ? "⌃" : "⌄") + '</span></button>' +
+      (d.optsOpen
+        ? '<div class="ed-opts">' +
+            optRow("표시", "busy", [[1,"바쁨"],[0,"한가함"]], d.busy === false ? 0 : 1) +
+            optRow("공개 설정", "vis", [["def","기본"],["pub","공개"],["priv","비공개"]], d.vis || "def") +
+            optRow("알림", "rem", [[10,"10분"],[30,"30분"],[60,"1시간"],[0,"없음"]], remOf(d)) +
+          '</div>'
+        : ''));
+
+  foot.innerHTML =
+    '<button class="btn ghost" id="edCancel">취소</button><div style="flex:1"></div>' +
+    '<button class="btn primary" id="edSave">저장</button>';
+
+  const ti = document.getElementById("edTitle");
+  ti.oninput = () => { state.title = ti.value; save(); };
+  ti.onkeydown = e => { if(e.key === "Enter") saveDraft(); };
+  /* 커서는 열 때 한 번만 옮긴다 — 다시 그릴 때마다 뺏지 않는다 */
+  if(!d.focused){ d.focused = true; ti.focus(); }
+
+  body.querySelectorAll("[data-dur]").forEach(b => {
+    b.onclick = () => {
+      d.e = Math.min(d.s + +b.dataset.dur, END_H);
+      d.roomId = null;                 /* 길이가 바뀌면 빈 방도 달라진다 */
+      render();
+    };
+  });
+  document.getElementById("edPeople").onclick = () => switchMode(1);
+
+  body.querySelectorAll("[data-on]").forEach(b => {
+    b.onclick = () => {
+      d.meet = true;
+      d.meetCode = meetCode(d.key + d.s);
+      render();
+    };
+  });
+  body.querySelectorAll("[data-off]").forEach(b => {
+    b.onclick = () => {
+      if(b.dataset.off === "meet") d.meet = false;
+      else { d.roomId = null; d.roomOpen = false; }
+      render();
+    };
+  });
+  body.querySelectorAll("[data-show]").forEach(b => {
+    b.onclick = () => { d["show" + (b.dataset.show === "loc" ? "Loc" : "Desc")] = true; render(); };
+  });
+
+  /* 바쁨 / 공개 설정 / 알림 */
+  document.getElementById("edOpts").onclick = () => { d.optsOpen = !d.optsOpen; render(); };
+  body.querySelectorAll("[data-busy]").forEach(b => {
+    b.onclick = () => { d.busy = b.dataset.busy === "1"; render(); };
+  });
+  body.querySelectorAll("[data-vis]").forEach(b => {
+    b.onclick = () => { d.vis = b.dataset.vis; render(); };
+  });
+  body.querySelectorAll("[data-rem]").forEach(b => {
+    b.onclick = () => { d.remind = +b.dataset.rem; render(); };
+  });
+
+  const er = document.getElementById("edRoom");
+  if(er) er.onclick = () => { d.roomOpen = true; render(); };
+  bindRooms(body, id => {
+    d.roomId = id === "none" ? null : id;
+    d.roomOpen = false;
+    render();
+  });
+
+  const lo = document.getElementById("edLoc");
+  if(lo){
+    lo.oninput = () => { d.loc = lo.value; };
+    if(d.showLoc === true){ d.showLoc = "on"; lo.focus(); }
+  }
+  const de = document.getElementById("edDesc");
+  if(de){
+    de.oninput = () => { d.desc = de.value; };
+    if(d.showDesc === true){ d.showDesc = "on"; de.focus(); }
+  }
+
+  document.getElementById("edCancel").onclick = closeSheet;
+  document.getElementById("edSave").onclick = saveDraft;
+}
+
+function saveDraft(){
+  const d = state.draft;
+  const t = (state.title || "").trim() || "제목 없음";
+  const room = d.roomId ? ROOMS.filter(r => r.id === d.roomId)[0] : null;
+  state.userEvents.push({
+    key:d.key, d:d.d, s:d.s, e:d.e, t, w:["me"],
+    _k:"u" + Date.now(),
+    meet:!!d.meet, roomId:d.roomId || null,
+    loc:d.loc || "", desc:d.desc || "",
+    busy:d.busy !== false, vis:d.vis || "def", remind:remOf(d),
+  });
+  persist();
+  closeSheet();
+  toast('「' + t + '」 일정을 만들었습니다.' + (room ? " · " + room.n : ""));
+}
+
 /* --------- 1. 인원 지정 --------- */
 function renderSetup(){
-  title.textContent = "자동 조율";
+  title.textContent = "일정 만들기";
   sub.textContent = "회의 이야기가 오간 곳을 알려주시면, 거기서 올 사람을 찾아옵니다.";
 
   body.innerHTML =
@@ -2488,6 +3159,7 @@ function renderSetup(){
       '<div class="label">누구를 부를까요?</div>' +
       '<input class="text-input" id="searchInput" placeholder="이름 또는 이메일 검색" autocomplete="off">' +
       '<div class="results" id="searchResults"></div>' +
+      '<div class="field-note">왼쪽 <b>부를 사람</b> 목록에서 체크해도 됩니다.</div>' +
     '</div>' +
     linkBlock() +
     '<div class="field">' +
@@ -2567,6 +3239,7 @@ function renderSetup(){
     rs.querySelectorAll(".res-item[data-id]:not([disabled])").forEach(b => {
       b.onclick = () => {
         state.attendees.push({ id:b.dataset.id, need:"required" });
+        state.hidden[b.dataset.id] = false;   /* 부른 사람의 일정은 보여야 한다 */
         save(); render();
         setTimeout(() => { const n = document.getElementById("searchInput"); if(n) n.focus(); }, 0);
       };
@@ -2589,6 +3262,7 @@ function renderSetup(){
   body.querySelectorAll("[data-rm]").forEach(b => {
     b.onclick = () => {
       state.attendees = state.attendees.filter(x => x.id !== b.dataset.rm);
+      state.hidden[b.dataset.rm] = true;      /* 뺀 사람의 캘린더도 같이 내린다 */
       save(); buildGrid(); render();
     };
   });
@@ -2705,6 +3379,7 @@ function startScan(){
   onbMark("scan");
   state.step = 2;
   state.selectedSlot = null;
+  state.room = null; state.roomOpen = false;
   state.slots = computeSlots();
   if(state.view !== "week" || weekOff() !== 0){ state.view = "week"; paintViewBtn(); gotoWeek(0); }
   render();
@@ -2715,13 +3390,14 @@ function startScan(){
     const sl = state.slots[0];
     state.selectedSlot = 0;
     state.sent = sl.rank <= 2 ? "invite" : "ask";
+    const rm = pickedRoom(sl);
     state.hold = {
       d:sl.d, s:sl.s, e:sl.e, rank:sl.rank, confirmed:sl.rank <= 2,
-      title:state.title, people:state.attendees.length + (state.hostJoins ? 1 : 0),
+      title:state.title, people:headCount(),
       att:(state.hostJoins ? [{ id:"me", need:"host" }] : []).concat(
         state.attendees.map(a => ({ id:a.id, need:a.need }))),
       askers:sl.conflicts.map(c => P(c.who).name),
-      room:(freeRoom(sl.d, sl.s, sl.e, state.attendees.length + 1) || {}).n || null,
+      room:rm ? rm.n : null, roomId:rm ? rm.id : null,
     };
     state.step = 4;
     onbMark("send");
@@ -2735,8 +3411,72 @@ function renderScan(){
   sub.textContent = "";
   body.innerHTML =
     '<div class="scan"><div class="spin"></div>' +
-      '<p>다음 주에서 잡을 수 있는 시간을 찾고 있습니다.</p></div>';
+      '<p>다음 주 평일에서 잡을 수 있는 시간을 찾고 있습니다.</p></div>';
   foot.innerHTML = '<div style="flex:1"></div>';
+}
+
+/* --------- 회의실 --------- */
+/* 방에 들어갈 사람 수 — 주최자가 빠지면 한 명 줄어든다 */
+function headCount(){ return state.attendees.length + (state.hostJoins ? 1 : 0); }
+
+/* 지금 잡혀 있는 방 — 주최자가 고르지 않았으면 자동으로 잡힌 방 */
+function pickedRoom(sl){
+  if(state.room === "none") return null;
+  const list = roomStatus(sl.d, sl.s, sl.e, headCount());
+  if(state.room){
+    const r = list.filter(x => x.id === state.room)[0];
+    if(r && !r.busy) return r;
+  }
+  return list.filter(x => !x.busy && x.fits)[0] || null;
+}
+
+/* 그 시간에 쓸 수 있는 방을 그대로 보여준다 — 찬 방도 왜 못 쓰는지까지 */
+function roomsHTML(sl, people, curId, autoTag){
+  const list = roomStatus(sl.d, sl.s, sl.e, people);
+  const free = list.filter(r => !r.busy && r.fits);
+  const cur = curId && curId !== "none" ? { id:curId } : null;
+
+  const rows = list.map(r => {
+    const off = !!r.busy || !r.fits;
+    const st = r.busy
+      ? '<span class="room-st busy">「' + esc(r.busy) + '」 사용 중</span>'
+      : !r.fits
+      ? '<span class="room-st">' + people + '명은 못 들어감</span>'
+      : '<span class="room-st ok">비어 있음</span>';
+    return '<button class="room-row' + (cur && cur.id === r.id ? " on" : "") + '"' +
+      (off ? " disabled" : ' data-room="' + r.id + '"') + '>' +
+      '<span class="room-mark">✓</span>' +
+      '<span class="room-n">' + r.n + '<span class="room-cap">' + r.cap + '인</span></span>' +
+      st + '</button>';
+  }).join("");
+
+  return '<div class="rooms"><div class="rooms-h">' +
+      '<span class="t">회의실</span>' +
+      '<span class="c">' + (free.length ? '이 시간에 ' + free.length + '곳 비어 있음' : '빈 방 없음') + '</span>' +
+      (autoTag ? '<span class="auto">자동 선택</span>' : '') +
+    '</div>' + rows +
+    '<button class="room-row' + (cur ? "" : " on") + '" data-room="none">' +
+      '<span class="room-mark">✓</span>' +
+      '<span class="room-n">회의실 없이 진행<span class="room-cap">온라인</span></span>' +
+    '</button></div>';
+}
+
+/* 잡힌 방을 보여주고, 그 자리에서 바꾸게 한다 */
+function doneRoomHTML(){
+  const h = state.hold;
+  if(!h) return "";
+  return '<div class="done-rooms">' +
+    '<button class="pop-room-btn" id="roomToggle">' +
+      (state.roomOpen ? "닫기" : h.room ? "다른 회의실 보기" : "회의실 잡기") + '</button>' +
+    (state.roomOpen ? roomsHTML(h, h.people, h.roomId || "none", false) : "") +
+  '</div>';
+}
+
+/* 방 고르기를 붙인다 — 어디서 눌러도 다시 그린다 */
+function bindRooms(root, pick){
+  root.querySelectorAll("[data-room]").forEach(b => {
+    b.onclick = e => { e.stopPropagation(); pick(b.dataset.room); };
+  });
 }
 
 /* --------- 3. 결과 --------- */
@@ -2785,6 +3525,7 @@ function renderResults(){
           '</b>에게만 조율 요청이 갑니다. 나머지 ' +
           (state.attendees.length - sel.conflicts.length) + '명에게는 아무 알림도 가지 않습니다.</div>'
         : '') +
+      roomsHTML(sel, headCount(), (pickedRoom(sel) || {}).id || "none", !state.room) +
     '</div>' +
 
     (alts.length
@@ -2801,8 +3542,14 @@ function renderResults(){
   const ab = document.getElementById("altsBtn");
   if(ab) ab.onclick = () => { state.showAlts = !state.showAlts; render(); };
   body.querySelectorAll("[data-slot]").forEach(c => {
-    c.onclick = () => { state.selectedSlot = +c.dataset.slot; state.showAlts = false; render(); };
+    c.onclick = () => {
+      state.selectedSlot = +c.dataset.slot;
+      state.showAlts = false;
+      state.room = null;              /* 시간이 바뀌면 빈 방도 달라진다 */
+      render();
+    };
   });
+  bindRooms(body, id => { state.room = id; render(); });
   foot.innerHTML =
     '<button class="btn ghost" id="backBtn">인원 수정</button><div style="flex:1"></div>' +
     '<button class="btn primary" id="sendBtn"' + (sel ? "" : " disabled") + '>' +
@@ -2811,13 +3558,14 @@ function renderResults(){
   const sn = document.getElementById("sendBtn");
   if(sn) sn.onclick = () => {
     state.sent = confirmable ? "invite" : "ask";
+    const rm = pickedRoom(sel);
     state.hold = {
       d:sel.d, s:sel.s, e:sel.e, rank:sel.rank, confirmed:confirmable,
-      title:state.title, people:state.attendees.length + (state.hostJoins ? 1 : 0),
+      title:state.title, people:headCount(),
       att:(state.hostJoins ? [{ id:"me", need:"host" }] : []).concat(
         state.attendees.map(a => ({ id:a.id, need:a.need }))),
       askers:sel.conflicts.map(c => P(c.who).name),
-      room:(freeRoom(sel.d, sel.s, sel.e, state.attendees.length + 1) || {}).n || null,
+      room:rm ? rm.n : null, roomId:rm ? rm.id : null,
     };
     state.step = 4; render();
   };
@@ -2899,10 +3647,11 @@ function renderDone(){
     body.innerHTML =
       '<div class="done-wrap"><div class="done-mark">✓</div>' +
         '<h3>일정이 잡혔습니다</h3>' +
-        '<p><b>' + fmt(sl) + '</b>' + (room ? ' · ' + room : '') + '<br>' +
+        '<p><b>' + fmt(sl) + '</b> · ' + (room || "회의실 없이 진행") + '<br>' +
           (viaAsk
             ? askers.map(p => p.name).join(", ") + "님이 옮겨줘서 자리가 났습니다."
             : "참석자 " + people + "명에게 초대가 나갔습니다.") + '</p>' +
+        doneRoomHTML() +
         whyBox(sl) +
       '</div>';
   }else{
@@ -2915,10 +3664,11 @@ function renderDone(){
     body.innerHTML =
       '<div class="done-wrap"><div class="done-mark hold">⏳</div>' +
         '<h3>이 시간을 잡아뒀습니다</h3>' +
-        '<p><b>' + fmt(sl) + '</b>' + (room ? ' · ' + room : '') + '<br>' +
+        '<p><b>' + fmt(sl) + '</b> · ' + (room || "회의실 없이 진행") + '<br>' +
           askers.map((p,i) => '<b>' + p.name + '</b>님께 「' + sl.conflicts[i].block +
             '」을 옮길 수 있는지 물었습니다.').join("<br>") + '<br>' +
           '나머지 ' + held.length + '명에게는 아직 아무 연락도 가지 않았습니다.</p>' +
+        doneRoomHTML() +
 
         (state.holdAnswer === "yes"
           ? '<div class="banner good"><b>' + askers.map(p => p.name).join(", ") +
@@ -2931,6 +3681,17 @@ function renderDone(){
         whyBox(sl) +
       '</div>';
   }
+
+  /* 회의실은 잡은 뒤에도 바꿀 수 있다 */
+  const rt = document.getElementById("roomToggle");
+  if(rt) rt.onclick = () => { state.roomOpen = !state.roomOpen; render(); };
+  bindRooms(body, id => {
+    const r = ROOMS.filter(x => x.id === id)[0];
+    state.hold.roomId = r ? r.id : null;
+    state.hold.room = r ? r.n : null;
+    persist(); paintCandidates(); render();
+    toast(r ? r.n + "로 바꿨습니다." : "회의실 없이 진행합니다.");
+  });
 
   /* 응답 상태에 따른 주최자의 다음 행동 */
   const ans = state.holdAnswer;
@@ -2961,18 +3722,35 @@ function renderDone(){
 /* ===================== 시트 열고 닫기 ===================== */
 const sheet = document.getElementById("sheet");
 const appEl = document.querySelector(".app");
-const menu = document.getElementById("createMenu");
 const createBtn = document.getElementById("createBtn");
 
-createBtn.onclick = e => { e.stopPropagation(); menu.classList.toggle("open"); };
-document.addEventListener("click", e => {
-  if(!e.target.closest("#createMenu") && !e.target.closest("#createBtn")) menu.classList.remove("open");
-});
-document.getElementById("autoBtn").onclick = () => {
-  menu.classList.remove("open");
-  state.step = 1; state.sent = null; state.selectedSlot = null; state.slots = [];
-  state.hold = null; state.reminders = 0; state.holdAnswer = null;
+function showSheet(){
+  sheet.classList.add("on"); appEl.classList.add("shifted");
+  document.body.classList.add("sheet-open");
+}
+
+/* 기본 일정 쪽 초안 — 시간과 옵션은 여기 담긴다 */
+function makeDraft(dt, h0){
+  const h = h0 != null ? h0 : openHour(dt);
+  return {
+    key:isoOf(dt), y:dt.getFullYear(), m:dt.getMonth(), day:dt.getDate(),
+    d:wdIndex(dt), s:h, e:Math.min(h + 1, END_H),
+    meet:false, meetCode:"", roomId:null, roomOpen:false,
+    loc:"", desc:"", showLoc:false, showDesc:false,
+    busy:true, vis:"def", remind:10, optsOpen:false,
+  };
+}
+
+/* 만들기 — 두 화면이 하나의 초안을 나눠 쓴다. 기본값은 자동 조율. */
+function openSheet(mode, dt0, h0, seedTitle){
+  closePop();
   clearTimeout(replyTimer);
+  const dt = dt0 || new Date(state.focus);
+  state.sent = null; state.selectedSlot = null; state.slots = [];
+  state.hold = null; state.reminders = 0; state.holdAnswer = null;
+  state.room = null; state.roomOpen = false;
+  state.draft = makeDraft(dt, h0);
+  if(seedTitle){ state.title = seedTitle; save(); }
 
   /* 내 캘린더에서 이미 사람을 골라 뒀다면 그 선택을 그대로 이어받는다 */
   /* 주최자는 늘 참석하므로 목록에 넣지 않는다 */
@@ -2983,20 +3761,26 @@ document.getElementById("autoBtn").onclick = () => {
   }else state.seeded = 0;
 
   state.sheetOpen = true;
+  state.step = mode;
   state.view = "week"; paintViewBtn();
-  gotoWeek(0);                       /* 조율 대상은 다음 주 */
+  if(mode === 1 || !dt0) gotoWeek(0);   /* 조율 대상은 다음 주 */
+  else repaint();                       /* 고른 시간이 있으면 그 주에 머문다 */
   render();
   onbMark("open");
-  setTimeout(() => tip("link", ".import-row",
+  if(mode === 1) setTimeout(() => tip("link", ".import-row",
     "회의 이야기가 오간 <b>슬랙 스레드나 노션 문서</b>가 있다면, 여기서 참석자를 한 번에 가져올 수 있습니다.", "left"), 400);
-  sheet.classList.add("on"); appEl.classList.add("shifted");
-  document.body.classList.add("sheet-open");
-};
+  showSheet();
+}
+/* 만들기 버튼은 자동 조율로 연다 */
+createBtn.onclick = e => { e.stopPropagation(); openSheet(1); };
+const openAuto = seedTitle => openSheet(1, null, null, seedTitle);
+const openEvent = (dt, h, seedTitle) => openSheet(0, dt, h, seedTitle);
 function closeSheet(){
   sheet.classList.remove("on"); appEl.classList.remove("shifted");
   document.body.classList.remove("sheet-open");
   state.step = 1; state.selectedSlot = null; state.sent = null; state.slots = [];
   state.sheetOpen = false;   /* 확보한 시간(state.hold)은 캘린더에 남긴다 */
+  state.draft = null;
   clearDraft();
   closePop(); syncGrid(); paintCandidates();
 }
@@ -3071,7 +3855,7 @@ document.getElementById("btnMenu").onclick = () => {
 };
 
 /* 섹션 접기 */
-[["myCalHead","calList"],["otherCalHead","otherList"]].forEach(pair => {
+[["myCalHead","calList"],["resHead","resList"],["otherCalHead","otherList"]].forEach(pair => {
   const h = document.getElementById(pair[0]), b = document.getElementById(pair[1]);
   h.onclick = () => {
     const closed = h.classList.toggle("closed");
@@ -3202,7 +3986,7 @@ btnAccount.onclick = () => openMenu(btnAccount,
    긴 투어 대신, 꼭 해봐야 할 것만 체크리스트로 두고
    나머지는 그 화면에 도달했을 때 한 줄 힌트로 알려준다. */
 const ONB = [
-  { k:"open",   t:"자동 조율 열기",   h:"만들기 → 자동 조율" },
+  { k:"open",   t:"자동 조율 열기",   h:"만들기 → 참석자 추가" },
   { k:"people", t:"참석자 넣기",     h:"슬랙·노션 링크를 붙여넣으면 자동으로" },
   { k:"scan",   t:"가능한 일정 뽑기", h:"옮길 수 있는 시간까지 찾습니다" },
   { k:"send",   t:"조율 요청 보내기", h:"겹친 한 명에게만 갑니다" },
@@ -3321,9 +4105,9 @@ function flash(sel, label, delay){
 const READ = 1200;
 function ensureSheet(cb){
   if(state.sheetOpen) return cb();
-  flash("#createBtn", "만들기 → 자동 조율");
+  flash("#createBtn", "만들기 → 참석자 추가");
   setTimeout(() => {
-    document.getElementById("autoBtn").click();
+    openAuto();
     setTimeout(cb, 400);
   }, READ);
 }
@@ -3351,7 +4135,7 @@ function onbRedo(k){
   closeSheet();
   state.hold = null; state.holdAnswer = null; state.reminders = 0;
   clearTimeout(replyTimer);
-  paintCandidates();
+  syncGrid(); paintCandidates();
   const from = ONB.findIndex(i => i.k === k);
   ONB.forEach((i, n) => { if(n >= from) state.onbDone[i.k] = false; });
   paintOnb();
