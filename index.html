@@ -24,7 +24,7 @@
     --p3:#fdd663;
     --p4:#d7aefb;
     --gutter:60px;
-    --rowH:48px;
+    --rowH:62px;
     --sheetW:404px;
   }
   *{box-sizing:border-box}
@@ -93,11 +93,6 @@
   .create-btn:hover{background:#3a3c3f;box-shadow:0 1px 3px rgba(0,0,0,.4),0 4px 8px 3px rgba(0,0,0,.15)}
   .create-btn .plus{font-size:22px;line-height:1;font-weight:400}
   .create-btn .caret{font-size:9px;color:var(--text-dim)}
-  .create-btn.ring::after{
-    content:"";position:absolute;inset:-3px;border-radius:19px;border:2px solid var(--accent);
-    pointer-events:none;animation:breathe 1.8s ease-in-out infinite;
-  }
-  @keyframes breathe{0%,100%{opacity:.9}50%{opacity:.3}}
 
   .menu{
     position:absolute;top:calc(100% + 4px);left:0;width:212px;z-index:60;
@@ -170,7 +165,7 @@
   .side-h.closed .chev{transform:rotate(180deg)}
   .cal-row{cursor:pointer;user-select:none}
   .cal-row.hid{color:#5f6368}
-  .cal-row.hid .cbox{background:transparent !important;box-shadow:inset 0 0 0 2px #5f6368;color:transparent}
+  .cal-row.hid .cbox{background:transparent;box-shadow:inset 0 0 0 2px #5f6368}
   .cal-row .only{
     margin-left:auto;font-size:10px;color:var(--text-faint);opacity:0;transition:opacity .12s;
   }
@@ -197,31 +192,29 @@
 
   /* ---------- 둘러보기 ---------- */
   /* 우측 하단 플로팅 버튼 — 여기서 안내가 펼쳐진다 */
+  /* 만들기 바로 아래 — 캘린더를 가리지 않는다 */
   .tour-btn{
-    position:fixed;right:24px;bottom:24px;z-index:199;
-    display:flex;align-items:center;gap:7px;height:44px;padding:0 20px;border-radius:999px;
-    background:var(--accent);color:var(--on-accent);font-size:13.5px;font-weight:600;
-    box-shadow:0 4px 10px rgba(0,0,0,.4);
-    animation:tourglow 2.4s ease-in-out infinite;
+    display:flex;align-items:center;gap:8px;margin:0 8px 14px 4px;
+    height:38px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:600;
+    background:rgba(168,199,250,.13);color:var(--accent);
+    border:1px solid rgba(168,199,250,.3);
   }
-  @keyframes tourglow{
-    0%,100%{box-shadow:0 4px 10px rgba(0,0,0,.4), 0 0 0 0 rgba(168,199,250,.45)}
-    50%{box-shadow:0 4px 10px rgba(0,0,0,.4), 0 0 0 9px rgba(168,199,250,0)}
-  }
-  .tour-btn:hover{background:#bcd5fb}
+  .tour-btn .lb{font-size:13px}
+  .tour-btn:hover{background:rgba(168,199,250,.22)}
+  .tour-btn.on{background:var(--accent);color:var(--on-accent);border-color:transparent}
   .tour-btn.on{
-    background:var(--surface-3);color:var(--accent);animation:none;
+    background:var(--surface-3);color:var(--accent);
     box-shadow:0 2px 6px rgba(0,0,0,.35);
   }
-  /* 시트가 열리면 옆으로 비켜선다 */
-  .tour-btn,.onb{transition:right .22s cubic-bezier(.2,.7,.3,1)}
-  body.sheet-open .tour-btn,
-  body.sheet-open .onb{right:calc(var(--sheetW) + 24px)}
+  /* 사이드바를 접으면 카드도 따라 붙는다 */
+  .onb{transition:left .22s cubic-bezier(.2,.7,.3,1)}
+  .app.no-side ~ .onb,
+  body.no-side .onb{left:20px}
 
   /* 시작하기 체크리스트 */
   .onb{
-    position:fixed;right:24px;bottom:80px;z-index:200;width:274px;background:#2d2f31;
-    transform-origin:bottom right;
+    position:fixed;left:268px;top:132px;z-index:200;width:274px;background:#2d2f31;
+    transform-origin:top left;
     border-radius:14px;border:1px solid rgba(168,199,250,.28);
     box-shadow:0 8px 10px 1px rgba(0,0,0,.35),0 3px 14px 2px rgba(0,0,0,.4);
     display:none;overflow:hidden;
@@ -252,21 +245,36 @@
   }
   .onb-i:hover .go{opacity:1}
   .onb-i.next{background:rgba(168,199,250,.1)}
-  .onb-i.done{cursor:default}
-  .onb-i.done:hover{background:none}
-  .onb-i.done .go{display:none}
+  .onb-i.done .go{color:var(--text-dim)}
 
   /* 눌렀을 때 어디가 움직이는지 짚어준다 */
+  /* 나머지를 어둡게 덮고 대상만 뚫어 보여준다 — 시선이 바로 간다 */
   .flash-ring{
     position:fixed;z-index:215;pointer-events:none;
-    box-shadow:0 0 0 2px var(--accent), 0 0 0 8px rgba(168,199,250,.2);
+    box-shadow:0 0 0 3px var(--accent),
+               0 0 0 9px rgba(168,199,250,.25),
+               0 0 0 9999px rgba(0,0,0,.62);
     animation:flashout 2.6s ease-out forwards;
   }
-  @keyframes flashout{0%,85%{opacity:1}100%{opacity:0}}
+  @keyframes flashout{
+    0%{opacity:0}
+    12%{opacity:1}
+    85%{opacity:1}
+    100%{opacity:0}
+  }
+  /* 나타날 때 한 번만 퍼진다 */
+  .flash-ring::after{
+    content:"";position:absolute;inset:-3px;border-radius:inherit;
+    border:2px solid var(--accent);animation:flashpulse .9s ease-out 1 forwards;
+  }
+  @keyframes flashpulse{
+    0%{transform:scale(1);opacity:.9}
+    100%{transform:scale(1.16);opacity:0}
+  }
   .flash-lb{
-    position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;
-    background:var(--accent);color:var(--on-accent);font-size:11px;font-weight:700;
-    border-radius:999px;padding:4px 11px;box-shadow:0 3px 8px rgba(0,0,0,.45);
+    position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;z-index:1;
+    background:var(--accent);color:var(--on-accent);font-size:12px;font-weight:700;
+    border-radius:999px;padding:6px 14px;box-shadow:0 4px 12px rgba(0,0,0,.55);
   }
   .flash-lb.up{bottom:calc(100% + 8px)}
   .flash-lb.down{top:calc(100% + 8px)}
@@ -358,9 +366,12 @@
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
 
-  .grid-body{flex:1;overflow-y:auto;overflow-x:hidden;position:relative}
-  .grid-inner{display:grid;grid-template-columns:var(--gutter) repeat(var(--cols,5),1fr);position:relative}
-  .times{position:relative;padding-top:1px}
+  .grid-body{flex:1;overflow:hidden;position:relative}
+  .grid-inner{
+    display:grid;grid-template-columns:var(--gutter) repeat(var(--cols,5),1fr);
+    position:relative;padding-top:10px;   /* 첫 시간 라벨이 잘리지 않도록 */
+  }
+  .times{position:relative}
   .times .t{
     height:var(--rowH);font-size:10px;color:var(--text-faint);
     text-align:right;padding-right:8px;transform:translateY(-6px);
@@ -504,6 +515,7 @@
     display:flex;align-items:center;gap:10px;
   }
   /* 빈 칸을 눌러 시작 */
+  .pop{padding-top:6px}
   .quick{padding:14px 16px 12px}
   .quick h5{margin:0 0 3px;font-size:14px;font-weight:600}
   .quick .w{font-size:12px;color:var(--text-dim);margin-bottom:12px}
@@ -519,6 +531,13 @@
   .quick .seg{display:flex;background:var(--surface-2);border-radius:999px;padding:2px}
   .quick .seg button{flex:1;font-size:11.5px;padding:6px 0;border-radius:999px;color:var(--text-dim)}
   .quick .seg button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
+  .quick textarea.text-input{font-family:inherit;line-height:1.6}
+  .sw-row{display:flex;flex-wrap:wrap;gap:9px}
+  .sw-dot{
+    width:26px;height:26px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);
+    transition:transform .12s;
+  }
+  .sw-dot:hover{transform:scale(1.15)}
   .quick .note{font-size:11px;color:var(--text-faint);margin-top:9px;line-height:1.6}
 
   .field{margin-bottom:18px}
@@ -569,6 +588,11 @@
   .seg{display:flex;background:var(--surface-2);border-radius:999px;padding:2px;flex:none}
   .seg button{font-size:11px;padding:5px 11px;border-radius:999px;color:var(--text-dim)}
   .seg button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
+  .att.host{background:rgba(232,234,237,.04)}
+  .host-tag{
+    flex:none;font-size:10px;color:var(--text-dim);
+    border:1px solid var(--line);border-radius:999px;padding:1px 8px;
+  }
   .att .rm{color:var(--text-faint);padding:4px 6px;border-radius:6px;flex:none}
   .att .rm:hover{color:var(--p4);background:var(--surface-3)}
 
@@ -593,12 +617,58 @@
   .link-row{display:flex;gap:8px;align-items:stretch}
   .link-row .text-input{flex:1}
   .btn.sm{padding:0 16px;font-size:13px;border-radius:8px;flex:none}
-  .link-ex{font-size:11px;color:var(--text-faint);margin-top:7px;line-height:1.9}
-  .link-ex code{
-    background:var(--surface-2);border-radius:4px;padding:3px 8px;font-size:10.5px;
-    color:#b9bdc2;cursor:pointer;font-family:inherit;
+
+  /* 참석자를 채우는 보조 수단 — 접힌 한 줄 */
+  .import-row{
+    display:flex;align-items:center;gap:8px;width:100%;margin:-6px 0 18px;
+    padding:11px 13px;border-radius:10px;font-size:12.5px;color:#c4c7c5;
+    border:1px dashed var(--line);background:var(--surface-2);
   }
-  .link-ex code:hover{background:var(--surface-3);color:var(--accent)}
+  .import-row:hover{border-color:rgba(197,138,249,.45);color:var(--text)}
+  .import-row .ai{color:#c58af9}
+  .import-row .go{margin-left:auto;font-size:11px;color:var(--text-faint)}
+  .import-row:hover .go{color:#d7b6fb}
+  .import-box{
+    border:1px solid rgba(197,138,249,.28);border-radius:12px;
+    padding:13px 14px 14px;background:rgba(197,138,249,.05);
+  }
+  .import-box .label{margin-bottom:9px}
+  .import-x{margin-left:auto;color:var(--text-faint);padding:2px 4px;border-radius:6px}
+  .import-x:hover{color:var(--text)}
+
+  /* 어디서 가져올지 고르기 */
+  .src-btns{display:flex;gap:8px}
+  .src-btn{
+    flex:1;display:flex;align-items:center;gap:10px;padding:12px 13px;text-align:left;
+    border:1px solid var(--line);border-radius:11px;background:var(--surface-2);
+  }
+  .src-btn:hover{border-color:rgba(168,199,250,.5);background:var(--surface-3)}
+  .src-btn.on{border-color:var(--accent);background:rgba(168,199,250,.1)}
+  .src-btn .ic{
+    width:30px;height:30px;border-radius:8px;flex:none;display:grid;place-items:center;
+    font-size:14px;background:var(--surface-3);
+  }
+  .src-btn.on .ic{background:var(--accent);color:var(--on-accent)}
+  .src-btn .nm{display:block;font-size:13px;font-weight:600}
+  .src-btn .sb{display:block;font-size:10.5px;color:var(--text-dim);margin-top:1px}
+
+  .pick-list{margin-top:10px;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .pick-h{
+    font-size:10.5px;color:var(--text-faint);padding:9px 13px 7px;background:var(--surface-2);
+  }
+  .pick{
+    display:block;width:100%;text-align:left;padding:11px 13px;
+    border-top:1px solid var(--line-soft);
+  }
+  .pick:hover{background:rgba(168,199,250,.09)}
+  .pick .pt{display:block;font-size:13px;font-weight:600;color:var(--accent)}
+  .pick .pd{display:block;font-size:12px;color:#c4c7c5;margin-top:2px;line-height:1.5}
+  .pick .pm{display:block;font-size:10.5px;color:var(--text-faint);margin-top:3px}
+
+  .link-toggle{
+    margin-top:10px;font-size:11.5px;color:var(--text-faint);padding:4px 2px;
+  }
+  .link-toggle:hover{color:var(--text-dim)}
   .src-card{
     display:flex;align-items:center;gap:11px;border:1px solid var(--line);
     border-radius:10px;padding:11px 12px;background:var(--surface-2);
@@ -621,15 +691,21 @@
     padding:8px 8px 16px;display:none;animation:pop .12s ease-out;
   }
   .pop.on{display:block}
-  .pop-tools{display:flex;justify-content:flex-end;gap:2px;margin-bottom:2px}
+  .pop-tools{display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px}
   .pop-tools button{
-    width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
-    color:#c4c7c5;font-size:15px;
+    width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
+    background:rgba(232,234,237,.09);color:#c4c7c5;font-size:16px;line-height:1;
+    transition:background .12s;
   }
-  .pop-tools button:hover{background:rgba(232,234,237,.08)}
+  .pop-tools button:hover{background:rgba(232,234,237,.18);color:var(--text)}
+  .pop-tools button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .pop-main{display:flex;gap:14px;padding:0 16px 4px}
   .pop-dot{width:14px;height:14px;border-radius:4px;flex:none;margin-top:5px}
   .pop-main h3{margin:0;font-size:20px;font-weight:400;line-height:1.35;letter-spacing:-.2px}
+  .pop-title-input{
+    width:100%;font-size:20px;font-weight:400;letter-spacing:-.2px;color:var(--text);
+    background:none;border:none;border-bottom:2px solid var(--accent);outline:none;padding:0 0 3px;
+  }
   .pop-main .when{margin:5px 0 0;font-size:13px;color:#c4c7c5;line-height:1.5}
   .pop-row{display:flex;gap:14px;padding:10px 16px 0;font-size:13px;color:#c4c7c5}
   .pop-row .ic{width:14px;flex:none;text-align:center;color:var(--text-dim);font-size:13px;margin-top:1px}
@@ -673,8 +749,6 @@
   .banner.good{border-color:rgba(129,201,149,.4);background:rgba(129,201,149,.08)}
   .banner b{color:var(--text)}
 
-  .rank-h{display:flex;align-items:center;gap:8px;margin:18px 0 8px;font-size:12px;color:var(--text-dim)}
-  .rank-h:first-child{margin-top:0}
   .pill{font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 9px;color:#10233f}
   .pill.p1{background:var(--p1)} .pill.p2{background:var(--p2)}
   .pill.p3{background:var(--p3)} .pill.p4{background:var(--p4)}
@@ -707,109 +781,35 @@
   .alt-note{font-size:11px;color:var(--text-dim);margin-top:2px}
   .alt-pick{margin-left:auto;font-size:11.5px;color:var(--accent);flex:none}
 
-  .slot-card{
-    width:100%;text-align:left;border:1px solid var(--line);border-radius:10px;
-    padding:12px 14px;margin-bottom:8px;background:var(--surface-2);cursor:pointer;
-    display:block;transition:border-color .15s,background .15s;
-  }
-  .slot-card:hover{border-color:#5a5e63}
-  .slot-card.sel{border-color:var(--accent);background:rgba(168,199,250,.10)}
-  .slot-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .slot-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-  .slot-when{font-size:14px;font-weight:600}
-  .slot-sub{font-size:11.5px;color:var(--text-dim);line-height:1.6}
   .conflict{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--text-dim);line-height:1.7}
   .conflict .row{display:flex;align-items:center;gap:7px;padding:2px 0;flex-wrap:wrap}
   .conflict .blk{color:#e0c98a}
-  .ask-box{margin-top:10px;border-radius:8px;background:var(--surface-3);padding:10px 12px;font-size:12px;color:#c4c7c5;line-height:1.7}
-  .ask-box .q{color:var(--accent)}
-  .reply{display:flex;gap:6px;margin-top:8px}
-  .reply button{flex:1;font-size:11.5px;padding:7px 0;border-radius:8px;background:var(--surface-2);color:var(--text-dim)}
-  .reply button:hover{background:#3a3c3f;color:var(--text)}
-  .reply button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
-
   .done-wrap{text-align:center;padding:24px 6px}
   .done-mark{width:56px;height:56px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;background:rgba(129,201,149,.15);color:var(--p1);font-size:26px}
   .done-wrap h3{margin:0 0 8px;font-size:17px}
+  .why-box{
+    text-align:left;margin-top:22px;border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px 15px;background:var(--surface-2);
+  }
+  .why-h{font-size:11.5px;color:var(--accent);font-weight:600;margin-bottom:9px}
+  .why-box ul{margin:0;padding-left:16px}
+  .why-box li{font-size:12.5px;line-height:1.85;color:#c4c7c5;margin-bottom:7px}
+  .why-box li:last-child{margin-bottom:0}
+  .why-box li::marker{color:var(--text-faint)}
+  .why-box b{color:var(--text)}
   .done-wrap p{margin:0;font-size:13px;color:var(--text-dim);line-height:1.8}
-  .recap{text-align:left;margin-top:20px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .recap .r{display:flex;gap:10px;padding:11px 13px;font-size:12.5px;border-bottom:1px solid #313234}
-  .recap .r:last-child{border-bottom:none}
-  .recap .k{color:var(--text-faint);width:76px;flex:none}
-  .recap .v{color:#c4c7c5;line-height:1.6}
-  .recap .v b{color:var(--text)}
   .done-mark.hold{background:rgba(253,214,99,.15);color:var(--p3)}
-  .tentative{
-    display:inline-block;font-size:10px;border-radius:999px;padding:1px 7px;margin-left:4px;
-    border:1px dashed var(--p3);color:var(--p3);
-  }
-  .tentative.hard{border-color:rgba(242,139,130,.6);color:#f6aaa4;margin:2px 0 0 0}
-  .sub-note{font-size:11px;color:var(--text-faint);margin-top:4px;line-height:1.6}
 
-  /* ---------- 슬랙 메시지 미리보기 ---------- */
-  .prev-lb{font-size:11px;color:var(--text-faint);margin:20px 0 8px;text-align:left}
-  .slack{
-    text-align:left;background:#1a1d21;border:1px solid #35383d;border-radius:10px;
-    padding:12px 14px 12px 12px;
+  /* 잡아둔 시간 — 확정 전에만 다르게 보인다 */
+  .ev.hold-wait{
+    background:rgba(253,214,99,.22) !important;color:#fce29b !important;
+    border:2px dashed var(--p3);
   }
-  .sl-head{display:flex;align-items:center;gap:7px;margin-bottom:6px}
-  .sl-ico{
-    width:22px;height:22px;border-radius:5px;background:#611f69;color:#fff;
-    display:grid;place-items:center;font-size:11px;flex:none;
-  }
-  .sl-nm{font-size:13px;font-weight:700;color:#e8e8e8}
-  .sl-app{font-size:9px;background:#35383d;color:#adafb3;border-radius:3px;padding:1px 4px}
-  .sl-t{font-size:11px;color:#8e9297}
-  .sl-body{font-size:12.5px;line-height:1.75;color:#d1d2d3;padding-left:29px}
-  .sl-body b{color:#fff}
-  .sl-body .q{color:#78d1a0}
-  .sl-warn{
-    margin:8px 0 0 29px;font-size:11.5px;line-height:1.6;padding:7px 10px;border-radius:6px;
-    background:rgba(242,139,130,.1);border-left:3px solid #f28b82;color:#f6aaa4;
-  }
-  .sl-acts{display:flex;gap:6px;margin:10px 0 0 29px}
-  .sl-acts button{
-    font-size:12px;padding:6px 14px;border-radius:4px;background:#2c2f33;
-    border:1px solid #464a4f;color:#d1d2d3;
-  }
-  .sl-acts button:hover{background:#35383d}
-  .sl-acts button.yes.on{background:#1d7a4c;border-color:#1d7a4c;color:#fff}
-  .sl-acts button.no.on{background:#8c2b25;border-color:#8c2b25;color:#fff}
-  .sl-acts button.cm.on{background:#3d4b64;border-color:#3d4b64;color:#fff}
-  .sl-foot{font-size:11px;color:#8e9297;margin:9px 0 0 29px;line-height:1.6}
-  .sl-reply{
-    margin:10px 0 0 29px;font-size:12px;color:#d1d2d3;background:#232629;
-    border-radius:6px;padding:8px 10px;line-height:1.6;
-  }
-  .sl-reply b{color:#fff}
-
-  /* ---------- 가예약 미리보기 ---------- */
-  .hold-prev{
-    text-align:left;border-radius:6px;padding:7px 9px;font-size:11.5px;line-height:1.4;
-    border:2px dashed var(--p3);background:rgba(253,214,99,.14);color:#fce29b;
-  }
-  .hold-prev.done{border:none;background:var(--accent);color:var(--on-accent)}
-  .hold-prev .sub{font-size:10.5px;opacity:.85;margin-top:2px}
-
-  /* 캘린더에 뜨는 가예약 / 확정 블록 */
-  .ev-hold{
-    position:absolute;left:1px;right:2px;z-index:40;border-radius:6px;padding:4px 8px;
-    font-size:11.5px;line-height:1.35;overflow:hidden;animation:fade .25s ease-out;
-    border:2px dashed var(--p3);background:rgba(253,214,99,.2);color:#fce29b;
-    backdrop-filter:blur(2px);
-  }
-  .ev-hold .sub{font-size:10px;opacity:.9;margin-top:1px}
-  .ev-hold.multi .tt{padding-right:52px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ev-hold.answered{
-    border:2px solid var(--p1);background:rgba(129,201,149,.2);color:#c8ecd2;
-  }
-  .ev-hold.done{
-    border:none;background:var(--accent);color:var(--on-accent);font-weight:600;
-    box-shadow:0 4px 14px rgba(0,0,0,.5);
+  .ev.hold-ok{
+    background:rgba(129,201,149,.24) !important;color:#c8ecd2 !important;
+    border:2px solid var(--p1);
   }
 
-  .demo{margin-top:22px;border-top:1px solid #313234;padding-top:14px;font-size:11px;color:var(--text-faint);line-height:1.8}
-  .demo .seg{display:inline-flex;margin-top:8px}
 </style>
 </head>
 <body>
@@ -838,7 +838,7 @@
   <!-- ================= 사이드바 ================= -->
   <aside class="sidebar">
     <div class="create-wrap">
-      <button class="create-btn ring" id="createBtn">
+      <button class="create-btn" id="createBtn">
         <span class="plus">＋</span><span>만들기</span><span class="caret">▼</span>
       </button>
       <div class="menu" id="createMenu">
@@ -849,6 +849,8 @@
         <button class="menu-item primary" id="autoBtn">자동 조율<span class="badge-new">New</span></button>
       </div>
     </div>
+
+    <button class="tour-btn" id="btnTour">💡<span class="lb">처음 이용해봐요!</span></button>
 
     <div class="mini">
       <div class="mini-head">
@@ -897,7 +899,6 @@
 <div class="toast" id="toast"></div>
 
 <!-- ================= 시작하기 ================= -->
-<button class="tour-btn" id="btnTour">💡 처음 이용해봐요!</button>
 <div class="onb" id="onb"></div>
 <div class="tip" id="tip"></div>
 
@@ -922,7 +923,7 @@
 
 /* ===================== 상수 ===================== */
 const DAYS   = ["월","화","수","목","금"];
-const START_H = 9, END_H = 19;
+const START_H = 9, END_H = 18;      /* 업무 시간 오전 9시 ~ 오후 6시 */
 
 /* 기준: 다음 주 월요일 2026-08-03, 오늘 2026-07-30 */
 const BASE_MON = new Date(2026, 7, 3);
@@ -990,7 +991,7 @@ const BASE_EVENTS = [
   E(0, 16,  17,  "광고 검수",      ["cma"]),
   E(0, 17,  18,  "코드 리뷰",      ["ljh"]),
   E(0, 17,  18,  "회고 준비",      ["psy"]),
-  E(0, 18,  19,  "메일 정리",      ["kdh"]),
+  E(0, 17,  18,  "메일 정리",      ["kdh"]),
   /* 화 */
   E(1, 9,   10,  "메일 정리",      ["cma"]),
   E(1, 9,   10,  "업무 집중",      ["psy"]),
@@ -1003,7 +1004,7 @@ const BASE_EVENTS = [
   E(1, 15,  16,  "채용 면접",      ["kdh"]),
   E(1, 15,  17,  "업무 집중",      ["hjw"]),
   E(1, 16,  17,  "광고 소재 검수", ["cma"]),
-  E(1, 17,  18.5,"외부 미팅",      ["kts"]),
+  E(1, 16.5,18,  "외부 미팅",      ["kts"]),
   E(1, 17,  18,  "QA 싱크",        ["ljh","psy"]),
   /* 수 */
   E(2, 9,   10,  "데일리",         ALL),
@@ -1015,9 +1016,9 @@ const BASE_EVENTS = [
   E(2, 13,  14,  "데이터 정합성",  ["hjw"]),
   E(2, 14,  15,  "스펙 리뷰",      ["ljh","kdh"]),
   E(2, 15,  16.5,"외부 미팅",      ["kts"]),
-  E(2, 16.5,17.5,"지표 리뷰",      ["hjw"]),
+  E(2, 16,  17,  "지표 리뷰",      ["hjw"]),
   E(2, 17,  18,  "디자인 싱크",    ["psy"]),
-  E(2, 18,  19,  "업무 집중",      ["ljh"]),
+  E(2, 15,  16,  "업무 집중",      ["ljh"]),
   /* 목 */
   E(3, 9,   10,  "주간 지표",      ["hjw"]),
   E(3, 9,   10,  "업무 집중",      ["ljh"]),
@@ -1031,7 +1032,7 @@ const BASE_EVENTS = [
   E(3, 16,  17,  "이사회 준비",    ["kts"]),
   E(3, 16,  17,  "업무 집중",      ["kdh"]),
   E(3, 17,  18,  "릴리즈 노트",    ["kdh"]),
-  E(3, 18,  19,  "광고 리포트",    ["cma"]),
+  E(3, 17,  18,  "광고 리포트",    ["cma"]),
   /* 금 */
   E(4, 9,   10,  "주간 마감",      ["kdh"]),
   E(4, 9,   10,  "업무 집중",      ["hjw"]),
@@ -1046,7 +1047,7 @@ const BASE_EVENTS = [
   E(4, 16,  17,  "대표 보고",      ["kts","kdh"]),
   E(4, 17,  18,  "업무 집중",      ["kdh"]),
   E(4, 17,  18,  "리서치 정리",    ["psy"]),
-  E(4, 18,  19,  "주간 정리",      ["kdh"]),
+  E(4, 15,  16,  "주간 정리",      ["kdh"]),
 
   /* ---- 다른 팀 · 여러 명이 함께 하는 일정 ---- */
   E(0, 9,  10,  "스프린트 그룹 검토", ["ohj","ysj"]),
@@ -1101,7 +1102,7 @@ const BASE_EVENTS = [
   E(2, 9,  10,  "매크로 정비",        ["nby"]),
   E(2, 15, 16,  "이슈 에스컬레이션",  ["nby"]),
   E(3, 10, 11,  "티켓 처리",          ["nby"]),
-  E(3, 18, 19,  "야간 인수인계",      ["nby"]),
+  E(3, 17, 18,  "인수인계",           ["nby"]),
   E(4, 14, 15,  "주간 VOC 리포트",    ["nby"]),
 
   /* ---- 권재이 · 인사 ---- */
@@ -1140,7 +1141,7 @@ const BASE_EVENTS = [
   E(6, 14, 15,  "행사 준비",          ["cma","psy"]),
 
   /* ---- 마일스톤은 종일이 아니라 그 시간에 일어난다 ---- */
-  E(2, 18, 19,  "정기 배포",          ["ohj","jmk","ljh"]),
+  E(2, 17, 18,  "정기 배포",          ["ohj","jmk","ljh"]),
   E(4, 17, 18,  "채용 공고 마감 확인",["kje"]),
 
   /* ---- 고승원 · 법무 ---- */
@@ -1179,6 +1180,33 @@ const MOBILITY_LABEL = {
 
 /* 점심 직후 — 회의는 열리지만 결정의 질이 떨어지는 시간 */
 const LOW_FOCUS = [13, 14];
+
+/* 회의실 5개 — 2명 이상 모이는 일정은 방을 하나 쓴다 */
+const ROOMS = [
+  { id:"A", n:"회의실 A", cap:4 },
+  { id:"B", n:"회의실 B", cap:6 },
+  { id:"C", n:"회의실 C", cap:8 },
+  { id:"D", n:"회의실 D", cap:10 },
+  { id:"E", n:"회의실 E", cap:16 },
+];
+/* 어떤 일정이 어느 방을 쓰는지는 일정마다 고정된다 */
+function roomOf(ev){
+  if(ev.w.length < 2) return null;
+  let h = 0;
+  for(let i = 0; i < ev._k.length; i++) h = (h * 31 + ev._k.charCodeAt(i)) % 9973;
+  return ROOMS[h % ROOMS.length].id;
+}
+/* 그 시간에 비어 있는 방 중 인원에 맞는 가장 작은 방 */
+function freeRoom(d, s, e, people){
+  const taken = {};
+  scanEvents().forEach(ev => {
+    if(ev.d !== d || ev.s >= e || ev.e <= s) return;
+    const r = roomOf(ev);
+    if(r) taken[r] = true;
+  });
+  const fit = ROOMS.filter(r => !taken[r.id] && r.cap >= people);
+  return fit.length ? fit[0] : null;
+}
 
 /* 매주 반복되는 일정 — 어느 주에나 그대로 선다 */
 const RECURRING = ["팀 스탠드업","데일리","주간 계획","주간 마감","주간 정리",
@@ -1341,15 +1369,31 @@ const LINK_FIXTURES = {
     ],
   },
 };
+/* 연결된 곳에서 최근 것을 그냥 고르게 한다 — 주소를 옮겨 적을 일이 없다 */
+const RECENT = {
+  slack:[
+    { t:"#product-roadmap", d:"3분기 우선순위 정하기", m:"메시지 34 · 미결 질문 3", w:"오늘 11:02" },
+    { t:"#design-review",   d:"시안 2안 중 고르기",    m:"메시지 12",              w:"어제 17:40" },
+    { t:"#eng-planning",    d:"검색 개편 일정 산정",   m:"메시지 21 · 미결 질문 1", w:"2일 전" },
+  ],
+  notion:[
+    { t:"3분기 로드맵 초안", d:"담당자 김도현 · 승인 대기", m:"코멘트 12 · 미해결 4", w:"오늘 09:15" },
+    { t:"디자인 시스템 v2",  d:"담당자 박서연",            m:"코멘트 5",             w:"3일 전" },
+    { t:"채용 계획 2026",    d:"담당자 권재이",            m:"코멘트 8 · 미해결 2",  w:"지난주" },
+  ],
+};
+const SLACK_URL = "https://company.slack.com/archives/C01PRODUCT/p1754112233";
+const SRC_META = {
+  slack:{ icon:"#", name:"슬랙", sub:"스레드에서 가져오기", url:SLACK_URL },
+  notion:{ icon:"◈", name:"노션", sub:"문서에서 가져오기",
+           url:"https://www.notion.so/company/3Q-roadmap-draft-9f2a1" },
+};
+
 function detectKind(url){
   if(/slack\.com|slack:\/\//i.test(url)) return "slack";
   if(/notion\.so|notion\.site/i.test(url)) return "notion";
   return "generic";
 }
-
-/* 참여자가 낼 수 있는 답은 둘뿐이다. 리마인드는 주최자가 누르는 행동이다. */
-const REPLY_LABEL = { yes:"가능", no:"불가능" };
-const REPLY_NOTE = { yes:"블록을 옮길 수 있음", no:"옮길 수 없음" };
 
 const RANK_TEXT = {
   1:"전원 실제로 비어 있음",
@@ -1362,13 +1406,13 @@ const RANK_TEXT = {
 const STORAGE_KEY = "auto-coordination-draft-v2";
 const state = {
   step:1, title:"", attendees:[], source:null, analyzing:null,
-  scenario:"B", slots:[], selectedSlot:null, replies:{}, sent:null,
+  scenario:"B", slots:[], selectedSlot:null, sent:null,
   onlyAttendees:true, sheetOpen:false, restored:false,
   focus:new Date(2026, 7, 3), view:"week", weekend:false, showDeclined:true,
   miniYear:2026, miniMonth:7,
-  hidden:{}, query:"", sidebar:true, userEvents:[], seeded:0,
-  onbOpen:true, onbDone:{}, tipSeen:{},
-  hold:null, holdReplies:{}, reminders:0, holdAnswer:null,
+  hidden:{}, query:"", sidebar:true, userEvents:[], seeded:0, edits:{}, deleted:{},
+  onbOpen:true, onbDone:{}, tipSeen:{}, picker:null, linkOpen:false, importOpen:false, hostJoins:true,
+  hold:null, reminders:0, holdAnswer:null,
   blockedCount:0, blockedDays:[], showAlts:false,
 };
 
@@ -1399,7 +1443,7 @@ function persist(){
   try{
     localStorage.setItem(PERSIST_KEY, JSON.stringify({
       hold:state.hold, holdAnswer:state.holdAnswer, reminders:state.reminders,
-      userEvents:state.userEvents, hidden:state.hidden,
+      userEvents:state.userEvents, hidden:state.hidden, edits:state.edits, deleted:state.deleted,
       onbDone:state.onbDone, tipSeen:state.tipSeen, onbOpen:state.onbOpen,
       view:state.view, weekend:state.weekend, showDeclined:state.showDeclined,
     }));
@@ -1415,6 +1459,8 @@ function loadPersist(){
     state.userEvents = Array.isArray(d.userEvents) ? d.userEvents : [];
     state.userEvents.forEach((u,i) => { u._k = "u" + i; });
     state.hidden = d.hidden || {};
+    state.edits = d.edits || {};
+    state.deleted = d.deleted || {};
     state.onbDone = d.onbDone || {};
     state.tipSeen = d.tipSeen || {};
     state.onbOpen = d.onbOpen !== false;
@@ -1427,7 +1473,7 @@ function loadPersist(){
 /* 시트를 닫으면 초안을 비운다 */
 function clearDraft(){
   state.title = ""; state.attendees = []; state.source = null;
-  state.analyzing = null; state.restored = false;
+  state.analyzing = null; state.restored = false; state.importOpen = false; state.picker = null;
   try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
 }
 
@@ -1438,11 +1484,22 @@ const wdIndex = dt => (dt.getDay() + 6) % 7;
 const weekOffOf = dt => Math.round((mondayOf(dt) - BASE_MON) / 604800000);
 const weekOff = () => weekOffOf(state.focus);
 
-/* 어떤 날짜든 그 날의 일정을 돌려준다 */
+/* 어떤 날짜든 그 날의 일정을 돌려준다 — 지운 것은 빼고, 고친 것은 반영해서 */
 function eventsForDate(dt){
   const base = weekEvents(weekOffOf(dt)).filter(e => e.d === wdIndex(dt));
   const mine = state.userEvents.filter(u => u.key === isoOf(dt));
-  return mine.length ? base.concat(mine) : base;
+  const out = base.concat(mine)
+    .filter(e => !state.deleted[e._k])
+    .map(e => state.edits[e._k] ? Object.assign({}, e, state.edits[e._k]) : e);
+
+  /* 잡아둔 시간도 보통 일정처럼 자리를 나눠 갖는다 */
+  const h = state.hold;
+  if(h && weekOffOf(dt) === 0 && wdIndex(dt) === h.d){
+    const w = (h.att || []).map(a => a.id);
+    out.push({ d:h.d, s:h.s, e:h.e, t:h.title || "(제목 없음)",
+      w:w.length ? w : ["me"], _k:"hold", hold:true });
+  }
+  return out;
 }
 /* 한 일정은 한 블록.
    여러 캘린더에 걸쳐 있으면 왼쪽 색 띠로 그 사실만 남긴다. */
@@ -1650,8 +1707,19 @@ function layoutDay(list){
   return list;
 }
 
+/* 9–19시가 화면 높이를 꽉 채우도록 한 칸 높이를 계산한다 */
+function fitRowH(){
+  const body = document.querySelector(".grid-body");
+  if(!body) return;
+  const h = body.clientHeight;
+  if(h < 120) return;                /* 아직 레이아웃이 안 잡힌 경우 */
+  const px = Math.max(34, Math.floor((h - 14) / (END_H - START_H)));
+  document.documentElement.style.setProperty("--rowH", px + "px");
+}
+
 function buildGrid(){
   paintHead();                       /* 종일 행의 🔒 표시가 조율 상태를 따라가도록 */
+  fitRowH();
   const shell = document.getElementById("gridShell");
   const alt = state.view === "month" || state.view === "year" || state.view === "schedule";
   shell.classList.toggle("alt", alt);
@@ -1727,12 +1795,13 @@ function buildGrid(){
       el.style.top = (ev.s - START_H) * rowH + "px";
       el.style.height = dur * rowH - 2 + "px";
 
-      /* 구글 규칙 — 일정은 그 일정이 속한 캘린더의 색으로만 그린다 */
-      const cal = P(ev._owner);
+      /* 구글 규칙 — 일정 색은 그 일정을 만든 사람의 캘린더 색이다.
+         누가 오는지는 프로필이 말한다. 캘린더를 켜고 꺼도 색은 그대로다. */
+      const cal = P(ev.w[0]);
       el.dataset.k = ev._k;
       el.dataset.owner = ev._owner;
-      el.style.backgroundColor = cal.color;
-      el.style.color = cal.ink;
+      el.style.backgroundColor = ev.color || cal.color;
+      el.style.color = ev.color ? inkFor(ev.color) : cal.ink;
       if(ev.dec && ev.dec.indexOf("me") >= 0 && ev._owners.indexOf("me") >= 0){
         el.classList.add("dec");
         el.style.color = tint(cal.color, 0.45);   /* 어두운 바탕에서도 읽히게 */
@@ -1760,7 +1829,18 @@ function buildGrid(){
           ev.w.some(id => P(id).name.includes(state.query));
         el.classList.add(hit ? "found" : "faded");
       }
-      el.onclick = e => { e.stopPropagation(); openEventPop(ev, el, dt); };
+      if(ev.hold){
+        const h = state.hold, ok = !h.confirmed && state.holdAnswer === "yes";
+        el.classList.add(h.confirmed ? "hold-done" : ok ? "hold-ok" : "hold-wait");
+        if(!h.confirmed){
+          el.querySelector(".tt").textContent = "[미정] " + ev.t;
+          const s = el.querySelector(".wh");
+          if(s) s.textContent = ok ? "옮길 수 있다는 답 도착" : "답 기다리는 중";
+        }
+        el.onclick = e => { e.stopPropagation(); openHoldPop(el); };
+      }else{
+        el.onclick = e => { e.stopPropagation(); openEventPop(ev, el, dt); };
+      }
       col.appendChild(el);
     });
     inner.appendChild(col);
@@ -1792,10 +1872,13 @@ function paintCalList(){
   };
 
   const el = document.getElementById("calList");
-  el.innerHTML = list.map(p =>
-    '<div class="cal-row' + (state.hidden[p.id] ? " hid" : "") + '" data-cal="' + p.id + '">' +
-      '<span class="cbox" style="background:' + p.color + ';color:' + p.ink + '">✓</span>' +
-      p.name + '<span class="only" data-only="' + p.id + '">이 캘린더만</span></div>').join("");
+  el.innerHTML = list.map(p => {
+    const off = state.hidden[p.id];
+    return '<div class="cal-row' + (off ? " hid" : "") + '" data-cal="' + p.id + '">' +
+      '<span class="cbox"' + (off ? '' : ' style="background:' + p.color + ';color:' + p.ink + '"') + '>' +
+        (off ? '' : '✓') + '</span>' +
+      p.name + '<span class="only" data-only="' + p.id + '">이 캘린더만</span></div>';
+  }).join("");
 
   el.querySelectorAll("[data-cal]").forEach(r => {
     r.onclick = e => {
@@ -1818,6 +1901,7 @@ function syncGrid(){
   const sig = JSON.stringify([
     state.sheetOpen, state.scenario, state.onlyAttendees, state.view,
     state.weekend, state.showDeclined, +state.focus, state.query, state.hidden,
+    state.edits, state.deleted, state.userEvents.length, state.hostJoins,
     state.attendees.map(a => a.id + ":" + a.need),
   ]);
   if(sig === gridSig) return;
@@ -1827,45 +1911,10 @@ function syncGrid(){
 
 
 function paintCandidates(){
-  document.querySelectorAll(".cand,.ev-hold").forEach(n => n.remove());
+  document.querySelectorAll(".cand").forEach(n => n.remove());
   document.querySelectorAll(".ev.hit,.ev.hit-opt").forEach(n => n.classList.remove("hit","hit-opt"));
   const shell = document.getElementById("gridShell");
   const onScanWeek = state.view === "week" && weekOff() === 0;
-
-  /* 확보한 시간은 시트를 닫아도 캘린더에 남는다 */
-  if(state.hold && onScanWeek){
-    const rh = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--rowH"));
-    const h = state.hold, done = h.confirmed;
-    const col = document.querySelector('.daycol[data-day="' + h.d + '"]');
-    if(col){
-      const ok = !done && state.holdAnswer === "yes";
-      const el = document.createElement("div");
-      el.className = "ev-hold" + (done ? " done" : ok ? " answered" : "");
-      el.style.top = (h.s - START_H) * rh + "px";
-      el.style.height = (h.e - h.s) * rh - 2 + "px";
-      el.innerHTML = '<div class="tt">' + (done ? "✓ " : "[미정] ") + esc(h.title || "제목 없음") + '</div>' +
-        '<div class="sub">' + (done ? "확정"
-                              : ok ? "가능 답변 도착 · 확정 대기"
-                              : "응답 대기 중") + '</div>';
-
-      /* 공통 일정과 같은 규칙 — 참석자는 프로필로 보여준다 */
-      const att = h.att || [];
-      if(att.length){
-        el.classList.add("multi");
-        const av = document.createElement("div");
-        av.className = "ev-avs";
-        av.innerHTML = att.slice(0, 3).map(a => {
-          const p = P(a.id);
-          return '<i title="' + p.name + '" style="background:' + p.color + ';color:' + p.ink + '">' +
-            p.name.slice(0,1) + '</i>';
-        }).join("") +
-          (att.length > 3 ? '<i class="more">+' + (att.length - 3) + '</i>' : '');
-        el.appendChild(av);
-      }
-      el.onclick = e => { e.stopPropagation(); openHoldPop(el); };
-      col.appendChild(el);
-    }
-  }
 
   persist();
   if(!state.sheetOpen || state.step < 3 || !onScanWeek){
@@ -1905,18 +1954,23 @@ function ampm(h){
   return ap + " " + hh + ":" + String(M).padStart(2,"0");
 }
 
-function popShell(dot, title, when, rows){
-  return '<div class="pop-tools">' +
-      '<button title="옵션">☰</button><button title="삭제">🗑</button>' +
-      '<button title="메일 보내기">✉</button><button title="더보기">⋮</button>' +
+function popShell(dot, title, when, rows, tools, titleHTML){
+  /* 구글 캘린더와 같은 순서 — 수정 · 삭제 · 메일 · 옵션 · 닫기 */
+  return '<div class="pop-tools">' + (tools ||
+      '<button title="수정" data-soon="수정">✎</button>' +
+      '<button title="삭제" data-soon="삭제">🗑</button>' +
+      '<button title="메일 보내기" data-soon="메일 보내기">✉</button>' +
+      '<button title="옵션" data-soon="옵션">⋮</button>') +
       '<button title="닫기" id="popClose">✕</button></div>' +
     '<div class="pop-main"><span class="pop-dot" style="background:' + dot + '"></span>' +
-      '<div><h3>' + esc(title) + '</h3><p class="when">' + when + '</p></div></div>' + rows;
+      '<div style="flex:1;min-width:0">' +
+        (titleHTML || '<h3>' + esc(title) + '</h3>') +
+        '<p class="when">' + when + '</p></div></div>' + rows;
 }
 
-function openEventPop(ev, anchor, when0){
+function openEventPop(ev, anchor, when0, mode){
   const owner = P(ev._owner || ev.w[0]);
-  const dot = owner.color;
+  const dot = ev.color || owner.color;
 
   const dt = when0 || dayOf(ev.d);
   const when = (dt.getMonth() + 1) + "월 " + dt.getDate() + "일 (" + DOW7[wdIndex(dt)] + "요일) · " +
@@ -1946,10 +2000,93 @@ function openEventPop(ev, anchor, when0){
       (dur >= 1 ? "10분 전 알림" : "알림 없음") + '</span></div>' +
     (ev.t.indexOf("집중") >= 0 || ev.t.indexOf("개인") >= 0
       ? '<div class="pop-row"><span class="ic">🔒</span><span class="val">바쁨 · 비공개</span></div>'
-      : '<div class="pop-row"><span class="ic">📍</span><span class="val">회의실 미지정</span></div>');
+      : '<div class="pop-row"><span class="ic">📍</span><span class="val">' +
+        (roomOf(ev) ? "회의실 " + roomOf(ev) : "회의실 없음 · 1인 작업") + '</span></div>');
 
-  pop.innerHTML = popShell(dot, ev.t, when, rows);
+  /* 메일 쓰기 / 색 고르기는 팝오버 안에서 바로 */
+  const to = ev.w.filter(id => id !== "me").map(id => P(id).name).join(", ") || "참석자";
+  const extra =
+    mode === "mail"
+      ? '<div class="quick" style="padding:14px 16px 4px">' +
+          '<div class="w" style="margin-bottom:8px">받는 사람 · ' + to + '</div>' +
+          '<input class="text-input" id="mailSubj" value="' + esc("[" + ev.t + "] 확인 부탁드립니다") + '">' +
+          '<textarea class="text-input" id="mailBody" rows="3" style="margin-top:8px;resize:none">' +
+            esc(when + " 일정 관련해 확인 부탁드립니다.") + '</textarea>' +
+          '<div class="acts" style="margin-top:10px">' +
+            '<button id="mailCancel">취소</button>' +
+            '<button class="pri" id="mailSend">보내기</button></div></div>'
+      : mode === "color"
+      ? '<div class="quick" style="padding:14px 16px 12px">' +
+          '<div class="w" style="margin-bottom:9px">색상</div>' +
+          '<div class="sw-row">' + PEOPLE.map(p =>
+            '<button class="sw-dot" data-color="' + p.color + '" title="' + p.name +
+            '" style="background:' + p.color + '"></button>').join("") + '</div>' +
+          '<div class="acts" style="margin-top:12px">' +
+            '<button id="colorReset">기본으로</button></div></div>'
+      : "";
+
+  const titleHTML = mode === "edit"
+    ? '<input class="pop-title-input" id="evTitle" value="' + esc(ev.t) + '" autocomplete="off">'
+    : null;
+  const tools =
+    '<button title="수정" id="evEdit">✎</button>' +
+    '<button title="삭제" id="evDel">🗑</button>' +
+    '<button title="메일 보내기" id="evMail">✉</button>' +
+    '<button title="옵션" id="evMore">⋮</button>';
+
+  pop.innerHTML = popShell(dot, ev.t, when, rows + extra, tools, titleHTML);
   placePop(anchor);
+
+  const re = m => openEventPop(ev, anchor, when0, m);
+  document.getElementById("evEdit").onclick = () => re(mode === "edit" ? null : "edit");
+  document.getElementById("evMail").onclick = () => re(mode === "mail" ? null : "mail");
+  document.getElementById("evMore").onclick = () => re(mode === "color" ? null : "color");
+  document.getElementById("evDel").onclick = () => {
+    state.deleted[ev._k] = true;
+    state.userEvents = state.userEvents.filter(u => u._k !== ev._k);
+    closePop(); buildGrid(); paintCandidates(); persist();
+    toast('「' + ev.t + '」을 삭제했습니다.', "실행취소", () => {
+      delete state.deleted[ev._k];
+      buildGrid(); paintCandidates(); persist();
+    });
+  };
+
+  const ti = document.getElementById("evTitle");
+  if(ti){
+    ti.focus(); ti.select();
+    const done = () => {
+      const t = ti.value.trim();
+      if(t && t !== ev.t){
+        state.edits[ev._k] = Object.assign({}, state.edits[ev._k], { t });
+        buildGrid(); paintCandidates(); persist();
+      }
+      re(null);
+    };
+    ti.onkeydown = e => { if(e.key === "Enter") done(); };
+    ti.onblur = done;
+  }
+
+  const mc = document.getElementById("mailCancel");
+  if(mc) mc.onclick = () => re(null);
+  const ms = document.getElementById("mailSend");
+  if(ms) ms.onclick = () => {
+    closePop();
+    toast(to + "님에게 메일을 보냈습니다.");
+  };
+
+  pop.querySelectorAll("[data-color]").forEach(b => {
+    b.onclick = () => {
+      state.edits[ev._k] = Object.assign({}, state.edits[ev._k], { color:b.dataset.color });
+      buildGrid(); paintCandidates(); persist();
+      re(null);
+    };
+  });
+  const cr = document.getElementById("colorReset");
+  if(cr) cr.onclick = () => {
+    if(state.edits[ev._k]) delete state.edits[ev._k].color;
+    buildGrid(); paintCandidates(); persist();
+    re(null);
+  };
 }
 
 function openAllDayPop(item, anchor, when0){
@@ -1975,17 +2112,19 @@ function toast(msg, actionLabel, action){
 }
 
 /* 캘린더에 잡힌 확보 시간의 상태 */
-function openHoldPop(anchor){
+function openHoldPop(anchor, editing){
   const h = state.hold;
   const list = (h.att || []).map(a => {
     const p = P(a.id);
+    const tag = a.need === "host" ? "주최자" : a.need === "required" ? "필수" : "선택";
     return '<div class="pop-att">' + avatar(p, 26) +
       '<span><span class="nm">' + p.name + '</span> <span class="rl">· ' + p.role + '</span></span>' +
-      '<span class="pop-tag' + (a.need === "optional" ? " opt" : "") + '">' +
-        (a.need === "required" ? "필수" : "선택") + '</span></div>';
+      '<span class="pop-tag' + (a.need === "required" ? "" : " opt") + '">' + tag + '</span></div>';
   }).join("");
 
   const rows =
+    '<div class="pop-row"><span class="ic">📍</span><span class="val">' +
+      (h.room ? h.room + ' 예약됨' : '회의실 없음 · 온라인으로 진행') + '</span></div>' +
     '<div class="pop-row"><span class="ic">👥</span><span class="val">' +
       '<div>참석자 ' + h.people + '명</div>' + list + '</span></div>' +
     (h.confirmed
@@ -2002,9 +2141,18 @@ function openHoldPop(anchor){
             : "응답 대기 중") + '</div></span></div>' +
         '<div class="pop-row"><span class="ic">🔒</span><span class="val">' +
           '다른 참석자에게는 알림 없음 · 자리만 확보</span></div>');
-  pop.innerHTML = popShell(h.confirmed ? "#a8c7fa" : (state.holdAnswer === "yes" ? "#81c995" : "#fdd663"),
-    (h.confirmed ? "" : "[미정] ") + (h.title || "제목 없음"),
-    (h.d != null ? fmt(h) : ""), rows) +
+  const tools =
+    '<button title="수정" id="popEdit">✎</button>' +
+    '<button title="삭제" id="popDel">🗑</button>' +
+    '<button title="메일 보내기" data-soon="메일 보내기">✉</button>' +
+    '<button title="옵션" data-soon="옵션">⋮</button>';
+  const titleHTML = editing
+    ? '<input class="pop-title-input" id="popTitle" value="' + esc(h.title || "") +
+      '" placeholder="제목 추가" autocomplete="off">'
+    : '<h3>' + esc((h.confirmed ? "" : "[미정] ") + (h.title || "(제목 없음)")) + '</h3>';
+
+  pop.innerHTML = popShell(h.confirmed ? P("me").color : (state.holdAnswer === "yes" ? "#81c995" : "#fdd663"),
+    "", (h.d != null ? fmt(h) : ""), rows, tools, titleHTML) +
     (h.confirmed ? "" :
       '<div class="pop-row" style="padding-top:14px">' +
         (state.holdAnswer === "yes"
@@ -2014,6 +2162,26 @@ function openHoldPop(anchor){
         '<button class="btn" id="holdDrop" style="padding:9px 16px;font-size:13px">확보 취소</button>' +
       '</div>');
   placePop(anchor);
+
+  const ed = document.getElementById("popEdit");
+  if(ed) ed.onclick = () => openHoldPop(anchor, true);
+  const ti = document.getElementById("popTitle");
+  if(ti){
+    ti.focus(); ti.select();
+    const done = () => {
+      state.hold.title = ti.value.trim();
+      persist(); paintCandidates(); openHoldPop(anchor);
+    };
+    ti.onkeydown = e => { if(e.key === "Enter") done(); };
+    ti.onblur = done;
+  }
+  const del = document.getElementById("popDel");
+  if(del) del.onclick = () => {
+    state.hold = null; state.holdAnswer = null; clearTimeout(replyTimer);
+    closePop(); paintCandidates();
+    toast("일정을 삭제했습니다.");
+  };
+
   const c = document.getElementById("holdConfirm");
   if(c) c.onclick = confirmHold;
   const r = document.getElementById("holdRemind");
@@ -2027,9 +2195,8 @@ function openHoldPop(anchor){
 }
 
 function sendRemind(){
-  onbMark("send");
   state.reminders++;
-  toast(state.hold.askers.join(", ") + "님에게 리마인드를 보냈습니다.");
+  toast(state.hold.askers.join(", ") + "님에게 한 번 더 물었습니다.");
   scheduleReply();
 }
 
@@ -2119,6 +2286,10 @@ function openCreate(dt, h, dur, anchor, keep){
 
 function placePop(anchor){
   pop.classList.add("on");
+  /* 아직 안 만든 기능은 조용히 알려만 준다 */
+  setTimeout(() => pop.querySelectorAll("[data-soon]").forEach(b => {
+    b.onclick = () => { closePop(); toast(b.dataset.soon + "은 프로토타입에서 지원하지 않습니다."); };
+  }), 0);
   const r = anchor.getBoundingClientRect();
   const w = pop.offsetWidth, h = pop.offsetHeight;
   let left = r.right + 10;
@@ -2140,7 +2311,9 @@ function busyEvent(personId, d, s, e){
 }
 
 function computeSlots(){
+  /* 주최자가 참석할 때만 그의 일정을 계산에 넣는다 */
   const req = required().map(a => a.id);
+  if(state.hostJoins && req.indexOf("me") < 0) req.push("me");
   const opt = optional().map(a => a.id);
   const found = [];
   state.blockedCount = 0;
@@ -2230,10 +2403,10 @@ function esc(s){
 }
 
 /* ===================== 링크 분석 ===================== */
-function startAnalyze(url){
+function startAnalyze(url, label){
   url = (url || "").trim();
   if(!url) return;
-  state.analyzing = { kind:detectKind(url), url, step:0 };
+  state.analyzing = { kind:detectKind(url), url, label:label || null, step:0 };
   render();
   const fx = LINK_FIXTURES[state.analyzing.kind];
   const tick = () => {
@@ -2249,9 +2422,9 @@ function startAnalyze(url){
   setTimeout(tick, 260);
 }
 function applyAnalysis(){
-  const { kind, url } = state.analyzing;
+  const { kind, url, label } = state.analyzing;
   const fx = LINK_FIXTURES[kind];
-  state.source = { kind, url, icon:fx.icon, label:fx.label, summary:fx.summary };
+  state.source = { kind, url, icon:fx.icon, label:label || fx.label, summary:fx.summary };
   if(!state.title.trim()) state.title = fx.title;
   fx.people.forEach(sp => {
     const cur = state.attendees.find(a => a.id === sp.id);
@@ -2291,7 +2464,7 @@ function render(){
     tip("filter", "#calList",
       "이 회의 <b>참석자의 캘린더만</b> 남았습니다. 어느 시간이 왜 막혔는지가 그제야 읽힙니다.", "right");
   if(state.step === 4 && state.hold && !state.hold.confirmed)
-    setTimeout(() => tip("hold", ".ev-hold",
+    setTimeout(() => tip("hold", ".ev.hold-wait",
       "확정이 아니라 <b>자리만 잡아둔 상태</b>입니다. 블록을 누르면 리마인드하거나 취소할 수 있어요.", "left"), 500);
 }
 
@@ -2305,24 +2478,26 @@ function renderSetup(){
       ? '<div class="banner">새로고침 전에 작성하던 내용을 불러왔습니다.' +
         '<button class="btn ghost" id="newDraft" style="padding:4px 10px;font-size:12px;margin-left:6px">새로 시작</button></div>'
       : state.seeded && state.attendees.some(a => a.from === "calendar")
-      ? '<div class="banner">내 캘린더에서 켜 둔 <b>' + state.seeded + '명</b>을 그대로 가져왔습니다. ' +
-        '링크를 붙여넣으면 여기에 근거가 채워지고 필수 / 선택이 다시 나뉩니다.</div>'
+      ? '<div class="banner">내 캘린더에서 켜 둔 <b>' + state.seeded + '명</b>을 가져왔습니다.</div>'
       : '') +
-    linkBlock() +
     '<div class="field">' +
       '<div class="label">회의 제목</div>' +
       '<input class="text-input" id="titleInput" placeholder="예: 3분기 로드맵 정렬" value="' + esc(state.title) + '">' +
     '</div>' +
     '<div class="field search-wrap">' +
-      '<div class="label">참석자 추가</div>' +
+      '<div class="label">누구를 부를까요?</div>' +
       '<input class="text-input" id="searchInput" placeholder="이름 또는 이메일 검색" autocomplete="off">' +
       '<div class="results" id="searchResults"></div>' +
     '</div>' +
+    linkBlock() +
     '<div class="field">' +
-      '<div class="label">필수 ' + required().length + '명 · 선택 ' + optional().length + '명' +
+      '<div class="label">부를 사람 ' + state.attendees.length + '명' +
+        (required().length ? ' · 필수 ' + required().length : '') +
+        (optional().length ? ' · 선택 ' + optional().length : '') +
         (state.attendees.some(a => a.auto) ? '<span class="tag-ai">AI 제안</span>' : '') + '</div>' +
+      hostRow() +
       (state.attendees.length ? state.attendees.map(attRow).join("")
-        : '<div class="banner">아직 참석자가 없습니다. 링크를 붙여넣거나 위에서 검색해 추가하세요.</div>') +
+        : '<div class="banner">아직 부를 사람이 없습니다. 위에 링크를 붙여넣으면 그 대화에 있던 사람부터 찾아옵니다.</div>') +
       (state.attendees.some(a => a.auto)
         ? '<div class="banner" style="margin-top:10px">AI가 뽑은 배분입니다. <b>필수 / 선택은 주최자가 바로 바꿀 수 있고</b>, 바꾼 줄은 “주최자 수정”으로 표시됩니다.</div>' : '') +
     '</div>' +
@@ -2333,18 +2508,36 @@ function renderSetup(){
     '<div style="flex:1"></div>' +
     '<button class="btn primary" id="scanBtn"' + (required().length ? "" : " disabled") + '>가능한 일정 뽑기</button>';
 
+  body.querySelectorAll("[data-src]").forEach(b => {
+    b.onclick = () => {
+      state.picker = state.picker === b.dataset.src ? null : b.dataset.src;
+      render();
+    };
+  });
+  body.querySelectorAll("[data-pick]").forEach(b => {
+    b.onclick = () => {
+      const k = b.dataset.pick, r = RECENT[k][+b.dataset.i];
+      state.picker = null;
+      startAnalyze(SRC_META[k].url, k === "slack" ? r.t + " 스레드" : r.t);
+    };
+  });
+  const io = document.getElementById("importOpen");
+  if(io) io.onclick = () => { state.importOpen = true; render(); };
+  const ic = document.getElementById("importClose");
+  if(ic) ic.onclick = () => { state.importOpen = false; state.picker = null; render(); };
+  const lt = document.getElementById("linkToggle");
+  if(lt) lt.onclick = () => { state.linkOpen = !state.linkOpen; render(); };
+
   const li = document.getElementById("linkInput");
   if(li){
     const go = () => startAnalyze(li.value);
     document.getElementById("analyzeBtn").onclick = go;
+    li.focus();
     li.onkeydown = e => { if(e.key === "Enter") go(); };
     li.onpaste = e => {
       const t = (e.clipboardData || window.clipboardData).getData("text");
       if(t && /^https?:\/\//i.test(t.trim())){ e.preventDefault(); li.value = t.trim(); go(); }
     };
-    body.querySelectorAll("[data-demo-url]").forEach(c => {
-      c.onclick = () => { li.value = c.dataset.demoUrl; startAnalyze(c.dataset.demoUrl); };
-    });
   }
   const nd = document.getElementById("newDraft");
   if(nd) nd.onclick = () => { clearDraft(); render(); };
@@ -2362,8 +2555,8 @@ function renderSetup(){
   si.oninput = () => {
     const q = si.value.trim().toLowerCase();
     if(!q){ rs.classList.remove("on"); return; }
-    const hits = PEOPLE.filter(p =>
-      p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q) || p.role.includes(q));
+    const hits = PEOPLE.filter(p => p.id !== "me" && (
+      p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q) || p.role.includes(q)));
     rs.innerHTML = hits.length ? hits.map(p => {
       const added = state.attendees.some(a => a.id === p.id);
       return '<button class="res-item" data-id="' + p.id + '"' + (added ? " disabled" : "") + '>' +
@@ -2381,6 +2574,9 @@ function renderSetup(){
   };
   si.onblur = () => setTimeout(() => rs.classList.remove("on"), 160);
 
+  body.querySelectorAll("[data-host]").forEach(b => {
+    b.onclick = () => { state.hostJoins = b.dataset.host === "1"; save(); render(); };
+  });
   body.querySelectorAll("[data-need]").forEach(b => {
     b.onclick = () => {
       const a = state.attendees.find(x => x.id === b.dataset.pid);
@@ -2419,16 +2615,64 @@ function linkBlock(){
         '<span class="src-s">' + esc(s.summary) + '</span></span>' +
         '<button class="rm" id="clearSrc" title="링크 제거">✕</button></div></div>';
   }
-  return '<div class="field">' +
-    '<div class="label">이 회의, 어디서 이야기가 나왔나요?<span class="tag-ai">AI 분석</span></div>' +
-    '<div class="link-row">' +
-      '<input class="text-input" id="linkInput" placeholder="그 대화가 있는 슬랙 스레드나 노션 문서 주소" autocomplete="off">' +
-      '<button class="btn sm" id="analyzeBtn">분석</button>' +
+  /* 참석자를 채우는 보조 수단 — 평소엔 한 줄로 접혀 있다 */
+  const pk = state.picker;
+  if(!state.importOpen)
+    return '<button class="import-row" id="importOpen">' +
+      '<span class="ai">✦</span>슬랙 · 노션에서 한 번에 가져오기' +
+      '<span class="go">열기 →</span></button>';
+
+  return '<div class="field import-box">' +
+    '<div class="label">어디서 이야기가 나왔나요?<span class="tag-ai">AI 분석</span>' +
+      '<button class="import-x" id="importClose">✕</button></div>' +
+    '<div class="src-btns">' +
+      ["slack","notion"].map(k => {
+        const s = SRC_META[k];
+        return '<button class="src-btn' + (pk === k ? " on" : "") + '" data-src="' + k + '">' +
+          '<span class="ic">' + s.icon + '</span>' +
+          '<span><span class="nm">' + s.name + '</span>' +
+          '<span class="sb">' + s.sub + '</span></span></button>';
+      }).join("") +
     '</div>' +
-    '<div class="link-ex">지금 링크가 없다면 — 예시로 열어보기<br>' +
-      '<code data-demo-url="https://company.slack.com/archives/C01PRODUCT/p1754112233">슬랙 스레드</code> ' +
-      '<code data-demo-url="https://www.notion.so/company/3Q-roadmap-draft-9f2a1">노션 문서</code></div>' +
+
+    (pk
+      ? '<div class="pick-list">' +
+          '<div class="pick-h">최근 ' + SRC_META[pk].name + ' ' +
+            (pk === "slack" ? "스레드" : "문서") + '</div>' +
+          RECENT[pk].map((r,i) =>
+            '<button class="pick" data-pick="' + pk + '" data-i="' + i + '">' +
+              '<span class="pt">' + r.t + '</span>' +
+              '<span class="pd">' + r.d + '</span>' +
+              '<span class="pm">' + r.m + ' · ' + r.w + '</span></button>').join("") +
+        '</div>'
+      : '') +
+
+    '<button class="link-toggle" id="linkToggle">' +
+      (state.linkOpen ? "▾" : "▸") + ' 주소를 직접 붙여넣기</button>' +
+    (state.linkOpen
+      ? '<div class="link-row" style="margin-top:8px">' +
+          '<input class="text-input" id="linkInput" placeholder="슬랙 스레드나 노션 문서 주소" autocomplete="off">' +
+          '<button class="btn sm" id="analyzeBtn">분석</button>' +
+        '</div>'
+      : '') +
   '</div>';
+}
+
+/* 주최자는 뺄 수 없지만, 자리만 만들고 안 들어갈 수는 있다 */
+function hostRow(){
+  const p = P("me");
+  const join = state.hostJoins;
+  return '<div class="att host">' + avatar(p) +
+    '<span class="meta"><span class="nm">' + p.name +
+      '<span class="host-tag">주최자</span></span>' +
+    '<span class="em">' + p.email + '</span>' +
+    '<span class="why">' + (join
+      ? "내 일정도 비어야 후보로 잡힙니다"
+      : "자리만 만들고 참석하지 않습니다 · 내 일정은 계산에서 빠집니다") + '</span></span>' +
+    '<span class="seg">' +
+      '<button data-host="1" class="' + (join ? "on" : "") + '">참석</button>' +
+      '<button data-host="0" class="' + (join ? "" : "on") + '">불참</button>' +
+    '</span></div>';
 }
 
 function attRow(a){
@@ -2473,13 +2717,16 @@ function startScan(){
     state.sent = sl.rank <= 2 ? "invite" : "ask";
     state.hold = {
       d:sl.d, s:sl.s, e:sl.e, rank:sl.rank, confirmed:sl.rank <= 2,
-      title:state.title, people:state.attendees.length,
-      att:state.attendees.map(a => ({ id:a.id, need:a.need })),
+      title:state.title, people:state.attendees.length + (state.hostJoins ? 1 : 0),
+      att:(state.hostJoins ? [{ id:"me", need:"host" }] : []).concat(
+        state.attendees.map(a => ({ id:a.id, need:a.need }))),
       askers:sl.conflicts.map(c => P(c.who).name),
+      room:(freeRoom(sl.d, sl.s, sl.e, state.attendees.length + 1) || {}).n || null,
     };
-    state.holdReplies = {};
     state.step = 4;
+    onbMark("send");
     render();
+    if(!state.hold.confirmed) scheduleReply();   /* 물어봤으니 답이 온다 */
   }, 1500);
 }
 
@@ -2566,10 +2813,12 @@ function renderResults(){
     state.sent = confirmable ? "invite" : "ask";
     state.hold = {
       d:sel.d, s:sel.s, e:sel.e, rank:sel.rank, confirmed:confirmable,
-      title:state.title, people:state.attendees.length,
+      title:state.title, people:state.attendees.length + (state.hostJoins ? 1 : 0),
+      att:(state.hostJoins ? [{ id:"me", need:"host" }] : []).concat(
+        state.attendees.map(a => ({ id:a.id, need:a.need }))),
       askers:sel.conflicts.map(c => P(c.who).name),
+      room:(freeRoom(sel.d, sel.s, sel.e, state.attendees.length + 1) || {}).n || null,
     };
-    state.holdReplies = {};
     state.step = 4; render();
   };
 }
@@ -2606,15 +2855,30 @@ function pickReason(sl, all){
 }
 
 /* --------- 4. 완료 --------- */
-function slackCard(o){
-  return '<div class="slack">' +
-    '<div class="sl-head"><span class="sl-ico">⚡</span><span class="sl-nm">자동 조율</span>' +
-      '<span class="sl-app">앱</span><span class="sl-t">' + o.time + '</span></div>' +
-    '<div class="sl-body">' + o.body + '</div>' +
-    (o.warn ? '<div class="sl-warn">' + o.warn + '</div>' : '') +
-    (o.acts || '') + (o.reply || '') +
-    (o.foot ? '<div class="sl-foot">' + o.foot + '</div>' : '') +
-  '</div>';
+/* 왜 이 시간이었는지 — 사람 이름과 실제 일정으로, 최대 세 줄 */
+function whyBox(sl){
+  const req = required().length + (state.hostJoins ? 1 : 0);
+  const names = a => a.map(c => P(c.who).name).join(", ");
+  const lines = [];
+
+  if(sl.rank === 1){
+    lines.push('그 시간에 <b>' + req + '명 모두</b> 다른 일정이 없습니다.');
+    lines.push('아무에게도 일정을 옮겨달라고 하지 않아도 됩니다.');
+  }else if(sl.rank === 2){
+    lines.push('꼭 와야 하는 <b>' + req + '명</b>은 그 시간이 비어 있습니다.');
+    lines.push('<b>' + names(sl.optConflicts) + '</b>님만 다른 일정이 있는데, 안 와도 되는 분이라 그대로 잡았습니다.');
+  }else{
+    lines.push('그 시간에 일정이 있는 사람은 <b>' + names(sl.conflicts) + '</b>님뿐입니다.');
+    lines.push('그마저 혼자 하는 작업이라 <b>옮길 수 있는 일정</b>이었습니다.');
+  }
+
+  if(state.slots.length > 1)
+    lines.push('외근처럼 못 옮기는 일정이 낀 시간은 빼고, 남은 후보 중 가장 빠른 때입니다.');
+  else
+    lines.push('외근처럼 못 옮기는 일정이 낀 시간은 후보에서 뺐습니다.');
+
+  return '<div class="why-box"><div class="why-h">왜 이 시간인가요</div><ul>' +
+    lines.slice(0, 3).map(l => '<li>' + l + '</li>').join("") + '</ul></div>';
 }
 
 function renderDone(){
@@ -2626,122 +2890,66 @@ function renderDone(){
   /* ---------- 1·2순위 또는 조율 성공 → 확정 ---------- */
   if(confirmed){
     const viaAsk = state.sent === "ask";
+    const people = state.attendees.length + 1;
+    const room = state.hold && state.hold.room;
     title.textContent = "확정 완료";
     sub.textContent = viaAsk
-      ? "겹친 블록이 옮겨져서 가예약이 확정으로 바뀌었습니다."
+      ? "겹친 일정이 옮겨져서 가예약이 확정으로 바뀌었습니다."
       : "전원이 비는 시간이라 바로 확정했습니다.";
     body.innerHTML =
       '<div class="done-wrap"><div class="done-mark">✓</div>' +
         '<h3>일정이 잡혔습니다</h3>' +
-        '<p>' + (viaAsk
-          ? askers.map(p => p.name).join(", ") + "님이 블록을 옮겨서 확정됐습니다.<br>참석자 전원에게 확정 초대가 나갔습니다."
-          : "참석자 전원에게 캘린더 초대와 슬랙 리마인드가 발송되었습니다.") + '</p>' +
-        '<div class="recap">' +
-          row("회의", esc(state.title) || "(제목 없음)") +
-          row("시간", fmt(sl) + " · 확정") +
-          row("고른 이유", pickReason(sl, state.slots)) +
-          row("초대", state.attendees.map(a =>
-            P(a.id).name + (a.need === "required" ? "(필수)" : "(선택)")).join(", ")) +
-        '</div>' +
-        '<div class="prev-lb">캘린더에 이렇게 바뀝니다</div>' +
-        '<div class="hold-prev done">✓ ' + esc(state.title || "제목 없음") +
-          '<div class="sub">확정 · 참석자 ' + state.attendees.length + '명</div></div>' +
-        '<div class="prev-lb">참석자에게 가는 슬랙 리마인드</div>' +
-        slackCard({
-          time:"오후 6:14",
-          body:'<b>「' + esc(state.title || "회의") + '」</b> 일정이 확정됐습니다.<br>' +
-            '📅 ' + fmt(sl) + '<br>참석 ' + state.attendees.length + '명 · 캘린더 초대를 함께 보냈습니다.',
-          foot:"시작 10분 전에 한 번 더 알려드립니다.",
-        }) +
+        '<p><b>' + fmt(sl) + '</b>' + (room ? ' · ' + room : '') + '<br>' +
+          (viaAsk
+            ? askers.map(p => p.name).join(", ") + "님이 옮겨줘서 자리가 났습니다."
+            : "참석자 " + people + "명에게 초대가 나갔습니다.") + '</p>' +
+        whyBox(sl) +
       '</div>';
   }else{
     /* ---------- 3·4순위 → 시간만 확보하고 겹친 사람에게만 묻는다 ---------- */
-    title.textContent = "시간 확보 + 조율 요청";
-    sub.textContent = "아직 확정이 아닙니다. 응답을 받고 주최자가 확정합니다.";
+    title.textContent = askers.map(p => p.name).join(", ") + "님 답을 기다립니다";
+    sub.textContent = "답이 오면 그때 확정하고 초대를 보냅니다.";
 
-    const cards = askers.map((p, i) => {
-      const cur = state.holdReplies[p.id];
-      return slackCard({
-        time:"오후 6:12",
-        body:'<b>@' + p.name + '</b> 님, ' + esc(state.title || "회의") + '을 ' +
-          '<b>' + fmt(sl) + '</b>에 잡으려고 합니다.<br>' +
-          '그 시간에 <b>「' + sl.conflicts[i].block + '」</b>이 걸려 있어요.<br>' +
-          '<span class="q">이 일정을 옮길 수 있나요?</span>',
-        warn: p.hardToReschedule
-          ? "이 회의에는 재조율이 어려운 참석자가 있습니다. 놓치면 다시 잡기 어렵습니다."
-          : "",
-        acts:'<div class="sl-acts">' + ["yes","no"].map(v =>
-          '<button class="' + v.slice(0,2) + (cur === v ? " on" : "") +
-          '" data-hr="' + p.id + '" data-v="' + v + '">' + REPLY_LABEL[v] + '</button>').join("") + '</div>',
-        reply: cur
-          ? '<div class="sl-reply"><b>' + p.name + '</b> — ' + REPLY_LABEL[cur] +
-            '<br>' + REPLY_NOTE[cur] + '</div>'
-          : (state.reminders
-            ? '<div class="sl-reply">주최자가 리마인드를 ' + state.reminders + '회 보냈습니다 · 아직 답 없음</div>'
-            : ""),
-        foot:"답은 주최자(정슬기)에게만 갑니다. 다른 참석자에게는 아무 알림도 가지 않습니다.",
-      });
-    }).join("");
+    const room = state.hold && state.hold.room;
 
     body.innerHTML =
       '<div class="done-wrap"><div class="done-mark hold">⏳</div>' +
-        '<h3>확정이 아니라 자리를 잡아뒀습니다</h3>' +
-        '<p>겹친 블록의 주인 ' + askers.length + '명에게만 조율 요청이 갔습니다.<br>' +
-          '나머지 ' + held.length + '명의 캘린더에는 <b>미정</b>으로 이 시간이 확보됐습니다.</p>' +
+        '<h3>이 시간을 잡아뒀습니다</h3>' +
+        '<p><b>' + fmt(sl) + '</b>' + (room ? ' · ' + room : '') + '<br>' +
+          askers.map((p,i) => '<b>' + p.name + '</b>님께 「' + sl.conflicts[i].block +
+            '」을 옮길 수 있는지 물었습니다.').join("<br>") + '<br>' +
+          '나머지 ' + held.length + '명에게는 아직 아무 연락도 가지 않았습니다.</p>' +
 
-        '<div class="prev-lb">전원 캘린더에 이렇게 뜹니다 — 오른쪽 ' + fmt(sl) + ' 자리</div>' +
-        '<div class="hold-prev">[미정] ' + esc(state.title || "제목 없음") +
-          '<div class="sub">응답 대기 중 · 정슬기 · 수락 버튼 없음</div></div>' +
+        (state.holdAnswer === "yes"
+          ? '<div class="banner good"><b>' + askers.map(p => p.name).join(", ") +
+            '</b>님이 <b>옮길 수 있다</b>고 답했습니다. 이제 확정할 수 있습니다.</div>'
+          : state.holdAnswer === "no"
+          ? '<div class="banner warn"><b>' + askers.map(p => p.name).join(", ") +
+            '</b>님이 <b>옮기기 어렵다</b>고 답했습니다. 다른 시간을 찾아야 합니다.</div>'
+          : '') +
 
-        '<div class="prev-lb">겹친 사람에게 가는 슬랙 (' + askers.length + '명)</div>' + cards +
-
-        '<div class="prev-lb">나머지 ' + held.length + '명에게 가는 것</div>' +
-        '<div class="banner">아무 알림도 가지 않습니다. 캘린더에 <b>미정</b> 블록만 조용히 잡히고, ' +
-          '확정되면 그때 초대가 나갑니다. <span class="sub-note">묻는 대상을 ' +
-          state.attendees.length + '명에서 ' + askers.length + '명으로 좁히는 게 목적입니다.</span></div>' +
-
-        '<div class="recap">' +
-          row("확보한 시간", fmt(sl) + ' <span class="tentative">미정</span>') +
-          row("고른 이유", pickReason(sl, state.slots)) +
-          row("확정 조건", askers.length === 1
-            ? '<b>' + askers[0].name + '</b>님이 가능으로 답하면 주최자가 확정합니다.'
-            : '두 사람이 모두 가능으로 답하면 주최자가 확정합니다.') +
-          row("리마인드", state.reminders
-            ? "주최자가 " + state.reminders + "회 보냄 · 24시간 뒤 자동으로 한 번 더"
-            : "24시간 뒤 자동 발송 · 주최자가 지금 보낼 수도 있습니다") +
-        '</div></div>';
-
-    body.querySelectorAll("[data-hr]").forEach(b => {
-      b.onclick = () => { state.holdReplies[b.dataset.hr] = b.dataset.v; render(); };
-    });
+        whyBox(sl) +
+      '</div>';
   }
 
   /* 응답 상태에 따른 주최자의 다음 행동 */
-  const vals = askers.map(p => state.holdReplies[p.id]);
-  const allYes = askers.length > 0 && vals.every(v => v === "yes");
-  const anyNo = vals.some(v => v === "no");
+  const ans = state.holdAnswer;
 
-  foot.innerHTML = '<button class="btn ghost" id="againBtn">다른 시간으로</button>' +
-    '<div style="flex:1"></div>' +
-    (confirmed ? '<button class="btn primary" id="doneBtn">닫기</button>'
-      : anyNo ? '<button class="btn primary" id="reFind">다른 시간 다시 찾기</button>'
-      : allYes ? '<button class="btn primary" id="confirmBtn">확정 초대 보내기</button>'
-      : '<button class="btn primary" id="remindBtn">' +
-        (state.reminders ? "리마인드 다시 보내기" : "리마인드 보내기") + '</button>');
+  /* 확정되면 더 고를 것이 없다 — 확인 하나로 끝낸다 */
+  foot.innerHTML = confirmed
+    ? '<div style="flex:1"></div><button class="btn primary" id="doneBtn">확인</button>'
+    : '<button class="btn ghost" id="againBtn">다른 시간으로</button>' +
+      '<div style="flex:1"></div>' +
+      (ans === "no" ? '<button class="btn primary" id="reFind">다른 시간 다시 찾기</button>'
+        : ans === "yes" ? '<button class="btn primary" id="confirmBtn">확정하고 전원 초대</button>'
+        : '<button class="btn primary" id="doneBtn">완료</button>');
 
-  document.getElementById("againBtn").onclick = () => {
-    state.showAlts = true; state.step = 3; render();
-  };
+  const ag = document.getElementById("againBtn");
+  if(ag) ag.onclick = () => { state.showAlts = true; state.step = 3; render(); };
   const cb = document.getElementById("confirmBtn");
   if(cb) cb.onclick = () => { state.hold.confirmed = true; state.reminders = 0; render(); };
   const rf = document.getElementById("reFind");
   if(rf) rf.onclick = () => { state.hold = null; state.step = 3; render(); };
-  /* 리마인드를 보내면 할 일이 끝난다 — 시트를 닫고 캘린더를 보여준다 */
-  const rb = document.getElementById("remindBtn");
-  if(rb) rb.onclick = () => {
-    sendRemind();
-    closeSheet();
-  };
   const db = document.getElementById("doneBtn");
   if(db) db.onclick = () => {
     const done = state.hold && state.hold.confirmed;
@@ -2749,7 +2957,6 @@ function renderDone(){
     toast(done ? "일정이 캘린더에 등록되었습니다." : "확보한 시간이 캘린더에 남아 있습니다.");
   };
 }
-const row = (k,v) => '<div class="r"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>';
 
 /* ===================== 시트 열고 닫기 ===================== */
 const sheet = document.getElementById("sheet");
@@ -2757,19 +2964,20 @@ const appEl = document.querySelector(".app");
 const menu = document.getElementById("createMenu");
 const createBtn = document.getElementById("createBtn");
 
-createBtn.onclick = e => { e.stopPropagation(); menu.classList.toggle("open"); createBtn.classList.remove("ring"); };
+createBtn.onclick = e => { e.stopPropagation(); menu.classList.toggle("open"); };
 document.addEventListener("click", e => {
   if(!e.target.closest("#createMenu") && !e.target.closest("#createBtn")) menu.classList.remove("open");
 });
 document.getElementById("autoBtn").onclick = () => {
   menu.classList.remove("open");
   state.step = 1; state.sent = null; state.selectedSlot = null; state.slots = [];
-  state.hold = null; state.holdReplies = {}; state.reminders = 0; state.holdAnswer = null;
+  state.hold = null; state.reminders = 0; state.holdAnswer = null;
   clearTimeout(replyTimer);
 
   /* 내 캘린더에서 이미 사람을 골라 뒀다면 그 선택을 그대로 이어받는다 */
-  const visible = PEOPLE.filter(p => !state.hidden[p.id]);
-  if(visible.length && visible.length < PEOPLE.length){
+  /* 주최자는 늘 참석하므로 목록에 넣지 않는다 */
+  const visible = PEOPLE.filter(p => !state.hidden[p.id] && p.id !== "me");
+  if(visible.length && visible.length < PEOPLE.length - 1){
     state.attendees = visible.map(p => ({ id:p.id, need:"required", from:"calendar" }));
     state.seeded = visible.length;
   }else state.seeded = 0;
@@ -2779,8 +2987,8 @@ document.getElementById("autoBtn").onclick = () => {
   gotoWeek(0);                       /* 조율 대상은 다음 주 */
   render();
   onbMark("open");
-  setTimeout(() => tip("link", "#linkInput",
-    "<b>슬랙 스레드나 노션 문서 링크</b>를 붙여넣으면 참석자와 필수 / 선택을 근거까지 뽑아 옵니다.", "left"), 400);
+  setTimeout(() => tip("link", ".import-row",
+    "회의 이야기가 오간 <b>슬랙 스레드나 노션 문서</b>가 있다면, 여기서 참석자를 한 번에 가져올 수 있습니다.", "left"), 400);
   sheet.classList.add("on"); appEl.classList.add("shifted");
   document.body.classList.add("sheet-open");
 };
@@ -2788,7 +2996,6 @@ function closeSheet(){
   sheet.classList.remove("on"); appEl.classList.remove("shifted");
   document.body.classList.remove("sheet-open");
   state.step = 1; state.selectedSlot = null; state.sent = null; state.slots = [];
-  state.replies = {};
   state.sheetOpen = false;   /* 확보한 시간(state.hold)은 캘린더에 남긴다 */
   clearDraft();
   closePop(); syncGrid(); paintCandidates();
@@ -2860,6 +3067,7 @@ document.getElementById("miniNext").onclick = () => {
 document.getElementById("btnMenu").onclick = () => {
   state.sidebar = !state.sidebar;
   document.querySelector(".app").classList.toggle("no-side", !state.sidebar);
+  document.body.classList.toggle("no-side", !state.sidebar);
 };
 
 /* 섹션 접기 */
@@ -2993,7 +3201,6 @@ btnAccount.onclick = () => openMenu(btnAccount,
 /* ===================== 시작하기 =====================
    긴 투어 대신, 꼭 해봐야 할 것만 체크리스트로 두고
    나머지는 그 화면에 도달했을 때 한 줄 힌트로 알려준다. */
-const SLACK_URL = "https://company.slack.com/archives/C01PRODUCT/p1754112233";
 const ONB = [
   { k:"open",   t:"자동 조율 열기",   h:"만들기 → 자동 조율" },
   { k:"people", t:"참석자 넣기",     h:"슬랙·노션 링크를 붙여넣으면 자동으로" },
@@ -3048,17 +3255,22 @@ function paintOnb(){
       '<span class="n">' + done + ' / ' + ONB.length + '</span>' +
       '<button id="onbClose" title="닫기">✕</button></div>' +
     '<div class="onb-bar"><i style="width:' + (done / ONB.length * 100) + '%"></i></div>' +
-    '<div class="onb-list">' + ONB.map(i =>
-      '<button class="onb-i' + (state.onbDone[i.k] ? " done" : i === next ? " next" : "") + '"' +
-        (state.onbDone[i.k] ? "" : ' data-onb="' + i.k + '"') + '>' +
+    '<div class="onb-list">' + ONB.map(i => {
+      const ok = state.onbDone[i.k];
+      return '<button class="onb-i' + (ok ? " done" : i === next ? " next" : "") + '" ' +
+        (ok ? 'data-redo' : 'data-onb') + '="' + i.k + '">' +
         '<span class="bx">✓</span>' +
         '<span><span class="lb">' + i.t + '</span>' +
         '<span class="hint">' + i.h + '</span></span>' +
-        '<span class="go">해보기 →</span></button>').join("") +
+        '<span class="go">' + (ok ? "↺ 다시" : "해보기 →") + '</span></button>';
+    }).join("") +
     '</div>';
   onbEl.classList.add("on");
   onbEl.querySelectorAll("[data-onb]").forEach(b => {
     b.onclick = () => onbRun(b.dataset.onb);
+  });
+  onbEl.querySelectorAll("[data-redo]").forEach(b => {
+    b.onclick = () => onbRedo(b.dataset.redo);
   });
   document.getElementById("onbClose").onclick = () => {
     state.onbOpen = false;
@@ -3118,8 +3330,9 @@ function ensureSheet(cb){
 function ensurePeople(cb){
   ensureSheet(() => {
     if(state.attendees.length) return cb();
-    flash("#linkInput", "슬랙 스레드 링크 붙여넣기");
-    setTimeout(() => startAnalyze(SLACK_URL), READ);
+    state.importOpen = true; render();
+    flash(".src-btns", "슬랙에서 스레드 고르기");
+    setTimeout(() => startAnalyze(SLACK_URL, RECENT.slack[0].t + " 스레드"), READ);
     setTimeout(cb, READ + 2700);
   });
 }
@@ -3133,17 +3346,29 @@ function ensureScan(cb){
     setTimeout(cb, READ + 1900);
   });
 }
+/* 이미 해본 단계를 다시 — 그 지점까지 처음부터 되돌린 뒤 실행한다 */
+function onbRedo(k){
+  closeSheet();
+  state.hold = null; state.holdAnswer = null; state.reminders = 0;
+  clearTimeout(replyTimer);
+  paintCandidates();
+  const from = ONB.findIndex(i => i.k === k);
+  ONB.forEach((i, n) => { if(n >= from) state.onbDone[i.k] = false; });
+  paintOnb();
+  setTimeout(() => onbRun(k), 320);
+}
+
 function onbRun(k){
   if(k === "open")   return ensureSheet(() => flash(".sheet-head", "자동 조율이 열렸습니다", 300));
   if(k === "people") return ensurePeople(() => flash(".att", "대화에서 참석자를 찾아왔습니다", 300));
   if(k === "scan")   return ensureScan(() => flash(".done-wrap h3", "AI가 고르고 보냈습니다", 300));
   if(k === "send")   return ensureScan(() => {
-    const b = document.getElementById("remindBtn");
+    const b = document.getElementById("doneBtn");
     if(!b) return;
-    flash("#remindBtn", "리마인드 보내기");
+    flash("#doneBtn", "완료");
     setTimeout(() => {
       b.click();
-      flash(".ev-hold", "캘린더에 확보됨", 500);
+      flash(".ev.hold-wait", "캘린더에 잡아둔 시간", 500);
     }, READ);
   });
 }
@@ -3191,6 +3416,14 @@ paintHead();
 paintMini();
 render();
 if(state.onbOpen){ paintOnb(); btnTour.classList.add("on"); }
+
+/* 창 크기가 바뀌면 칸 높이를 다시 맞춘다 */
+let fitTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(fitTimer);
+  fitTimer = setTimeout(() => { buildGrid(); paintCandidates(); }, 120);
+});
+requestAnimationFrame(() => { buildGrid(); paintCandidates(); });
 </script>
 </body>
 </html>
