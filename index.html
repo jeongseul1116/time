@@ -1353,9 +1353,10 @@ const BASE_EVENTS = [
    이 도구가 묻는 것은 “이 시간에 일정이 있는가”가 아니라
    “그 일정을 옮길 수 있는가”다. 그래서 시간을 세 가지로 나눈다.
      fixed   — 몸이 다른 곳에 있어야 함. 물어봐도 안 열린다.
-     soft    — 혼자 하는 작업. 물어보면 옮길 수 있다.
+     soft    — 혼자 하는 작업. 물어볼 값어치가 있다.
      unknown — 물어보기 전에는 알 수 없다.
-   시스템은 옮길 수 있는지를 단정하지 않는다. 물어볼 값어치가 있는 시간을 골라줄 뿐이다. */
+   soft는 제목으로 때린 짐작이지 판정이 아니다. 그래서 화면에는 “혼자 하는 일정”까지만 쓰고,
+   “옮길 수 있다”는 말은 본인이 답한 뒤에만 쓴다. */
 const FIXED_RE = /외부 미팅|고객|점심 미팅|임원 보고|이사회|대표 보고|면접|계약 서명|방문|워크숍|공유회|온보딩|인터뷰|고객 콜|분쟁|자문|약관|스탠드업|데일리/;
 const SOFT_RE  = /업무 집중|집중 근무|개인 작업|정리|작성|준비|점검|모니터링|처리|최적화|리팩터링|프로파일링|스크립트|서류|계획|승인|검토|테스트|리뷰/;
 
@@ -1366,9 +1367,10 @@ function mobility(ev){
   if(SOFT_RE.test(ev.t)) return "soft";                      /* 혼자 하는 작업 */
   return "unknown";
 }
+/* 화면에 붙는 말은 본 것까지만 — 옮길 수 있는지는 본인이 답할 몫이다 */
 const MOBILITY_LABEL = {
   fixed:"옮길 수 없음",
-  soft:"옮길 수 있음",
+  soft:"혼자 하는 일정",
   unknown:"물어봐야 앎",
 };
 
@@ -1655,8 +1657,8 @@ function detectKind(url){
 const RANK_TEXT = {
   1:"전원 실제로 비어 있음",
   2:"필수 전원 가능 · 선택만 겹침",
-  3:"옮길 수 있는 일정 1건과 겹침",
-  4:"옮길 수 있는 일정 2건과 겹침",
+  3:"혼자 하는 일정 1건과 겹침",
+  4:"혼자 하는 일정 2건과 겹침",
 };
 
 /* ===================== 상태 ===================== */
@@ -3486,7 +3488,7 @@ function renderResults(){
   title.textContent = "가능한 일정";
 
   if(!slots.length){
-    sub.textContent = "옮길 수 있는 시간까지 봤지만 후보가 없습니다.";
+    sub.textContent = "물어볼 만한 시간까지 봤지만 후보가 없습니다.";
     body.innerHTML = '<div class="banner warn">옮길 수 없는 일정과 겹친 <b>' + (state.blockedCount || 0) +
       '칸</b>을 빼고 나면, 남는 건 필수 3명 이상이 겹치는 시간뿐입니다. ' +
       '필수를 줄이거나 범위를 다음다음 주로 넓혀야 합니다.</div>';
@@ -3509,7 +3511,7 @@ function renderResults(){
     (confirmable
       ? '<div class="banner good">전원이 비는 시간을 찾았습니다. 바로 확정 초대가 나갑니다.</div>'
       : '<div class="banner warn"><b>전원이 비는 시간은 없습니다.</b> 여기서 멈추지 않고 ' +
-        '<b>옮길 수 있는 일정과 겹치는 시간</b>까지 봤습니다. ' +
+        '<b>혼자 하는 일정과 겹치는 시간</b>까지 봤습니다. ' +
         '“일정이 있다”를 확정된 불가능이 아니라 아직 물어보지 않은 상태로 취급합니다.</div>') +
 
     '<div class="rec">' +
@@ -3598,7 +3600,7 @@ function pickReason(sl, all){
   if(sl.rank === 2)
     return "필수 인원은 모두 가능하고, 선택 인원 " +
       sl.optConflicts.map(c => P(c.who).name).join(", ") + "만 겹칩니다. 물어볼 사람이 없습니다.";
-  return "겹치는 일정이 " + sl.conflicts.length + "건뿐이고 모두 옮길 수 있는 일정입니다." +
+  return "겹치는 일정이 " + sl.conflicts.length + "건뿐이고, 모두 혼자 하는 일정이라 물어볼 만합니다." +
     (sl.conflicts.length === fewest ? " 후보 중 물어볼 사람이 가장 적습니다." : "");
 }
 
@@ -3617,7 +3619,9 @@ function whyBox(sl){
     lines.push('<b>' + names(sl.optConflicts) + '</b>님만 다른 일정이 있는데, 안 와도 되는 분이라 그대로 잡았습니다.');
   }else{
     lines.push('그 시간에 일정이 있는 사람은 <b>' + names(sl.conflicts) + '</b>님뿐입니다.');
-    lines.push('그마저 혼자 하는 작업이라 <b>옮길 수 있는 일정</b>이었습니다.');
+    /* 옮길 수 있는지는 본인만 안다 — 도구는 본 것만 말한다 */
+    lines.push('그 일정이 <b>「' + sl.conflicts[0].block + '」</b>이라 물어볼 만하다고 봤습니다. ' +
+      '옮길 수 있는지는 본인만 압니다.');
   }
 
   if(state.slots.length > 1)
@@ -3988,7 +3992,7 @@ btnAccount.onclick = () => openMenu(btnAccount,
 const ONB = [
   { k:"open",   t:"자동 조율 열기",   h:"만들기 → 참석자 추가" },
   { k:"people", t:"참석자 넣기",     h:"슬랙·노션 링크를 붙여넣으면 자동으로" },
-  { k:"scan",   t:"가능한 일정 뽑기", h:"옮길 수 있는 시간까지 찾습니다" },
+  { k:"scan",   t:"가능한 일정 뽑기", h:"물어보면 열릴 시간까지 찾습니다" },
   { k:"send",   t:"조율 요청 보내기", h:"겹친 한 명에게만 갑니다" },
 ];
 const onbEl = document.getElementById("onb");
