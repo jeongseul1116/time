@@ -35,10 +35,10 @@
     --scrim:rgba(255,255,255,.62);
     --toast-bg:#191F28;
     --toast-fg:#FFFFFF;
+    --toast-em:#8FBBFB;
     --scroll:#D1D6DB;
     --scroll-hover:#B0B8C1;
     --shadow-pop:0 10px 32px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06);
-    --guide-scrim:rgba(25,31,40,.34);
     --r-card:16px;
     --r-btn:12px;
     --gutter:60px;
@@ -68,10 +68,10 @@
     --scrim:rgba(19,19,20,.55);
     --toast-bg:#F0F0F2;
     --toast-fg:#17171C;
+    --toast-em:#1B64DA;
     --scroll:#3A3A44;
     --scroll-hover:#4A4A56;
     --shadow-pop:0 12px 32px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.35);
-    --guide-scrim:rgba(0,0,0,.55);
   }  *{box-sizing:border-box}
   html,body{height:100%}
   body{
@@ -253,14 +253,21 @@
   /* 우측 하단 플로팅 버튼 — 여기서 안내가 펼쳐진다 */
   /* 만들기 바로 아래 — 캘린더를 가리지 않는다 */
   .tour-btn{
+    position:relative;
     display:flex;align-items:center;justify-content:center;gap:8px;
     margin:0 4px 16px;width:calc(100% - 8px);
     height:44px;border-radius:14px;font-size:14.5px;font-weight:700;
-    background:var(--accent-soft);color:var(--accent-fg);
+    background:var(--surface-2);color:var(--text-dim);
+    transition:background .12s,color .12s,box-shadow .12s;
   }
   .tour-btn .lb{font-size:14.5px}
-  .tour-btn:hover{background:rgba(49,130,246,.22)}
-  .tour-btn.on{background:var(--accent);color:#fff}
+  .tour-btn:hover{background:var(--surface-3);color:var(--text)}
+  /* 켜진 상태 — 색을 채우지 않고 테두리와 글자색으로 */
+  .tour-btn.on{
+    background:var(--accent-soft);color:var(--accent-fg);
+    box-shadow:inset 0 0 0 2px var(--accent);
+  }
+  .tour-btn.on:hover{background:rgba(49,130,246,.18);color:var(--accent-fg)}
   /* 사이드바를 접으면 카드도 따라 붙는다 */
   .onb{transition:left .22s cubic-bezier(.2,.7,.3,1)}
   .app.no-side ~ .onb,
@@ -302,6 +309,18 @@
     border-radius:999px;padding:5px 11px;transition:background .12s,color .12s;
   }
   .onb-i:hover .go{background:var(--accent);color:#fff}
+  /* 방금 채워진 줄 — 체크가 튀어 들어오고 줄이 한 번 밝아진다 */
+  .onb-i.just{animation:onbrow .5s ease-out}
+  .onb-i.just .bx{animation:onbcheck .45s cubic-bezier(.2,1.5,.4,1)}
+  @keyframes onbrow{
+    0%{background:var(--accent-soft)}
+    100%{background:transparent}
+  }
+  @keyframes onbcheck{
+    0%{transform:scale(.3);opacity:0}
+    60%{transform:scale(1.18)}
+    100%{transform:scale(1);opacity:1}
+  }
   .onb-i.done .go{color:var(--text-faint);background:transparent;font-weight:600}
   .onb-i.done:hover .go{background:var(--surface-3);color:var(--text-dim)}
   /* 다음에 할 줄은 눌러야 한다는 게 한눈에 보인다 */
@@ -313,10 +332,12 @@
   .flash-ring{
     position:fixed;z-index:215;pointer-events:none;
     box-shadow:0 0 0 3px var(--accent),
-               0 0 0 9px rgba(49,130,246,.22),
-               0 0 0 9999px var(--guide-scrim);
+               0 0 0 10px rgba(49,130,246,.20);
     animation:flashin .22s ease-out both;
   }
+  /* 스스로 물러나는 짚기 — 다음 단계로 이어줄 때 쓴다 */
+  .flash-ring.soft{animation:flashin .22s ease-out both,flashfade .5s ease-in 5s both}
+  @keyframes flashfade{ to{opacity:0} }
   @keyframes flashin{ from{opacity:0} to{opacity:1} }
   /* 나타날 때 한 번만 퍼진다 */
   .flash-ring::after{
@@ -349,19 +370,20 @@
   .onb-again:hover{background:rgba(49,130,246,.22)}
 
   /* 그 자리에서 한 줄로 알려주는 힌트 */
+  /* 한 줄 힌트 — 배경에 묻으면 읽히지 않는다. 바탕을 뒤집어 띄운다 */
   .tip{
-    position:fixed;z-index:205;max-width:268px;background:var(--surface-2);border-radius:10px;
-    padding:11px 13px;font-size:12px;line-height:1.7;color:var(--text);
-    border:1px solid rgba(155,114,240,.35);
-    box-shadow:0 6px 18px rgba(0,0,0,.45);display:none;
+    position:fixed;z-index:205;max-width:292px;border-radius:14px;
+    background:var(--toast-bg);color:var(--toast-fg);
+    padding:14px 34px 14px 16px;font-size:13.5px;line-height:1.65;letter-spacing:-.02em;
+    box-shadow:0 10px 28px rgba(0,0,0,.28);display:none;
   }
   .tip.on{display:block;animation:pop .16s ease-out}
-  .tip b{color:#fff}
+  .tip b{font-weight:700;color:var(--toast-em)}
   .tip .x{
-    position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;
-    display:grid;place-items:center;font-size:10px;color:var(--text-faint);
+    position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:8px;
+    display:grid;place-items:center;font-size:12px;color:var(--toast-fg);opacity:.5;
   }
-  .tip .x:hover{background:rgba(240,240,242,.1);color:var(--text)}
+  .tip .x:hover{opacity:1;background:rgba(128,128,128,.22)}
 
   /* 스낵바 */
   .toast{
@@ -466,6 +488,7 @@
   .ev-avs i.more{background:rgba(0,0,0,.5);color:#fff;font-size:8px}
   .ev.short .ev-avs{top:2px}
   .ev:hover{filter:brightness(1.12);transform:translateY(-1px);z-index:24 !important}
+  .ev.just:hover{transform:scale(1.06);filter:none}
   .grid-shell.dim .ev{opacity:.3}
   /* 거절한 일정 — 배경은 캘린더 바탕색으로 막고 테두리만 색을 남긴다 */
   .ev.dec{background:var(--surface) !important;box-shadow:inset 0 0 0 1.5px currentColor}
@@ -1050,34 +1073,47 @@
   .done-wrap p{margin:0;font-size:13px;color:var(--text-dim);line-height:1.8}
   .done-mark.hold{background:rgba(255,200,69,.15);color:var(--p3)}
 
-  /* 잡아둔 시간 — 확정 전에만 다르게 보인다 */
+  /* 잡아둔 시간 — 옅게 두면 잡혔다는 사실 자체가 안 읽힌다 */
   .ev.hold-wait{
-    background:rgba(255,200,69,.22) !important;color:var(--warn-fg) !important;
-    border:2px dashed var(--p3);
+    background:var(--p3) !important;color:#3D2E00 !important;
+    border:2px dashed rgba(61,46,0,.45);font-weight:700;
   }
   /* 자동 조율로 잡힌 일정은 확정된 뒤에도 표가 난다 */
   .ev.hold-done{box-shadow:inset 0 0 0 2px rgba(21,196,126,.85)}
 
   /* 결과를 보는 동안엔 잡힌 자리만 남기고 나머지는 물러난다 */
-  .time-view.focus-hold .ev:not(.just){opacity:.16}
-  .time-view.focus-hold .cand{opacity:.25}
-  .time-view.focus-hold .allday .cell > span{opacity:.3}
+  .time-view.focus-hold .ev:not(.just){opacity:.12}
+  .time-view.focus-hold .cand{opacity:.18}
+  .time-view.focus-hold .allday .cell > span{opacity:.22}
+  .time-view.focus-hold .daycol.wknd,
+  .time-view.focus-hold .day-block,
+  .time-view.focus-hold .lunch{opacity:.25}
   .ev.just{
-    outline:3px solid var(--accent);outline-offset:3px;z-index:9 !important;
-    box-shadow:0 0 0 9px rgba(49,130,246,.16), 0 8px 24px rgba(0,0,0,.55);
+    z-index:30 !important;transform:scale(1.06);
+    outline:3px solid var(--accent);outline-offset:4px;
+    box-shadow:0 0 0 10px var(--accent-soft),
+               0 14px 34px rgba(0,0,0,.28),
+               0 0 0 9999px transparent;
   }
   /* 어느 칸인지 눈으로 짚어 준다 */
   .just-mark{
-    position:absolute;z-index:10;pointer-events:none;
+    position:absolute;z-index:31;pointer-events:none;
     left:0;right:0;display:flex;justify-content:center;
   }
   .just-mark span{
-    transform:translateY(-100%);margin-bottom:9px;
-    background:var(--accent);color:var(--on-accent);
-    font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 10px;
-    box-shadow:0 3px 10px rgba(0,0,0,.22);white-space:nowrap;
+    position:relative;transform:translateY(calc(-100% - 12px));
+    background:var(--accent);color:#fff;
+    font-size:12px;font-weight:700;letter-spacing:-.02em;
+    border-radius:999px;padding:6px 13px;
+    box-shadow:0 4px 14px rgba(49,130,246,.45);white-space:nowrap;
   }
-  .just-mark.below span{transform:none;margin:9px 0 0}
+  /* 알약에서 블록으로 내려오는 꼬리 */
+  .just-mark span::after{
+    content:"";position:absolute;left:50%;top:100%;
+    width:2px;height:12px;margin-left:-1px;background:var(--accent);
+  }
+  .just-mark.below span{transform:translateY(12px)}
+  .just-mark.below span::after{top:auto;bottom:100%}
 
 </style>
 </head>
@@ -1779,7 +1815,7 @@ const state = {
   onbOpen:true, onbDone:{}, tipSeen:{}, picker:null, linkOpen:false, importOpen:false, hostJoins:true,
   hold:null,
   blockedCount:0, blockedDays:[], showAlts:false, room:null, roomOpen:false, rsvp:{},
-  res:{}, roomsOnly:false, draft:null, pickOpen:false,
+  res:{}, roomsOnly:false, draft:null, pickOpen:false, onbJust:null,
 };
 
 function save(){
@@ -4132,15 +4168,26 @@ function onbReset(){
 
 function onbMark(k){
   const at = ONB.findIndex(i => i.k === k);
-  if(at < 0 || state.onbDone[k]) return;
+  if(at < 0) return;
+  clearGuide();                      /* 무엇이든 눌렀다는 뜻이다 */
+  if(state.onbDone[k]) return;
   let changed = false;
   ONB.forEach((i, n) => {
     if(n <= at && !state.onbDone[i.k]){ state.onbDone[i.k] = true; changed = true; }
   });
   if(!changed) return;
-  clearGuide();                      /* 그 단계는 끝났으니 짚기를 거둔다 */
+  state.onbJust = k;                 /* 방금 채워진 줄 — 한 번만 튄다 */
   persist();
-  if(state.onbOpen) paintOnb();
+  /* 체크리스트를 열어 두고 따라가는 중일 때만 알린다 */
+  if(state.onbOpen){
+    const done = ONB.filter(i => state.onbDone[i.k]).length;
+    toast(done < ONB.length
+      ? "‘" + ONB[at].t + "’ 완료 · " + done + " / " + ONB.length
+      : "네 단계를 모두 해보셨어요");
+    paintOnb();
+    /* 체크가 들어가는 걸 본 뒤에 다음 자리를 짚는다 */
+    setTimeout(() => guideNext(0), 900);
+  }
 }
 
 function paintOnb(){
@@ -4164,6 +4211,7 @@ function paintOnb(){
       clearTimeout(onbTimer);
       onbReset();
       paintOnb();
+      setTimeout(() => guideNext(0), 260);
     };
     return;
   }
@@ -4176,7 +4224,9 @@ function paintOnb(){
     '<div class="onb-bar"><i style="width:' + (done / ONB.length * 100) + '%"></i></div>' +
     '<div class="onb-list">' + ONB.map(i => {
       const ok = state.onbDone[i.k];
-      return '<button class="onb-i' + (ok ? " done" : i === next ? " next" : "") + '" ' +
+      const just = ok && i.k === state.onbJust;
+      return '<button class="onb-i' + (ok ? " done" : i === next ? " next" : "") +
+        (just ? " just" : "") + '" ' +
         (ok ? 'data-redo' : 'data-onb') + '="' + i.k + '">' +
         '<span class="bx">✓</span>' +
         '<span><span class="lb">' + i.t + '</span>' +
@@ -4184,6 +4234,7 @@ function paintOnb(){
         '<span class="go">' + (ok ? "↺ 다시" : "해보기 →") + '</span></button>';
     }).join("") +
     '</div>';
+  state.onbJust = null;              /* 애니메이션은 한 번만 */
   onbEl.classList.add("on");
   onbEl.querySelectorAll("[data-onb]").forEach(b => {
     b.onclick = () => onbRun(b.dataset.onb);
@@ -4207,6 +4258,7 @@ btnTour.onclick = () => {
     /* 이미 다 해본 뒤에 다시 열면 처음부터 */
     if(ONB.every(i => state.onbDone[i.k])) onbReset();
     paintOnb();
+    setTimeout(() => guideNext(0), 260);
   }else{
     clearTimeout(onbTimer);
     onbEl.classList.remove("on");
@@ -4222,11 +4274,22 @@ function clearGuide(){
   if(guideOff){ guideOff(); guideOff = null; }
 }
 
-function guide(sel, label){
+function guide(sel, label, soft){
   clearGuide();
   const pre = document.querySelector(sel);
   if(!pre) return;
   if(pre.scrollIntoView) pre.scrollIntoView({ behavior:"smooth", block:"nearest" });
+
+  /* 링이 그려지기 전에 이미 누를 수 있다 — 듣기부터 걸어 둔다.
+     안 그러면 그 사이에 누른 사람에게는 어두운 막만 남는다. */
+  const done = () => clearGuide();
+  pre.addEventListener("click", done, { once:true });
+  const away = () => clearGuide();
+  setTimeout(() => document.addEventListener("click", away, { once:true }), 300);
+  guideOff = () => {
+    pre.removeEventListener("click", done);
+    document.removeEventListener("click", away);
+  };
 
   setTimeout(() => {
     const el = document.querySelector(sel);
@@ -4240,7 +4303,8 @@ function guide(sel, label){
     const h = bottom - top;
 
     const n = document.createElement("div");
-    n.className = "flash-ring";
+    n.className = "flash-ring" + (soft ? " soft" : "");
+    if(soft) setTimeout(clearGuide, 5500);
     n.style.left = (r.left - 3) + "px";
     n.style.top = (top - 3) + "px";
     n.style.width = (r.width + 6) + "px";
@@ -4260,11 +4324,6 @@ function guide(sel, label){
       if(lr.left + dx < 12) dx = 12 - lr.left;
       if(dx) lb.style.transform = "translateX(calc(-50% + " + Math.round(dx) + "px))";
     }
-
-    /* 그 자리를 누르면 짚기를 거둔다 */
-    const done = () => clearGuide();
-    el.addEventListener("click", done, { once:true });
-    guideOff = () => el.removeEventListener("click", done);
   }, 420);
 }
 
@@ -4285,7 +4344,8 @@ function guideFor(k){
     return { sel:".pick", label:"지원자를 골라요" };
   }
   if(k === "open")   return { sel:".sheet-head", label:"자동 조율이 열려 있어요" };
-  if(k === "people") return { sel:"#peopleField", label:"이 사람들에게 물어봐요" };
+  /* 넣는 자리를 짚는다 — 이미 들어온 명단이 아니라 */
+  if(k === "people") return { sel:".search-wrap", label:"여기서 부를 사람을 더해요" };
 
   if(state.step === 1)
     return { sel:"#scanBtn", label:(k === "scan" ? "" : "먼저 ") + "가능한 일정을 뽑아요" };
@@ -4295,6 +4355,17 @@ function guideFor(k){
       ? { sel:".why-box", label:"왜 이 시간인지 적혀 있어요" }
       : { sel:"#doneBtn", label:"완료를 눌러요" };
   return null;
+}
+
+/* 다음에 할 곳을 이어서 짚는다. 누르는 건 여전히 사람 몫이다.
+   화면이 아직 안 그려졌으면(스캔 중처럼) 잠깐 뒤 다시 본다. */
+function guideNext(tries){
+  if(!state.onbOpen) return;
+  const nx = ONB.find(i => !state.onbDone[i.k]);
+  if(!nx) return;
+  const g = guideFor(nx.k);
+  if(g) return guide(g.sel, g.label, true);
+  if((tries || 0) < 3) setTimeout(() => guideNext((tries || 0) + 1), 700);
 }
 
 function onbRun(k){
@@ -4329,6 +4400,9 @@ function onbRedo(k){
 const tipEl = document.getElementById("tip");
 let tipTimer = null;
 function tip(key, sel, html, side){
+  /* 체크리스트가 짚어주는 중이면 같은 자리를 두 번 말하지 않는다.
+     본 것으로 치지 않으니, 닫고 쓸 때 다시 나온다. */
+  if(state.onbOpen) return;
   if(state.tipSeen[key]) return;
   const el = document.querySelector(sel);
   if(!el) return;
