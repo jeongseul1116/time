@@ -883,6 +883,7 @@
   .pill{font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 9px;color:#10233f}
   .pill.p1{background:var(--p1)} .pill.p2{background:var(--p2)}
   .pill.p3{background:var(--p3)} .pill.p4{background:var(--p4)}
+  .pill.p5{background:transparent;color:#f6aea9;border:1px solid rgba(242,139,130,.55)}
 
   /* AI가 고른 시간 */
   .rec{
@@ -1351,12 +1352,13 @@ const BASE_EVENTS = [
 
 /* ===================== 옮길 수 있는가 =====================
    이 도구가 묻는 것은 “이 시간에 일정이 있는가”가 아니라
-   “그 일정을 옮길 수 있는가”다. 그래서 시간을 세 가지로 나눈다.
-     fixed   — 몸이 다른 곳에 있어야 함. 물어봐도 안 열린다.
-     soft    — 혼자 하는 작업. 물어볼 값어치가 있다.
-     unknown — 물어보기 전에는 알 수 없다.
-   soft는 제목으로 때린 짐작이지 판정이 아니다. 그래서 화면에는 “혼자 하는 일정”까지만 쓰고,
-   “옮길 수 있다”는 말은 본인이 답한 뒤에만 쓴다. */
+   “그 일정을 옮길 수 있는가”다. 제목으로 짐작할 수 있는 것은 여기까지다.
+     fixed   — 상대가 있어 보인다. 물어보는 값이 비싸 보인다.
+     soft    — 혼자 하는 작업으로 보인다. 물어볼 값어치가 있다.
+     unknown — 아무것도 짐작할 수 없다.
+   셋 다 짐작이지 판정이 아니다. 그래서 어느 쪽도 후보에서 지우지 않는다.
+   「고객사 방문」도 미리 양해를 구하면 옮겨지고, 「자료 정리」도 마감이 급하면 못 옮긴다.
+   그 사정은 캘린더에 없다. 도구는 순서만 정하고, 지울지는 사람이 정한다. */
 const FIXED_RE = /외부 미팅|고객|점심 미팅|임원 보고|이사회|대표 보고|면접|계약 서명|방문|워크숍|공유회|온보딩|인터뷰|고객 콜|분쟁|자문|약관|스탠드업|데일리/;
 const SOFT_RE  = /업무 집중|집중 근무|개인 작업|정리|작성|준비|점검|모니터링|처리|최적화|리팩터링|프로파일링|스크립트|서류|계획|승인|검토|테스트|리뷰/;
 
@@ -1369,7 +1371,7 @@ function mobility(ev){
 }
 /* 화면에 붙는 말은 본 것까지만 — 옮길 수 있는지는 본인이 답할 몫이다 */
 const MOBILITY_LABEL = {
-  fixed:"옮길 수 없음",
+  fixed:"상대가 있는 일정",
   soft:"혼자 하는 일정",
   unknown:"물어봐야 앎",
 };
@@ -1659,6 +1661,7 @@ const RANK_TEXT = {
   2:"필수 전원 가능 · 선택만 겹침",
   3:"혼자 하는 일정 1건과 겹침",
   4:"혼자 하는 일정 2건과 겹침",
+  5:"어려워 보이는 일정과 겹침 · 물어봐야 앎",
 };
 
 /* ===================== 상태 ===================== */
@@ -1671,7 +1674,7 @@ const state = {
   miniYear:2026, miniMonth:7,
   hidden:{}, query:"", sidebar:true, userEvents:[], seeded:0, edits:{}, deleted:{},
   onbOpen:true, onbDone:{}, tipSeen:{}, picker:null, linkOpen:false, importOpen:false, hostJoins:true,
-  hold:null, reminders:0, holdAnswer:null,
+  hold:null, reminders:0, holdAnswer:null, dropped:null, exhausted:false,
   blockedCount:0, blockedDays:[], showAlts:false, room:null, roomOpen:false, rsvp:{},
   res:{}, roomsOnly:false, draft:null,
 };
@@ -2677,16 +2680,55 @@ function sendRemind(){
   scheduleReply();
 }
 
-/* 리마인드를 받은 사람이 답을 보내온다 */
+/* 옮길 수 있는지는 그날의 사정에 달렸다 — 제목만 보고는 도구도 모른다.
+   그래서 답은 그 사람과 그 일정에 따라 갈리고, 같은 자리에서는 늘 같은 답이 온다. */
+function replyFor(sl){
+  const c = sl && sl.conflicts[0];
+  if(!c) return "yes";
+  let h = 0;
+  const s = c.who + "|" + c.block;
+  for(let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 9973;
+  return h % 3 === 0 ? "no" : "yes";
+}
+
+/* 물어본 사람이 답을 보내온다 */
 let replyTimer = null;
 function scheduleReply(){
   clearTimeout(replyTimer);
   replyTimer = setTimeout(() => {
     if(!state.hold || state.hold.confirmed || state.holdAnswer) return;
-    state.holdAnswer = "yes";
+    const who = state.hold.askers.join(", ");
+    state.holdAnswer = replyFor(state.slots[state.selectedSlot]);
     persist(); syncGrid(); paintCandidates();
-    toast(state.hold.askers.join(", ") + "님이 ‘가능’으로 답했습니다.", "전원 확정하기", confirmHold);
+    if(state.sheetOpen) render();       /* 시트를 닫아 뒀으면 캘린더만 갱신한다 */
+    if(state.holdAnswer === "yes"){
+      toast(who + "님이 ‘가능’으로 답했습니다.", "전원 확정하기", confirmHold);
+      return;
+    }
+    /* 옮길 수 없다는 답이 오면 그 후보는 빠지고 다음 순위로 넘어간다 */
+    toast(who + "님이 ‘어렵다’고 답했습니다.");
+    setTimeout(dropAndAdvance, 1800);
   }, 4000);
+}
+
+/* 거절당한 자리를 후보에서 빼고, 남은 것 중 가장 높은 순위를 다시 제안한다 */
+function dropAndAdvance(){
+  if(state.holdAnswer !== "no" || !state.hold) return;
+  const sl = state.slots[state.selectedSlot];
+  state.dropped = { who:state.hold.askers.join(", "), block:sl.conflicts[0].block, when:fmt(sl) };
+  state.slots = state.slots.filter((s, i) => i !== state.selectedSlot);
+  state.hold = null; state.holdAnswer = null; state.reminders = 0;
+
+  if(!state.slots.length){            /* 더 물어볼 자리가 없다 */
+    state.selectedSlot = null;
+    state.exhausted = true;
+    state.step = 3;
+    persist(); syncGrid(); paintCandidates();
+    if(state.sheetOpen) render();
+    toast("물어본 자리가 모두 어렵다는 답을 받았습니다.");
+    return;
+  }
+  proposeSlot(0);
 }
 
 /* 겹쳤던 한 명이 옮겨주면, 그 자리에서 참석자 전원의 일정이 확정된다 */
@@ -2815,7 +2857,7 @@ function computeSlots(){
         if(!ev) return;
         const m = mobility(ev);
         const c = { who:id, block:ev.t, k:ev._k, m };
-        /* 옮길 수 없는 일정과 겹치면 그 시간은 후보가 아니다 */
+        /* 상대가 있어 보이는 일정 — 어려워 보일 뿐, 아직 물어본 적은 없다 */
         if(m === "fixed") hard.push(c); else rc.push(c);
       });
       opt.forEach(id => {
@@ -2825,17 +2867,24 @@ function computeSlots(){
         if(ev) oc.push({ who:id, block:ev.t, k:ev._k, m:mobility(ev) });
       });
 
-      if(hard.length){ state.blockedCount++; continue; }
-
+      const all = rc.concat(hard);
       let rank = null;
-      if(rc.length === 0) rank = oc.length === 0 ? 1 : 2;
-      else if(rc.length === 1) rank = 3;
-      else if(rc.length === 2) rank = 4;
-      if(!rank) continue;
+      if(!hard.length){
+        if(rc.length === 0) rank = oc.length === 0 ? 1 : 2;
+        else if(rc.length === 1) rank = 3;
+        else if(rc.length === 2) rank = 4;
+      }else if(all.length <= 2){
+        /* 「고객사 방문」처럼 어려워 보이는 자리도 지우지 않는다.
+           화면만 보고 안 된다고 결론 내리는 것이 원래 문제였다.
+           맨 뒤 후보로 남겨, 물어볼지 말지는 주최자가 정한다. */
+        rank = 5;
+      }
+      /* 물어볼 사람이 셋 넘게 생기는 자리만 후보에서 뺀다 */
+      if(!rank){ state.blockedCount++; continue; }
 
       /* 점심 직후 — 회의는 열리지만 결정의 질이 떨어진다 */
       const lowFocus = s < LOW_FOCUS[1] && e > LOW_FOCUS[0];
-      found.push({ d, s, e, rank, lowFocus, conflicts:rc, optConflicts:oc });
+      found.push({ d, s, e, rank, lowFocus, conflicts:all, optConflicts:oc });
     }
   }
 
@@ -3382,6 +3431,7 @@ function startScan(){
   state.step = 2;
   state.selectedSlot = null;
   state.room = null; state.roomOpen = false;
+  state.dropped = null; state.exhausted = false;
   state.slots = computeSlots();
   if(state.view !== "week" || weekOff() !== 0){ state.view = "week"; paintViewBtn(); gotoWeek(0); }
   render();
@@ -3389,23 +3439,31 @@ function startScan(){
     if(state.step !== 2) return;
     if(!state.slots.length){ state.selectedSlot = null; state.step = 3; render(); return; }
     /* 고르는 것도 보내는 것도 AI가 한다 — 주최자는 결과를 보고 되돌린다 */
-    const sl = state.slots[0];
-    state.selectedSlot = 0;
-    state.sent = sl.rank <= 2 ? "invite" : "ask";
-    const rm = pickedRoom(sl);
-    state.hold = {
-      d:sl.d, s:sl.s, e:sl.e, rank:sl.rank, confirmed:sl.rank <= 2,
-      title:state.title, people:headCount(),
-      att:(state.hostJoins ? [{ id:"me", need:"host" }] : []).concat(
-        state.attendees.map(a => ({ id:a.id, need:a.need }))),
-      askers:sl.conflicts.map(c => P(c.who).name),
-      room:rm ? rm.n : null, roomId:rm ? rm.id : null,
-    };
-    state.step = 4;
     onbMark("send");
-    render();
-    if(!state.hold.confirmed) scheduleReply();   /* 물어봤으니 답이 온다 */
+    proposeSlot(0);
   }, 1500);
+}
+
+/* 후보 하나를 제안한다 — 전원 비면 확정 초대, 아니면 겹친 한 명에게만 요청 */
+function proposeSlot(i){
+  const sl = state.slots[i];
+  if(!sl) return;
+  const rm = (state.selectedSlot = i, pickedRoom(sl));
+  state.sent = sl.rank <= 2 ? "invite" : "ask";
+  state.holdAnswer = null;
+  state.reminders = 0;
+  state.hold = {
+    d:sl.d, s:sl.s, e:sl.e, rank:sl.rank, confirmed:sl.rank <= 2,
+    title:state.title, people:headCount(),
+    att:(state.hostJoins ? [{ id:"me", need:"host" }] : []).concat(
+      state.attendees.map(a => ({ id:a.id, need:a.need }))),
+    askers:sl.conflicts.map(c => P(c.who).name),
+    room:rm ? rm.n : null, roomId:rm ? rm.id : null,
+  };
+  state.step = 4;
+  persist(); syncGrid(); paintCandidates();
+  if(state.sheetOpen) render();
+  if(!state.hold.confirmed) scheduleReply();   /* 물어봤으니 답이 온다 */
 }
 
 function renderScan(){
@@ -3488,10 +3546,16 @@ function renderResults(){
   title.textContent = "가능한 일정";
 
   if(!slots.length){
-    sub.textContent = "물어볼 만한 시간까지 봤지만 후보가 없습니다.";
-    body.innerHTML = '<div class="banner warn">옮길 수 없는 일정과 겹친 <b>' + (state.blockedCount || 0) +
-      '칸</b>을 빼고 나면, 남는 건 필수 3명 이상이 겹치는 시간뿐입니다. ' +
-      '필수를 줄이거나 범위를 다음다음 주로 넓혀야 합니다.</div>';
+    /* 애초에 없었던 것과, 물어봤다가 다 거절당한 것은 다른 상황이다 */
+    sub.textContent = state.exhausted
+      ? "물어본 자리가 모두 어렵다는 답을 받았습니다."
+      : "물어볼 만한 시간까지 봤지만 후보가 없습니다.";
+    body.innerHTML = state.exhausted
+      ? '<div class="banner warn">겹친 분들이 모두 <b>옮기기 어렵다</b>고 답해 후보가 다 빠졌습니다. ' +
+        '필수를 줄이거나 범위를 다음다음 주로 넓혀야 합니다.</div>'
+      : '<div class="banner warn">어느 자리든 <b>물어볼 사람이 셋 넘게</b> 생깁니다' +
+        (state.blockedCount ? ' (' + state.blockedCount + '칸)' : '') + '. ' +
+        '필수를 줄이거나 범위를 다음다음 주로 넓혀야 합니다.</div>';
     foot.innerHTML = '<button class="btn ghost" id="backBtn">인원 수정</button>';
     document.getElementById("backBtn").onclick = () => { state.step = 1; render(); };
     return;
@@ -3505,11 +3569,18 @@ function renderResults(){
 
   sub.textContent = confirmable
     ? "AI가 고른 시간입니다. 보낼지만 정하시면 됩니다."
+    : sel.rank === 5
+    ? "앞 순위가 없어, 어려워 보이는 자리까지 후보로 올렸습니다."
     : "전원이 비는 시간이 없어, 물어볼 사람이 가장 적은 시간을 골랐습니다.";
 
   body.innerHTML =
     (confirmable
       ? '<div class="banner good">전원이 비는 시간을 찾았습니다. 바로 확정 초대가 나갑니다.</div>'
+      : sel.rank === 5
+      /* 사람이라면 지웠을 자리 — 지우지 않은 이유를 밝힌다 */
+      ? '<div class="banner warn"><b>여기는 화면만 보면 안 되는 시간처럼 보입니다.</b> ' +
+        '그래도 지우지 않았습니다. 「고객사 방문」도 미리 양해를 구하면 옮겨지고, ' +
+        '그 사정은 캘린더에 적혀 있지 않습니다. 물어볼지는 주최자가 정합니다.</div>'
       : '<div class="banner warn"><b>전원이 비는 시간은 없습니다.</b> 여기서 멈추지 않고 ' +
         '<b>혼자 하는 일정과 겹치는 시간</b>까지 봤습니다. ' +
         '“일정이 있다”를 확정된 불가능이 아니라 아직 물어보지 않은 상태로 취급합니다.</div>') +
@@ -3548,6 +3619,7 @@ function renderResults(){
       state.selectedSlot = +c.dataset.slot;
       state.showAlts = false;
       state.room = null;              /* 시간이 바뀌면 빈 방도 달라진다 */
+      state.dropped = null;           /* 주최자가 직접 고른 자리다 */
       render();
     };
   });
@@ -3558,19 +3630,7 @@ function renderResults(){
       (confirmable ? "초대 + 리마인드 보내기" : "시간 확보 + 조율 요청") + '</button>';
   document.getElementById("backBtn").onclick = () => { state.step = 1; render(); };
   const sn = document.getElementById("sendBtn");
-  if(sn) sn.onclick = () => {
-    state.sent = confirmable ? "invite" : "ask";
-    const rm = pickedRoom(sel);
-    state.hold = {
-      d:sel.d, s:sel.s, e:sel.e, rank:sel.rank, confirmed:confirmable,
-      title:state.title, people:headCount(),
-      att:(state.hostJoins ? [{ id:"me", need:"host" }] : []).concat(
-        state.attendees.map(a => ({ id:a.id, need:a.need }))),
-      askers:sel.conflicts.map(c => P(c.who).name),
-      room:rm ? rm.n : null, roomId:rm ? rm.id : null,
-    };
-    state.step = 4; render();
-  };
+  if(sn) sn.onclick = () => proposeSlot(state.selectedSlot);
 }
 
 function slotNote(sl){
@@ -3600,6 +3660,9 @@ function pickReason(sl, all){
   if(sl.rank === 2)
     return "필수 인원은 모두 가능하고, 선택 인원 " +
       sl.optConflicts.map(c => P(c.who).name).join(", ") + "만 겹칩니다. 물어볼 사람이 없습니다.";
+  if(sl.rank === 5)
+    return "앞 순위 후보가 없어 여기까지 내려왔습니다. 「" + sl.conflicts[0].block +
+      "」은 어려워 보이지만, 물어보기 전에는 모릅니다.";
   return "겹치는 일정이 " + sl.conflicts.length + "건뿐이고, 모두 혼자 하는 일정이라 물어볼 만합니다." +
     (sl.conflicts.length === fewest ? " 후보 중 물어볼 사람이 가장 적습니다." : "");
 }
@@ -3617,6 +3680,11 @@ function whyBox(sl){
   }else if(sl.rank === 2){
     lines.push('꼭 와야 하는 <b>' + req + '명</b>은 그 시간이 비어 있습니다.');
     lines.push('<b>' + names(sl.optConflicts) + '</b>님만 다른 일정이 있는데, 안 와도 되는 분이라 그대로 잡았습니다.');
+  }else if(sl.rank === 5){
+    /* 화면만 보고 지워버리던 자리 — 지우는 대신 맨 뒤에 남겨 물어보게 한다 */
+    lines.push('앞 순위 후보가 없어, <b>어려워 보이는 자리</b>까지 내려왔습니다.');
+    lines.push('<b>' + names(sl.conflicts) + '</b>님의 <b>「' + sl.conflicts[0].block +
+      '」</b>과 겹칩니다. 미리 양해를 구하면 옮겨질 수도 있어, 지우지 않고 남겼습니다.');
   }else{
     lines.push('그 시간에 일정이 있는 사람은 <b>' + names(sl.conflicts) + '</b>님뿐입니다.');
     /* 옮길 수 있는지는 본인만 안다 — 도구는 본 것만 말한다 */
@@ -3624,10 +3692,8 @@ function whyBox(sl){
       '옮길 수 있는지는 본인만 압니다.');
   }
 
-  if(state.slots.length > 1)
-    lines.push('외근처럼 못 옮기는 일정이 낀 시간은 빼고, 남은 후보 중 가장 빠른 때입니다.');
-  else
-    lines.push('외근처럼 못 옮기는 일정이 낀 시간은 후보에서 뺐습니다.');
+  lines.push('전사 일정으로 막힌 날과 점심시간만 후보에서 뺐습니다. ' +
+    '나머지는 순서만 매기고 지우지 않았습니다.');
 
   return '<div class="why-box"><div class="why-h">왜 이 시간인가요</div><ul>' +
     lines.slice(0, 3).map(l => '<li>' + l + '</li>').join("") + '</ul></div>';
@@ -3639,6 +3705,14 @@ function renderDone(){
   const held = state.attendees.filter(a => !sl.conflicts.some(c => c.who === a.id));
   const confirmed = state.hold && state.hold.confirmed;
 
+  /* 앞 후보가 왜 빠졌는지 — 한 번 물었다가 접었다는 사실을 남긴다 */
+  const dp = state.dropped;
+  const dropBanner = dp
+    ? '<div class="banner"><b>' + esc(dp.when) + '</b>은 <b>' + esc(dp.who) +
+      '</b>님이 「' + esc(dp.block) + '」을 옮기기 어렵다고 해서 빠졌습니다. ' +
+      '다음 순위로 넘어왔습니다.</div>'
+    : '';
+
   /* ---------- 1·2순위 또는 조율 성공 → 확정 ---------- */
   if(confirmed){
     const viaAsk = state.sent === "ask";
@@ -3648,7 +3722,7 @@ function renderDone(){
     sub.textContent = viaAsk
       ? "겹친 일정이 옮겨져서 가예약이 확정으로 바뀌었습니다."
       : "전원이 비는 시간이라 바로 확정했습니다.";
-    body.innerHTML =
+    body.innerHTML = dropBanner +
       '<div class="done-wrap"><div class="done-mark">✓</div>' +
         '<h3>일정이 잡혔습니다</h3>' +
         '<p><b>' + fmt(sl) + '</b> · ' + (room || "회의실 없이 진행") + '<br>' +
@@ -3665,7 +3739,7 @@ function renderDone(){
 
     const room = state.hold && state.hold.room;
 
-    body.innerHTML =
+    body.innerHTML = dropBanner +
       '<div class="done-wrap"><div class="done-mark hold">⏳</div>' +
         '<h3>이 시간을 잡아뒀습니다</h3>' +
         '<p><b>' + fmt(sl) + '</b> · ' + (room || "회의실 없이 진행") + '<br>' +
@@ -3679,7 +3753,8 @@ function renderDone(){
             '</b>님이 <b>옮길 수 있다</b>고 답했습니다. 이제 확정할 수 있습니다.</div>'
           : state.holdAnswer === "no"
           ? '<div class="banner warn"><b>' + askers.map(p => p.name).join(", ") +
-            '</b>님이 <b>옮기기 어렵다</b>고 답했습니다. 다른 시간을 찾아야 합니다.</div>'
+            '</b>님이 <b>옮기기 어렵다</b>고 답했습니다. ' +
+            '이 자리는 후보에서 빼고 다음 순위로 넘어갑니다.</div>'
           : '') +
 
         whyBox(sl) +
@@ -3705,7 +3780,8 @@ function renderDone(){
     ? '<div style="flex:1"></div><button class="btn primary" id="doneBtn">확인</button>'
     : '<button class="btn ghost" id="againBtn">다른 시간으로</button>' +
       '<div style="flex:1"></div>' +
-      (ans === "no" ? '<button class="btn primary" id="reFind">다른 시간 다시 찾기</button>'
+      /* 거절 답이 오면 도구가 알아서 다음 순위로 넘어간다 — 재촉할 버튼이 없다 */
+      (ans === "no" ? '<button class="btn primary" id="nextBtn">다음 순위로</button>'
         : ans === "yes" ? '<button class="btn primary" id="confirmBtn">확정하고 전원 초대</button>'
         : '<button class="btn primary" id="doneBtn">완료</button>');
 
@@ -3713,8 +3789,8 @@ function renderDone(){
   if(ag) ag.onclick = () => { state.showAlts = true; state.step = 3; render(); };
   const cb = document.getElementById("confirmBtn");
   if(cb) cb.onclick = () => { state.hold.confirmed = true; state.reminders = 0; render(); };
-  const rf = document.getElementById("reFind");
-  if(rf) rf.onclick = () => { state.hold = null; state.step = 3; render(); };
+  const nx = document.getElementById("nextBtn");
+  if(nx) nx.onclick = dropAndAdvance;
   const db = document.getElementById("doneBtn");
   if(db) db.onclick = () => {
     const done = state.hold && state.hold.confirmed;
