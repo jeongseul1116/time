@@ -6,65 +6,113 @@
 <meta name="robots" content="noindex, nofollow" />
 <title>자동 조율 · 인터랙티브 프로토타입</title>
 <style>
+  /* 밝은 모드가 기본 — 토스 그레이 스케일 */
   :root{
-    --bg:#131314;
-    --surface:#1b1b1b;
-    --surface-2:#282a2c;
-    --surface-3:#303134;
-    --line:#3c4043;
-    --grid-line:#2f3033;
-    --text:#e3e3e3;
-    --text-dim:#9aa0a6;
-    --text-faint:#70757a;
-    --accent:#a8c7fa;
-    --accent-deep:#8ab4f8;
-    --on-accent:#062e6f;
-    --p1:#81c995;
-    --p2:#a8c7fa;
-    --p3:#fdd663;
-    --p4:#d7aefb;
+    --bg:#F2F4F6;
+    --surface:#FFFFFF;
+    --surface-2:#F2F4F6;
+    --surface-3:#E5E8EB;
+    --line:#E5E8EB;
+    --grid-line:#EFF1F4;
+    --text:#191F28;
+    --text-dim:#6B7684;
+    --text-faint:#8B95A1;
+    --accent:#3182F6;
+    --accent-deep:#1B64DA;
+    --accent-soft:rgba(49,130,246,.10);
+    --accent-fg:#1B64DA;
+    --on-accent:#ffffff;
+    --p1:#15C47E;   /* 됨 */
+    --p2:#3182F6;   /* 거의 됨 */
+    --p3:#FFC845;   /* 물어봐야 함 */
+    --p4:#9B72F0;   /* 더 물어봐야 함 */
+    --p5:#F04452;   /* 어려워 보임 */
+    --good-fg:#0FA968;
+    --warn-fg:#B98700;
+    --bad-fg:#D6303F;
+    --hatch:rgba(0,0,0,.05);
+    --hatch-strong:rgba(0,0,0,.09);
+    --scrim:rgba(255,255,255,.62);
+    --toast-bg:#191F28;
+    --toast-fg:#FFFFFF;
+    --scroll:#D1D6DB;
+    --scroll-hover:#B0B8C1;
+    --shadow-pop:0 10px 32px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06);
+    --r-card:16px;
+    --r-btn:12px;
     --gutter:60px;
     --rowH:62px;
-    --sheetW:404px;
+    --sheetW:420px;
   }
-  *{box-sizing:border-box}
+  /* 어두운 모드 */
+  :root[data-theme="dark"]{
+    --bg:#17171C;
+    --surface:#1D1D22;
+    --surface-2:#26262D;
+    --surface-3:#2E2E36;
+    --line:#33333C;
+    --grid-line:#26262D;
+    --text:#F0F0F2;
+    --text-dim:#8D8D9B;
+    --text-faint:#61616E;
+    --accent:#3182F6;
+    --accent-deep:#1B64DA;
+    --accent-soft:rgba(49,130,246,.16);
+    --accent-fg:#6BA6FA;
+    --good-fg:#5FD3A6;
+    --warn-fg:#E3BE73;
+    --bad-fg:#F79AA1;
+    --hatch:rgba(255,255,255,.03);
+    --hatch-strong:rgba(255,255,255,.06);
+    --scrim:rgba(19,19,20,.55);
+    --toast-bg:#F0F0F2;
+    --toast-fg:#17171C;
+    --scroll:#3A3A44;
+    --scroll-hover:#4A4A56;
+    --shadow-pop:0 12px 32px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.35);
+  }  *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;background:var(--bg);color:var(--text);
-    font-family:"Google Sans","Pretendard","Apple SD Gothic Neo","Malgun Gothic",Roboto,system-ui,sans-serif;
-    font-size:14px;-webkit-font-smoothing:antialiased;overflow:hidden;
+    font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",
+      system-ui,-apple-system,sans-serif;
+    font-size:15px;line-height:1.5;letter-spacing:-.02em;
+    -webkit-font-smoothing:antialiased;overflow:hidden;
   }
-  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
-  input{font:inherit}
-  ::-webkit-scrollbar{width:12px;height:12px}
-  ::-webkit-scrollbar-thumb{background:#5f6368;border-radius:8px;border:4px solid var(--bg);background-clip:padding-box}
-  ::-webkit-scrollbar-thumb:hover{background:#80868b;background-clip:padding-box;border:4px solid var(--bg)}
+  /* 토스는 글자가 굵고 자간이 좁다 */
+  h1,h2,h3,h4,h5{letter-spacing:-.03em;font-weight:700}
+  b,strong{font-weight:700}
+  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;letter-spacing:-.02em}
+  input,textarea{font:inherit;letter-spacing:-.02em}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:99px;border:3px solid var(--bg);background-clip:padding-box}
+  ::-webkit-scrollbar-thumb:hover{background:var(--scroll-hover);background-clip:padding-box;border:3px solid var(--bg)}
 
   /* ---------- 상단바 ---------- */
   .topbar{
     height:64px;display:flex;align-items:center;gap:8px;padding:0 12px 0 8px;
   }
-  .logo{display:flex;align-items:center;gap:9px;font-size:22px;color:#c4c7c5;letter-spacing:-.3px;margin-right:8px}
+  .logo{display:flex;align-items:center;gap:9px;font-size:22px;color:var(--text-dim);letter-spacing:-.3px;margin-right:8px}
   .logo .mark{
     width:32px;height:32px;border-radius:8px;background:#fff;position:relative;
-    display:grid;place-items:center;font-size:13px;font-weight:700;color:#1a73e8;
-    box-shadow:inset 0 0 0 1px #dadce0;
+    display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--accent);
+    box-shadow:inset 0 0 0 1px var(--line);
   }
   .topbar .spacer{flex:1}
   .g-btn{
     border:1px solid var(--line);border-radius:999px;padding:0 16px;height:36px;
-    display:flex;align-items:center;gap:6px;color:#c4c7c5;font-size:14px;
+    display:flex;align-items:center;gap:6px;color:var(--text-dim);font-size:14px;
   }
-  .g-btn:hover{background:rgba(232,234,237,.08)}
+  .g-btn:hover{background:rgba(240,240,242,.08)}
   .icon-btn{
     width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
-    color:#c4c7c5;font-size:18px;line-height:1;flex:none;
+    color:var(--text-dim);font-size:18px;line-height:1;flex:none;
   }
-  .icon-btn:hover{background:rgba(232,234,237,.08)}
+  .icon-btn:hover{background:rgba(240,240,242,.08)}
   .icon-btn.sm{width:32px;height:32px;font-size:14px}
-  .range-title{font-size:22px;color:#e3e3e3;letter-spacing:-.4px;margin-left:8px}
+  .range-title{font-size:22px;color:var(--text);letter-spacing:-.4px;margin-left:8px}
   .avatar-me{
-    width:32px;height:32px;border-radius:50%;background:#3f51b5;color:#fff;
+    width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;
     display:grid;place-items:center;font-size:13px;font-weight:600;margin-left:8px;
   }
 
@@ -77,47 +125,49 @@
   /* 창이 좁으면 밀어낼 자리가 없으므로 덮는 방식으로 되돌린다 */
   @media (max-width:1180px){
     .app.shifted{margin-right:0}
-    .sheet.on{box-shadow:-8px 0 30px rgba(0,0,0,.5)}
+    .sheet.on{box-shadow:-8px 0 30px rgba(0,0,0,.10)}
+  :root[data-theme="dark"] .sheet.on{box-shadow:-8px 0 30px rgba(0,0,0,.5)}
   }
   .sidebar{width:256px;flex:none;padding:0 8px 16px 12px;overflow:auto}
   .main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 8px 8px 0}
 
   /* ---------- 만들기 ---------- */
-  .create-wrap{position:relative;margin:6px 0 16px 4px}
+  .create-wrap{position:relative;margin:6px 4px 8px}
   .create-btn{
-    position:relative;               /* 링이 버튼 크기를 따라가도록 */
-    display:inline-flex;align-items:center;gap:10px;
-    background:var(--surface-3);border-radius:16px;padding:0 24px 0 16px;height:48px;
-    box-shadow:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15);font-size:14px;font-weight:500;
+    position:relative;
+    display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+    background:var(--accent);color:#fff;border-radius:14px;height:50px;
+    font-size:16px;font-weight:700;transition:background .12s,transform .08s;
   }
-  .create-btn:hover{background:#3a3c3f;box-shadow:0 1px 3px rgba(0,0,0,.4),0 4px 8px 3px rgba(0,0,0,.15)}
+  .create-btn:hover{background:var(--accent-deep)}
+  .create-btn:active{transform:scale(.98)}
   .create-btn .plus{font-size:22px;line-height:1;font-weight:400}
   @keyframes pop{from{opacity:0;transform:scale(.97);transform-origin:top left}to{opacity:1;transform:none}}
 
   /* ---------- 미니 캘린더 ---------- */
   .mini{padding:0 8px 8px}
   .mini-head{display:flex;align-items:center;gap:2px;margin-bottom:6px}
-  .mini-head .m{flex:1;font-size:14px;color:#e3e3e3;padding-left:8px}
+  .mini-head .m{flex:1;font-size:14px;color:var(--text);padding-left:8px}
   .mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0}
   .mini-grid .dw{font-size:10px;color:var(--text-dim);text-align:center;padding:5px 0}
   .mini-grid .d{
-    font-size:11px;text-align:center;line-height:24px;height:24px;border-radius:50%;
-    color:#c4c7c5;cursor:pointer;
+    font-size:12px;font-weight:600;text-align:center;line-height:28px;height:28px;
+    border-radius:9px;color:var(--text);cursor:pointer;
   }
-  .mini-grid .d:hover{background:rgba(232,234,237,.1)}
-  .mini-grid .d.out{color:#5f6368}
+  .mini-grid .d:hover{background:rgba(240,240,242,.1)}
+  .mini-grid .d.out{color:var(--text-faint)}
   /* 주말은 조율 대상이 아니다 — 빗금으로 잡을 수 없는 날임을 말한다 */
   .mini-grid .d.wknd{
-    color:#5f6368;
+    color:var(--text-faint);
     background:repeating-linear-gradient(-45deg,
-      rgba(255,255,255,.05) 0 3px, transparent 3px 6px);
+      var(--hatch-strong) 0 3px, transparent 3px 6px);
   }
-  .mini-grid .d.wknd:hover{background:rgba(232,234,237,.1)}
-  .mini-grid .dw.wknd{color:#5f6368}
-  .mini-grid .d.today{background:#0b57d0;color:#fff}
-  .mini-grid .d.week{background:rgba(138,180,248,.18);border-radius:0;color:#d3e3fd}
-  .mini-grid .d.week.w0{border-radius:12px 0 0 12px}
-  .mini-grid .d.week.w1{border-radius:0 12px 12px 0}
+  .mini-grid .d.wknd:hover{background:rgba(240,240,242,.1)}
+  .mini-grid .dw.wknd{color:var(--text-faint)}
+  .mini-grid .d.today{background:var(--accent);color:#fff}
+  .mini-grid .d.week{background:var(--accent-soft);border-radius:0;color:var(--accent-fg)}
+  .mini-grid .d.week.w0{border-radius:9px 0 0 9px}
+  .mini-grid .d.week.w1{border-radius:0 9px 9px 0}
   .mini-note{
     display:flex;align-items:center;gap:7px;margin:8px 2px 0;
     font-size:10.5px;color:var(--text-faint);
@@ -125,8 +175,8 @@
   .mini-note i{
     width:12px;height:12px;border-radius:3px;flex:none;
     background:repeating-linear-gradient(-45deg,
-      rgba(255,255,255,.16) 0 3px, transparent 3px 6px);
-    box-shadow:inset 0 0 0 1px #3c4043;
+      var(--hatch-strong) 0 3px, transparent 3px 6px);
+    box-shadow:inset 0 0 0 1px var(--line);
   }
 
   /* ---------- 사이드바 목록 ---------- */
@@ -161,12 +211,12 @@
   .side-h .all{
     font-size:11px;color:var(--accent);padding:3px 8px;border-radius:999px;
   }
-  .side-h .all:hover{background:rgba(168,199,250,.14)}
+  .side-h .all:hover{background:rgba(49,130,246,.14)}
   .side-h .chev{transition:transform .15s;display:inline-block}
   .side-h.closed .chev{transform:rotate(180deg)}
   .cal-row{cursor:pointer;user-select:none}
-  .cal-row.hid{color:#5f6368}
-  .cal-row.hid .cbox{background:transparent;box-shadow:inset 0 0 0 2px #5f6368}
+  .cal-row.hid{color:var(--text-faint)}
+  .cal-row.hid .cbox{background:transparent;box-shadow:inset 0 0 0 2px var(--text-faint)}
   .cal-row .only{
     margin-left:auto;font-size:10px;color:var(--text-faint);opacity:0;transition:opacity .12s;
   }
@@ -180,14 +230,14 @@
 
   /* 떠 있는 메뉴 */
   .tmenu{
-    position:fixed;z-index:130;min-width:196px;background:#2d2f31;border-radius:8px;padding:8px 0;
-    box-shadow:0 4px 8px 3px rgba(0,0,0,.3),0 1px 3px rgba(0,0,0,.5);display:none;
+    position:fixed;z-index:130;min-width:196px;background:var(--surface-2);border-radius:8px;padding:8px 0;
+    box-shadow:var(--shadow-pop);display:none;
   }
   .tmenu.on{display:block;animation:pop .12s ease-out}
   .tmenu .ti{
     display:flex;align-items:center;gap:10px;width:100%;padding:10px 18px;text-align:left;font-size:13.5px;
   }
-  .tmenu .ti:hover{background:rgba(232,234,237,.08)}
+  .tmenu .ti:hover{background:rgba(240,240,242,.08)}
   .tmenu .ti .k{margin-left:auto;font-size:11px;color:var(--text-faint)}
   .tmenu .ti.on{color:var(--accent)}
   .tmenu .th{padding:10px 18px 6px;font-size:11px;color:var(--text-faint)}
@@ -201,13 +251,13 @@
   /* 우측 하단 플로팅 버튼 — 여기서 안내가 펼쳐진다 */
   /* 만들기 바로 아래 — 캘린더를 가리지 않는다 */
   .tour-btn{
-    display:flex;align-items:center;gap:8px;margin:0 8px 14px 4px;
-    height:38px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:600;
-    background:rgba(168,199,250,.13);color:var(--accent);
-    border:1px solid rgba(168,199,250,.3);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    margin:0 4px 16px;width:calc(100% - 8px);
+    height:44px;border-radius:14px;font-size:14.5px;font-weight:700;
+    background:var(--accent-soft);color:var(--accent-fg);
   }
-  .tour-btn .lb{font-size:13px}
-  .tour-btn:hover{background:rgba(168,199,250,.22)}
+  .tour-btn .lb{font-size:14.5px}
+  .tour-btn:hover{background:rgba(49,130,246,.22)}
   .tour-btn.on{background:var(--accent);color:var(--on-accent);border-color:transparent}
   .tour-btn.on{
     background:var(--surface-3);color:var(--accent);
@@ -220,9 +270,9 @@
 
   /* 시작하기 체크리스트 */
   .onb{
-    position:fixed;left:268px;top:132px;z-index:200;width:274px;background:#2d2f31;
+    position:fixed;left:268px;top:132px;z-index:200;width:274px;background:var(--surface-2);
     transform-origin:top left;
-    border-radius:14px;border:1px solid rgba(168,199,250,.28);
+    border-radius:14px;border:1px solid rgba(49,130,246,.28);
     box-shadow:0 8px 10px 1px rgba(0,0,0,.35),0 3px 14px 2px rgba(0,0,0,.4);
     display:none;overflow:hidden;
   }
@@ -234,24 +284,24 @@
     width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
     font-size:11px;color:var(--text-dim);
   }
-  .onb-h button:hover{background:rgba(232,234,237,.1);color:var(--text)}
-  .onb-bar{height:3px;background:rgba(255,255,255,.1);margin:0 14px}
+  .onb-h button:hover{background:rgba(240,240,242,.1);color:var(--text)}
+  .onb-bar{height:3px;background:var(--surface-3);margin:0 14px}
   .onb-bar i{display:block;height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
   .onb-list{padding:10px 6px 12px}
   .onb-i{display:flex;gap:10px;padding:8px 10px;border-radius:9px;align-items:flex-start}
   .onb-i .bx{
     width:16px;height:16px;border-radius:50%;flex:none;margin-top:1px;
-    box-shadow:inset 0 0 0 1.5px #5f6368;display:grid;place-items:center;font-size:9px;color:transparent;
+    box-shadow:inset 0 0 0 1.5px var(--text-faint);display:grid;place-items:center;font-size:9px;color:transparent;
   }
   .onb-i{width:100%;text-align:left;cursor:pointer}
-  .onb-i:hover{background:rgba(232,234,237,.07)}
+  .onb-i:hover{background:rgba(240,240,242,.07)}
   .onb-i .lb{display:block;font-size:12.5px;line-height:1.5}
   .onb-i .hint{display:block;font-size:11px;color:var(--text-faint);margin-top:2px;line-height:1.5}
   .onb-i .go{
     margin-left:auto;flex:none;font-size:10.5px;color:var(--accent);opacity:0;transition:opacity .12s;
   }
   .onb-i:hover .go{opacity:1}
-  .onb-i.next{background:rgba(168,199,250,.1)}
+  .onb-i.next{background:rgba(49,130,246,.1)}
   .onb-i.done .go{color:var(--text-dim)}
 
   /* 눌렀을 때 어디가 움직이는지 짚어준다 */
@@ -259,7 +309,7 @@
   .flash-ring{
     position:fixed;z-index:215;pointer-events:none;
     box-shadow:0 0 0 3px var(--accent),
-               0 0 0 9px rgba(168,199,250,.25),
+               0 0 0 9px rgba(49,130,246,.25),
                0 0 0 9999px rgba(0,0,0,.62);
     animation:flashout 2.6s ease-out forwards;
   }
@@ -286,7 +336,7 @@
   .flash-lb.up{bottom:calc(100% + 8px)}
   .flash-lb.down{top:calc(100% + 8px)}
   .onb-i.next .lb{color:var(--accent);font-weight:600}
-  .onb-i.done .bx{background:var(--p1);box-shadow:none;color:#0b2e1c}
+  .onb-i.done .bx{background:var(--p1);box-shadow:none;color:#fff}
   .onb-i.done .lb{color:var(--text-faint);text-decoration:line-through}
   .onb-i.done .hint{display:none}
   .onb-done{padding:18px 16px;text-align:center}
@@ -294,15 +344,15 @@
   .onb-done p{margin:0;font-size:12px;color:var(--text-dim);line-height:1.7}
   .onb-again{
     margin-top:12px;font-size:12px;font-weight:600;color:var(--accent);
-    border-radius:999px;padding:6px 14px;background:rgba(168,199,250,.12);
+    border-radius:999px;padding:6px 14px;background:rgba(49,130,246,.12);
   }
-  .onb-again:hover{background:rgba(168,199,250,.22)}
+  .onb-again:hover{background:rgba(49,130,246,.22)}
 
   /* 그 자리에서 한 줄로 알려주는 힌트 */
   .tip{
-    position:fixed;z-index:205;max-width:268px;background:#2d2f31;border-radius:10px;
-    padding:11px 13px;font-size:12px;line-height:1.7;color:#d7d9dc;
-    border:1px solid rgba(197,138,249,.35);
+    position:fixed;z-index:205;max-width:268px;background:var(--surface-2);border-radius:10px;
+    padding:11px 13px;font-size:12px;line-height:1.7;color:var(--text);
+    border:1px solid rgba(155,114,240,.35);
     box-shadow:0 6px 18px rgba(0,0,0,.45);display:none;
   }
   .tip.on{display:block;animation:pop .16s ease-out}
@@ -311,34 +361,36 @@
     position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;
     display:grid;place-items:center;font-size:10px;color:var(--text-faint);
   }
-  .tip .x:hover{background:rgba(232,234,237,.1);color:var(--text)}
+  .tip .x:hover{background:rgba(240,240,242,.1);color:var(--text)}
 
   /* 스낵바 */
   .toast{
-    position:fixed;left:24px;bottom:24px;z-index:210;background:#e3e3e3;color:#202124;
-    border-radius:8px;padding:13px 18px;font-size:13.5px;box-shadow:0 4px 14px rgba(0,0,0,.5);
-    display:flex;align-items:center;gap:14px;opacity:0;transform:translateY(10px);
-    transition:opacity .2s,transform .2s;pointer-events:none;
+    position:fixed;left:24px;bottom:24px;z-index:210;background:var(--toast-bg);color:var(--toast-fg);
+    border-radius:14px;padding:16px 20px;font-size:15px;font-weight:600;letter-spacing:-.02em;
+    box-shadow:var(--shadow-pop);
+    display:flex;align-items:center;gap:16px;opacity:0;transform:translateY(10px);
+    transition:opacity .22s cubic-bezier(.16,1,.3,1),transform .22s cubic-bezier(.16,1,.3,1);
+    pointer-events:none;
   }
   .toast.on{opacity:1;transform:none;pointer-events:auto}
-  .toast button{color:#0b57d0;font-weight:600;font-size:13px}
+  .toast button{color:var(--accent);font-weight:600;font-size:13px}
 
   /* 검색에 걸리지 않은 일정 */
   .ev.faded{opacity:.1 !important}
   .ev.found{outline:2px solid var(--accent);outline-offset:1px;z-index:5}
   .side-h{
-    font-size:14px;color:#e3e3e3;padding:8px 8px 4px;display:flex;align-items:center;
-    justify-content:space-between;
+    font-size:13px;font-weight:700;color:var(--text-dim);padding:16px 10px 6px;
+    display:flex;align-items:center;justify-content:space-between;letter-spacing:-.01em;
   }
-  .side-h span:last-child{color:var(--text-dim);font-size:11px}
-  .cal-row{display:flex;align-items:center;gap:12px;padding:6px 8px;border-radius:8px;color:#c4c7c5;font-size:13px}
-  .cal-row:hover{background:rgba(232,234,237,.06)}
-  .cbox{width:16px;height:16px;border-radius:3px;flex:none;display:grid;place-items:center;font-size:11px;color:#fff}
-  .cbox.sw-off{background:transparent;box-shadow:inset 0 0 0 2px #5f6368}
+  .side-h span:last-child{color:var(--text-faint);font-size:12px}
+  .cal-row{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:10px;color:var(--text);font-size:14px;font-weight:500}
+  .cal-row:hover{background:var(--surface-2)}
+  .cbox{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff}
+  .cbox.sw-off{background:transparent;box-shadow:inset 0 0 0 2px var(--text-faint)}
 
   /* ---------- 주간 그리드 ---------- */
   .grid-shell{
-    flex:1;min-height:0;background:var(--surface);border-radius:16px;
+    flex:1;min-height:0;background:var(--surface);border-radius:20px;
     display:flex;flex-direction:column;overflow:hidden;
   }
   .time-view{display:flex;flex-direction:column;flex:1;min-height:0}
@@ -348,29 +400,29 @@
 
   .grid-head{
     display:grid;grid-template-columns:var(--gutter) repeat(var(--cols,5),1fr);
-    border-bottom:1px solid var(--grid-line);
   }
   .grid-head .tz{
-    display:flex;align-items:flex-end;justify-content:flex-end;padding:0 8px 6px 0;
-    font-size:10px;color:var(--text-faint);
+    display:flex;align-items:flex-end;justify-content:flex-end;padding:0 10px 12px 0;
+    font-size:11px;font-weight:500;color:var(--text-faint);
   }
-  .dayhead{padding:8px 0 4px;text-align:center;border-left:1px solid var(--grid-line)}
-  .dayhead .dow{font-size:11px;color:var(--text-dim);letter-spacing:.8px}
+  .dayhead{padding:14px 0 10px;text-align:center}
+  .dayhead .dow{font-size:12px;font-weight:600;color:var(--text-dim);letter-spacing:0}
   .dayhead .num{
-    font-size:26px;color:#e3e3e3;margin-top:1px;line-height:1.5;font-weight:400;
-    width:46px;height:46px;display:inline-grid;place-items:center;border-radius:50%;
+    font-size:19px;font-weight:700;color:var(--text);margin-top:5px;line-height:1;
+    letter-spacing:-.03em;
+    width:36px;height:36px;display:inline-grid;place-items:center;border-radius:11px;
   }
-  .dayhead .num:hover{background:rgba(232,234,237,.1)}
-  .dayhead .num.on{background:#0b57d0;color:#fff}
+  .dayhead .num:hover{background:var(--surface-2)}
+  .dayhead .num.on{background:var(--accent);color:#fff}
   .allday{
     display:grid;grid-template-columns:var(--gutter) repeat(var(--cols,5),1fr);
-    border-bottom:1px solid var(--grid-line);min-height:30px;
+    border-bottom:1px solid var(--grid-line);min-height:34px;
   }
-  .allday .lb{font-size:10px;color:var(--text-faint);text-align:right;padding:8px 8px 0 0}
-  .allday .cell{border-left:1px solid var(--grid-line);padding:3px 4px}
+  .allday .lb{font-size:11px;font-weight:500;color:var(--text-faint);text-align:right;padding:9px 10px 0 0}
+  .allday .cell{padding:4px 5px}
   .allday .chip{
-    display:block;border-radius:4px;padding:2px 7px;font-size:11px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    display:block;border-radius:8px;padding:4px 9px;font-size:11.5px;font-weight:700;
+    letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
 
   .grid-body{flex:1;overflow:hidden;position:relative}
@@ -380,29 +432,29 @@
   }
   .times{position:relative}
   .times .t{
-    height:var(--rowH);font-size:10px;color:var(--text-faint);
-    text-align:right;padding-right:8px;transform:translateY(-6px);
+    height:var(--rowH);font-size:11px;font-weight:500;color:var(--text-faint);
+    text-align:right;padding-right:10px;transform:translateY(-6px);
   }
-  .daycol{position:relative;border-left:1px solid var(--grid-line)}
-  .daycol .slot{height:var(--rowH);border-bottom:1px solid var(--grid-line)}
-  .daycol .slot:hover{background:rgba(232,234,237,.03)}
+  .daycol{position:relative}
+  .daycol .slot{height:var(--rowH);border-bottom:1px solid var(--grid-line);border-radius:6px}
+  .daycol .slot:hover{background:var(--surface-2)}
   /* 주말 — 회의를 잡지 않는 날 */
   .daycol.wknd{background:repeating-linear-gradient(-45deg,
-    rgba(255,255,255,.022) 0 5px, transparent 5px 10px)}
-  .dayhead.wknd .dow,.dayhead.wknd .num:not(.on){color:#5f6368}
+    var(--hatch) 0 5px, transparent 5px 10px)}
+  .dayhead.wknd .dow,.dayhead.wknd .num:not(.on){color:var(--text-faint)}
   .lunch{position:absolute;left:0;right:0;background:repeating-linear-gradient(
-    45deg,transparent,transparent 6px,rgba(255,255,255,.022) 6px,rgba(255,255,255,.022) 12px);
+    45deg,transparent,transparent 6px,var(--hatch) 6px,var(--hatch) 12px);
     pointer-events:none;}
 
   .ev{
-    position:absolute;border-radius:4px;padding:1px 6px;overflow:hidden;
-    font-size:11px;line-height:1.3;cursor:pointer;
-    border:1px solid var(--surface);transition:opacity .2s;
+    position:absolute;border-radius:9px;padding:5px 9px;overflow:hidden;
+    font-size:12.5px;line-height:1.35;cursor:pointer;
+    border:2px solid var(--surface);transition:opacity .2s,transform .1s;
   }
-  .ev .tt{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ev .wh{font-size:10px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ev.short{padding-top:0;font-size:10.5px}
-  .ev.stk{border-left:2px solid var(--surface)}
+  .ev .tt{font-weight:700;letter-spacing:-.025em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ev .wh{font-size:11px;font-weight:500;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .ev.short{padding:2px 9px;font-size:11.5px}
+  .ev.stk{border-left:3px solid var(--surface)}
   /* 여러 명이 함께하는 일정 — 참석자 프로필 */
   .ev.multi{padding-right:6px}
   .ev-avs{position:absolute;right:4px;top:3px;display:flex;pointer-events:none}
@@ -413,7 +465,7 @@
   .ev-avs i:first-child{margin-left:0}
   .ev-avs i.more{background:rgba(0,0,0,.5);color:#fff;font-size:8px}
   .ev.short .ev-avs{top:2px}
-  .ev:hover{filter:brightness(1.18);z-index:24 !important}
+  .ev:hover{filter:brightness(1.12);transform:translateY(-1px);z-index:24 !important}
   .grid-shell.dim .ev{opacity:.3}
   /* 거절한 일정 — 배경은 캘린더 바탕색으로 막고 테두리만 색을 남긴다 */
   .ev.dec{background:var(--surface) !important;box-shadow:inset 0 0 0 1.5px currentColor}
@@ -428,17 +480,17 @@
   .mv-row{display:grid;grid-template-columns:repeat(7,1fr)}
   .mv-cell{border-left:1px solid var(--grid-line);border-top:1px solid var(--grid-line);
     padding:2px 4px 4px;overflow:hidden;cursor:pointer;min-height:0}
-  .mv-cell:hover{background:rgba(232,234,237,.03)}
-  .mv-head div.wknd{color:#5f6368}
+  .mv-cell:hover{background:rgba(240,240,242,.03)}
+  .mv-head div.wknd{color:var(--text-faint)}
   .mv-cell.wknd{background:repeating-linear-gradient(-45deg,
-    rgba(255,255,255,.022) 0 5px, transparent 5px 10px)}
-  .mv-cell.wknd .n:not(.today){color:#5f6368}
+    var(--hatch) 0 5px, transparent 5px 10px)}
+  .mv-cell.wknd .n:not(.today){color:var(--text-faint)}
   .mv-cell .n{
-    font-size:11px;color:#c4c7c5;text-align:center;width:22px;height:22px;line-height:22px;
+    font-size:11px;color:var(--text-dim);text-align:center;width:22px;height:22px;line-height:22px;
     margin:1px auto 3px;border-radius:50%;
   }
-  .mv-cell.out .n{color:#5f6368}
-  .mv-cell .n.today{background:#0b57d0;color:#fff}
+  .mv-cell.out .n{color:var(--text-faint)}
+  .mv-cell .n.today{background:var(--accent);color:#fff}
   .mv-chip{
     display:flex;align-items:center;gap:5px;font-size:10.5px;line-height:1.5;
     border-radius:4px;padding:1px 5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;
@@ -452,21 +504,21 @@
   .yv-g{display:grid;grid-template-columns:repeat(7,1fr)}
   .yv-g .dw{font-size:9px;color:var(--text-faint);text-align:center;padding:3px 0}
   .yv-g .d{font-size:10.5px;text-align:center;line-height:20px;height:20px;border-radius:50%;
-    color:#c4c7c5;cursor:pointer}
-  .yv-g .d:hover{background:rgba(232,234,237,.1)}
-  .yv-g .d.out{color:#45484c}
-  .yv-g .d.today{background:#0b57d0;color:#fff}
-  .yv-g .d.busy{font-weight:700;color:#e3e3e3}
+    color:var(--text-dim);cursor:pointer}
+  .yv-g .d:hover{background:rgba(240,240,242,.1)}
+  .yv-g .d.out{color:var(--text-faint)}
+  .yv-g .d.today{background:var(--accent);color:#fff}
+  .yv-g .d.busy{font-weight:700;color:var(--text)}
 
   /* ---------- 일정 목록 ---------- */
   .sv{padding:8px 24px 24px}
   .sv-day{display:flex;gap:20px;padding:14px 0;border-bottom:1px solid var(--grid-line)}
-  .sv-date{width:120px;flex:none;font-size:13px;color:#c4c7c5;padding-top:2px}
-  .sv-date b{display:block;font-size:24px;color:#e3e3e3;font-weight:400;line-height:1.3}
+  .sv-date{width:120px;flex:none;font-size:13px;color:var(--text-dim);padding-top:2px}
+  .sv-date b{display:block;font-size:24px;color:var(--text);font-weight:400;line-height:1.3}
   .sv-date.today b{color:var(--accent-deep)}
   .sv-list{flex:1;min-width:0}
   .sv-row{display:flex;align-items:center;gap:12px;padding:5px 0;font-size:13px;cursor:pointer}
-  .sv-row:hover{background:rgba(232,234,237,.04);border-radius:6px}
+  .sv-row:hover{background:rgba(240,240,242,.04);border-radius:6px}
   .sv-time{width:120px;flex:none;color:var(--text-dim);font-size:12.5px}
   .sv-dot{width:9px;height:9px;border-radius:50%;flex:none}
   .sv-t{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -477,12 +529,12 @@
   .day-block{
     position:absolute;inset:0;z-index:28;pointer-events:none;
     background:repeating-linear-gradient(-45deg,
-      rgba(142,36,170,.16) 0 9px, rgba(19,19,20,.55) 9px 18px);
+      rgba(155,114,240,.16) 0 9px, var(--scrim) 9px 18px);
     display:flex;align-items:center;justify-content:center;
   }
   .day-block span{
-    font-size:11px;font-weight:600;color:#e3c8f5;background:rgba(19,19,20,.85);
-    border:1px solid rgba(197,138,249,.5);border-radius:999px;padding:6px 12px;
+    font-size:11px;font-weight:600;color:var(--p4);background:var(--surface);
+    border:1px solid rgba(155,114,240,.5);border-radius:999px;padding:6px 12px;
     writing-mode:vertical-rl;letter-spacing:2px;
   }
   .allday .chip .lk{margin-right:3px;font-size:9.5px}
@@ -491,10 +543,10 @@
   .grid-shell.dim .ev.out{opacity:.14}
   /* 선택한 후보를 막고 있는 블록 */
   .grid-shell.dim .ev.hit,.grid-shell.dim .ev.hit-opt{opacity:1}
-  .ev.hit,.ev.hit-opt{outline:3px solid #fdd663;outline-offset:1px;z-index:26 !important}
+  .ev.hit,.ev.hit-opt{outline:3px solid var(--p3);outline-offset:1px;z-index:26 !important}
   .ev.hit-opt{outline-style:dashed}
 
-  .cal-row.off{color:#5f6368}
+  .cal-row.off{color:var(--text-faint)}
 
   .cand{
     position:absolute;left:1px;right:2px;border-radius:6px;z-index:30;
@@ -503,45 +555,43 @@
     animation:fade .25s ease-out;
   }
   .cand .sub{font-size:9.5px;font-weight:500;opacity:.9}
-  .cand.p1{border:2px solid var(--p1);background:rgba(129,201,149,.22);color:#c8ecd2}
-  .cand.p2{border:2px solid var(--p2);background:rgba(168,199,250,.22);color:#d3e3fd}
-  .cand.p3{border:2px dashed var(--p3);background:rgba(253,214,99,.18);color:#fce29b}
-  .cand.p4{border:2px dashed var(--p4);background:rgba(215,174,251,.18);color:#e6ccfd}
-  .cand.sel{box-shadow:0 0 0 2px rgba(255,255,255,.35),0 4px 14px rgba(0,0,0,.5)}
+  .cand.p1{border:2px solid var(--p1);background:rgba(21,196,126,.22);color:var(--good-fg)}
+  .cand.p2{border:2px solid var(--p2);background:rgba(49,130,246,.22);color:var(--accent-fg)}
+  .cand.p3{border:2px dashed var(--p3);background:rgba(255,200,69,.18);color:var(--warn-fg)}
+  .cand.p4{border:2px dashed var(--p4);background:rgba(155,114,240,.18);color:var(--p4)}
+  .cand.sel{box-shadow:0 0 0 2px var(--accent),0 4px 14px rgba(0,0,0,.18)}
   @keyframes fade{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
 
   /* ---------- 우측 시트 ---------- */
   .sheet{
     position:fixed;top:64px;right:0;bottom:0;width:var(--sheetW);max-width:100vw;z-index:90;
-    background:#1f2021;border-left:1px solid var(--line);
+    background:var(--surface);border-left:1px solid var(--line);
     display:flex;flex-direction:column;transform:translateX(100%);
-    transition:transform .22s cubic-bezier(.2,.7,.3,1);
+    transition:transform .28s cubic-bezier(.16,1,.3,1);
   }
   .sheet.on{transform:none}
   .sheet-head{
-    padding:16px 18px 12px;display:flex;align-items:flex-start;gap:10px;
-    border-bottom:1px solid #313234;
+    padding:26px 24px 4px;display:flex;align-items:flex-start;gap:10px;
   }
-  .sheet-head h2{margin:0;font-size:16px;font-weight:600;letter-spacing:-.2px}
-  .sheet-head p{margin:4px 0 0;font-size:12px;color:var(--text-dim);line-height:1.6}
+  .sheet-head h2{margin:0;font-size:22px;font-weight:700;letter-spacing:-.035em;line-height:1.35}
+  .sheet-head p{margin:8px 0 0;font-size:14px;color:var(--text-dim);line-height:1.55}
   /* 기본 일정 ↔ 자동 조율 — 넣은 값은 그대로 두고 화면만 바꾼다 */
   .sheet-tabs{
-    display:flex;gap:8px;padding:12px 18px 0;flex:none;
+    display:flex;gap:6px;padding:18px 24px 2px;flex:none;
   }
   .sheet-tabs.off{display:none}
   .sheet-tabs button{
-    font-size:12.5px;font-weight:600;border-radius:999px;padding:7px 16px;
-    color:var(--text-dim);border:1px solid var(--line);
+    font-size:14px;font-weight:700;border-radius:10px;padding:9px 14px;
+    color:var(--text-dim);background:var(--surface-2);
   }
-  .sheet-tabs button:hover{background:rgba(232,234,237,.06);color:var(--text)}
-  .sheet-tabs button.on{
-    background:var(--accent);border-color:var(--accent);color:var(--on-accent);
-  }
-  .sheet-body{flex:1;overflow:auto;padding:16px 18px 24px}
+  .sheet-tabs button:hover{color:var(--text)}
+  .sheet-tabs button.on{background:var(--accent-soft);color:var(--accent-fg)}
+  .sheet-body{flex:1;overflow:auto;padding:18px 24px 28px}
   .sheet-foot{
-    padding:12px 18px;border-top:1px solid #313234;
-    display:flex;align-items:center;gap:10px;
+    padding:12px 24px 20px;
+    display:flex;align-items:center;gap:8px;
   }
+  .sheet-foot .btn.ghost{padding-left:16px;padding-right:16px;min-width:0}
   /* 빈 칸을 눌러 시작 */
   .pop{padding-top:6px}
   .quick{padding:14px 16px 12px}
@@ -552,13 +602,13 @@
     flex:1;font-size:12.5px;font-weight:600;border-radius:999px;padding:8px 0;
     background:var(--surface-3);color:var(--text);
   }
-  .quick .acts button:hover{background:#3a3c3f}
+  .quick .acts button:hover{background:var(--surface-3)}
   .quick .acts button.pri{background:var(--accent);color:var(--on-accent)}
-  .quick .acts button.pri:hover{background:#bcd5fb}
+  .quick .acts button.pri:hover{background:var(--accent-deep)}
   .quick .text-input{font-size:16px;padding:9px 12px}
-  .quick .seg{display:flex;background:var(--surface-2);border-radius:999px;padding:2px}
-  .quick .seg button{flex:1;font-size:11.5px;padding:6px 0;border-radius:999px;color:var(--text-dim)}
-  .quick .seg button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
+  .quick .seg{display:flex;background:var(--surface);border-radius:10px;padding:3px;gap:2px}
+  .quick .seg button{flex:1;font-size:13px;font-weight:600;padding:8px 0;border-radius:8px;color:var(--text-dim)}
+  .quick .seg button.on{background:var(--accent);color:var(--on-accent);font-weight:700}
   .quick textarea.text-input{font-family:inherit;line-height:1.6}
   .sw-row{display:flex;flex-wrap:wrap;gap:9px}
   .sw-dot{
@@ -572,9 +622,9 @@
   .with-others{
     display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin-bottom:12px;
     padding:10px 12px;border-radius:10px;
-    border:1px solid rgba(168,199,250,.35);background:rgba(168,199,250,.08);
+    border:1px solid rgba(49,130,246,.35);background:rgba(49,130,246,.08);
   }
-  .with-others:hover{background:rgba(168,199,250,.16);border-color:var(--accent)}
+  .with-others:hover{background:rgba(49,130,246,.16);border-color:var(--accent)}
   .with-others .ic{font-size:14px;flex:none}
   .with-others b{display:block;font-size:12.5px;font-weight:600;color:var(--text)}
   .with-others i{display:block;font-style:normal;font-size:10.5px;color:var(--text-dim);
@@ -584,11 +634,13 @@
   /* ---------- 일정 만들기 (사이드바) ---------- */
   .ed-title{
     width:100%;background:none;border:none;outline:none;color:var(--text);
-    font-size:22px;font-weight:400;letter-spacing:-.3px;
-    padding:2px 0 8px;border-bottom:2px solid var(--accent);margin-bottom:22px;
+    font-size:26px;font-weight:700;letter-spacing:-.04em;
+    padding:2px 0 12px;border-bottom:2px solid var(--line);margin-bottom:24px;
+    transition:border-color .12s;
   }
+  .ed-title:focus{border-bottom-color:var(--accent)}
   .ed-title::placeholder{color:var(--text-faint);font-weight:300}
-  .ed-row{display:flex;gap:16px;padding:9px 0;font-size:13.5px;color:#c4c7c5}
+  .ed-row{display:flex;gap:16px;padding:12px 0;font-size:15px;color:var(--text)}
   .ed-row .ic{width:18px;flex:none;text-align:center;font-size:14px;margin-top:2px;opacity:.85}
   .ed-row .v{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
   .ed-when{font-size:13.5px;color:var(--text);width:100%}
@@ -596,7 +648,7 @@
   .ed-seg button{flex:1;font-size:11.5px;padding:6px 0;border-radius:999px;color:var(--text-dim)}
   .ed-seg button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
   .ed-add{
-    text-align:left;font-size:13.5px;color:var(--text-dim);padding:2px 0;
+    text-align:left;font-size:15px;font-weight:500;color:var(--text-dim);padding:2px 0;
     display:flex;align-items:center;gap:10px;width:100%;
   }
   .ed-add:hover{color:var(--text)}
@@ -607,10 +659,10 @@
   }
   .ed-hint{width:100%;font-size:11.5px;color:var(--text-faint);line-height:1.6;margin-top:3px}
   .ed-people{
-    border:1px solid rgba(168,199,250,.35);background:rgba(168,199,250,.08);
+    border:1px solid rgba(49,130,246,.35);background:rgba(49,130,246,.08);
     border-radius:10px;padding:11px 12px;margin:4px 0 6px;
   }
-  .ed-people:hover{background:rgba(168,199,250,.14);border-color:var(--accent)}
+  .ed-people:hover{background:rgba(49,130,246,.14);border-color:var(--accent)}
   .ed-on{color:var(--text);display:flex;align-items:center;gap:8px}
   .ed-dot{width:11px;height:11px;border-radius:50%;display:inline-block}
   .ed-x{margin-left:auto;flex:none;color:var(--text-faint);padding:0 4px;font-size:12px}
@@ -635,62 +687,68 @@
 
   /* 이 회의가 왜 지금인지 — 참석자가 아니라 회의의 이유 */
   .for-card{
-    border:1px solid rgba(129,201,149,.35);background:rgba(129,201,149,.07);
-    border-radius:12px;padding:12px 14px;margin-bottom:18px;
+    background:var(--surface-2);border-radius:var(--r-card);
+    padding:16px 18px;margin-bottom:24px;
   }
   .for-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .for-h .ic{color:var(--p1);font-size:13px}
-  .for-h .nm{font-size:14px;font-weight:600;color:var(--text)}
-  .for-h .rl{font-size:12px;color:var(--text-dim)}
+  .for-h .nm{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.03em}
+  .for-h .rl{font-size:13px;color:var(--text-dim)}
   .for-h .stage{
     margin-left:auto;font-size:10.5px;font-weight:700;
-    background:var(--p1);color:#10233f;border-radius:999px;padding:2px 9px;
+    background:var(--p1);color:#0F1720;border-radius:999px;padding:2px 9px;
   }
-  .for-note{font-size:11.5px;color:#e0c98a;line-height:1.65;margin-top:7px}
+  .for-note{font-size:13px;color:var(--warn-fg);line-height:1.6;margin-top:10px}
 
-  .field{margin-bottom:18px}
-  .label{font-size:12px;color:var(--text-dim);margin-bottom:7px;display:flex;align-items:center;gap:6px}
-  .field-note{font-size:11.5px;color:var(--text-faint);margin-top:7px}
+  .field{margin-bottom:24px}
+  .label{font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .field-note{font-size:13px;color:var(--text-faint);margin-top:9px}
   .field-note b{color:var(--text-dim);font-weight:600}
   .text-input{
-    width:100%;background:var(--surface-2);border:none;border-bottom:1px solid var(--line);
-    border-radius:6px 6px 0 0;padding:11px 12px;color:var(--text);outline:none;
+    width:100%;background:var(--surface-2);border:2px solid transparent;
+    border-radius:var(--r-btn);padding:14px 15px;color:var(--text);outline:none;
+    font-size:16px;font-weight:500;transition:border-color .12s;
   }
-  .text-input:focus{border-bottom:2px solid var(--accent);padding-bottom:10px}
-  .text-input::placeholder{color:var(--text-faint)}
+  .text-input:focus{border-color:var(--accent)}
+  .text-input::placeholder{color:var(--text-faint);font-weight:400}
 
   .search-wrap{position:relative}
   .results{
-    position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:20;
-    background:#2d2f31;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.6);
-    max-height:236px;overflow:auto;display:none;padding:6px 0;
+    position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:20;
+    background:var(--surface-2);border-radius:14px;box-shadow:var(--shadow-pop);
+    max-height:320px;overflow:auto;display:none;padding:6px;
   }
   .results.on{display:block}
-  .res-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;text-align:left}
-  .res-item:hover{background:rgba(232,234,237,.08)}
-  .res-item[disabled]{opacity:.4;cursor:default}
+  .res-h{font-size:12.5px;font-weight:700;color:var(--text-dim);padding:8px 10px 6px}
+  .res-none{padding:16px 12px;color:var(--text-faint);font-size:14px}
+  .res-item{display:flex;align-items:center;gap:11px;width:100%;padding:10px 10px;
+    text-align:left;border-radius:10px}
+  .res-item:hover{background:var(--surface-3)}
+  .res-item[disabled]{opacity:.45;cursor:default}
+  .res-plus{margin-left:auto;flex:none;color:var(--accent);font-size:17px;font-weight:700}
+  .res-added{margin-left:auto;flex:none;color:var(--text-faint);font-size:12px;font-weight:600}
   .avatar{
     width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;
     font-size:12px;font-weight:600;color:#fff;
   }
   .res-item .meta{min-width:0}
-  .res-item .nm{font-size:13px}
-  .res-item .em{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res-item .nm{font-size:14.5px;font-weight:600}
+  .res-item .em{font-size:12px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-  .att{display:flex;align-items:flex-start;gap:10px;padding:8px 6px;border-radius:8px}
-  .att:hover{background:rgba(232,234,237,.05)}
+  .att{display:flex;align-items:flex-start;gap:12px;padding:12px 10px;border-radius:12px}
+  .att:hover{background:var(--surface-2)}
   .att .meta{flex:1;min-width:0}
-  .att .nm{font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-  .att .em{font-size:11px;color:var(--text-dim)}
+  .att .nm{font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .att .em{font-size:12.5px;color:var(--text-dim)}
   .att .why{
     font-size:11px;color:var(--text-faint);line-height:1.6;margin-top:3px;
     display:flex;align-items:center;gap:5px;flex-wrap:wrap;
   }
-  .why .src-mark{color:#c58af9}
+  .why .src-mark{color:var(--p4)}
   /* AI가 근거로 삼은 원문 */
   .att .quote{
-    display:block;margin-top:5px;font-size:11.5px;line-height:1.65;color:#c4c7c5;
-    background:var(--surface-2);border-left:2px solid rgba(197,138,249,.55);
+    display:block;margin-top:5px;font-size:11.5px;line-height:1.65;color:var(--text-dim);
+    background:var(--surface-2);border-left:2px solid rgba(155,114,240,.55);
     border-radius:0 6px 6px 0;padding:6px 9px;
   }
   .att .quote .by{display:block;font-size:10.5px;color:var(--text-faint);margin-top:3px}
@@ -698,7 +756,7 @@
   .seg{display:flex;background:var(--surface-2);border-radius:999px;padding:2px;flex:none}
   .seg button{font-size:11px;padding:5px 11px;border-radius:999px;color:var(--text-dim)}
   .seg button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
-  .att.host{background:rgba(232,234,237,.04)}
+  .att.host{background:rgba(240,240,242,.04)}
   .host-tag{
     flex:none;font-size:10px;color:var(--text-dim);
     border:1px solid var(--line);border-radius:999px;padding:1px 8px;
@@ -708,13 +766,13 @@
 
   .flag{
     font-size:10px;border-radius:999px;padding:2px 7px;white-space:nowrap;
-    border:1px solid rgba(242,139,130,.5);color:#f6aaa4;background:rgba(242,139,130,.10);
+    border:1px solid rgba(240,68,82,.5);color:var(--bad-fg);background:rgba(240,68,82,.10);
   }
   .flag.soft{border-color:var(--line);color:var(--text-dim);background:transparent}
-  .flag.mv-ok{border-color:rgba(129,201,149,.55);color:#a5d9b3;background:rgba(129,201,149,.1)}
+  .flag.mv-ok{border-color:rgba(21,196,126,.55);color:var(--good-fg);background:rgba(21,196,126,.12)}
   .lowfocus-note{
-    margin-top:8px;font-size:11.5px;line-height:1.6;color:#e0c98a;
-    border-left:2px solid rgba(253,214,99,.5);padding-left:9px;
+    margin-top:8px;font-size:11.5px;line-height:1.6;color:var(--warn-fg);
+    border-left:2px solid rgba(255,200,69,.5);padding-left:9px;
   }
   .autosave{font-size:11px;color:var(--p1);display:flex;align-items:center;gap:5px}
   .autosave.idle{color:var(--text-faint)}
@@ -722,7 +780,7 @@
   /* ---------- 링크 분석 ---------- */
   .tag-ai{
     font-size:10px;font-weight:700;border-radius:999px;padding:2px 7px;
-    background:rgba(197,138,249,.16);color:#d7b6fb;border:1px solid rgba(197,138,249,.4);
+    background:rgba(155,114,240,.16);color:var(--p4);border:1px solid rgba(155,114,240,.4);
   }
   .link-row{display:flex;gap:8px;align-items:stretch}
   .link-row .text-input{flex:1}
@@ -731,48 +789,48 @@
   /* 참석자를 채우는 보조 수단 — 접힌 한 줄 */
   .import-row{
     display:flex;align-items:center;gap:8px;width:100%;margin:-6px 0 18px;
-    padding:11px 13px;border-radius:10px;font-size:12.5px;color:#c4c7c5;
+    padding:11px 13px;border-radius:10px;font-size:12.5px;color:var(--text-dim);
     border:1px dashed var(--line);background:var(--surface-2);
   }
-  .import-row:hover{border-color:rgba(197,138,249,.45);color:var(--text)}
-  .import-row .ai{color:#c58af9}
+  .import-row:hover{border-color:rgba(155,114,240,.45);color:var(--text)}
+  .import-row .ai{color:var(--p4)}
   .import-row .go{margin-left:auto;font-size:11px;color:var(--text-faint)}
-  .import-row:hover .go{color:#d7b6fb}
+  .import-row:hover .go{color:var(--p4)}
   .import-box{
-    border:1px solid rgba(197,138,249,.28);border-radius:12px;
-    padding:13px 14px 14px;background:rgba(197,138,249,.05);
+    border:1px solid rgba(155,114,240,.28);border-radius:12px;
+    padding:13px 14px 14px;background:rgba(155,114,240,.05);
   }
   .import-box .label{margin-bottom:9px}
   .import-x{margin-left:auto;color:var(--text-faint);padding:2px 4px;border-radius:6px}
   .import-x:hover{color:var(--text)}
 
   /* 어디서 가져올지 고르기 */
-  .src-btns{display:flex;gap:8px}
+  .src-btns{display:flex;flex-direction:column;gap:6px}
   .src-btn{
-    flex:1;display:flex;align-items:center;gap:10px;padding:12px 13px;text-align:left;
-    border:1px solid var(--line);border-radius:11px;background:var(--surface-2);
+    display:flex;align-items:center;gap:12px;padding:13px 14px;text-align:left;width:100%;
+    border-radius:12px;background:var(--surface-2);
   }
-  .src-btn:hover{border-color:rgba(168,199,250,.5);background:var(--surface-3)}
-  .src-btn.on{border-color:var(--accent);background:rgba(168,199,250,.1)}
+  .src-btn:hover{background:var(--surface-3)}
+  .src-btn.on{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
   .src-btn .ic{
-    width:30px;height:30px;border-radius:8px;flex:none;display:grid;place-items:center;
-    font-size:14px;background:var(--surface-3);
+    width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;
+    font-size:15px;background:var(--surface-3);
   }
   .src-btn.on .ic{background:var(--accent);color:var(--on-accent)}
-  .src-btn .nm{display:block;font-size:13px;font-weight:600}
-  .src-btn .sb{display:block;font-size:10.5px;color:var(--text-dim);margin-top:1px}
+  .src-btn .nm{display:block;font-size:15px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+  .src-btn .sb{display:block;font-size:12.5px;color:var(--text-dim);margin-top:2px;white-space:nowrap}
 
   .pick-list{margin-top:10px;border:1px solid var(--line);border-radius:11px;overflow:hidden}
   .pick-h{
-    font-size:10.5px;color:var(--text-faint);padding:9px 13px 7px;background:var(--surface-2);
+    font-size:12px;font-weight:700;color:var(--text-dim);padding:12px 15px 8px;background:var(--surface-2);
   }
   .pick{
-    display:block;width:100%;text-align:left;padding:11px 13px;
-    border-top:1px solid var(--line-soft);
+    display:block;width:100%;text-align:left;padding:14px 15px;
+    border-top:1px solid var(--grid-line);
   }
-  .pick:hover{background:rgba(168,199,250,.09)}
-  .pick .pt{display:block;font-size:13px;font-weight:600;color:var(--accent)}
-  .pick .pd{display:block;font-size:12px;color:#c4c7c5;margin-top:2px;line-height:1.5}
+  .pick:hover{background:var(--accent-soft)}
+  .pick .pt{display:block;font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+  .pick .pd{display:block;font-size:13px;color:var(--text-dim);margin-top:3px;line-height:1.5}
   .pick .pm{display:block;font-size:10.5px;color:var(--text-faint);margin-top:3px}
 
   .link-toggle{
@@ -787,53 +845,53 @@
   .src-card .meta{flex:1;min-width:0}
   .src-t{font-size:13px;display:block}
   .src-s{font-size:11px;color:var(--text-dim);margin-top:2px;line-height:1.6;display:block}
-  .analyzing{border:1px solid rgba(197,138,249,.35);border-radius:10px;padding:14px;background:rgba(197,138,249,.06)}
+  .analyzing{border:1px solid rgba(155,114,240,.35);border-radius:10px;padding:14px;background:rgba(155,114,240,.06)}
   .analyzing .bar{height:3px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-bottom:12px}
-  .analyzing .bar i{display:block;height:100%;width:0;background:#c58af9;transition:width .3s linear}
+  .analyzing .bar i{display:block;height:100%;width:0;background:var(--p4);transition:width .3s linear}
   .an-line{display:flex;gap:9px;font-size:12.5px;color:var(--text-faint);padding:5px 0;transition:color .2s}
   .an-line .tick{width:14px;text-align:center;color:var(--line)}
-  .an-line.on{color:var(--text)} .an-line.on .tick{color:#c58af9}
+  .an-line.on{color:var(--text)} .an-line.on .tick{color:var(--p4)}
 
   /* ---------- 일정 상세 팝오버 ---------- */
   .pop{
-    position:fixed;z-index:120;width:352px;background:#2d2f31;border-radius:12px;
-    box-shadow:0 8px 10px 1px rgba(0,0,0,.3),0 3px 14px 2px rgba(0,0,0,.35);
-    padding:8px 8px 16px;display:none;animation:pop .12s ease-out;
+    position:fixed;z-index:120;width:372px;background:var(--surface-2);border-radius:20px;
+    box-shadow:var(--shadow-pop);
+    padding:10px 10px 20px;display:none;animation:pop .14s cubic-bezier(.16,1,.3,1);
     max-height:min(78vh,660px);overflow-y:auto;
   }
   .pop.on{display:block}
   .pop-tools{display:flex;justify-content:flex-end;gap:8px;margin-bottom:4px}
   .pop-tools button{
-    width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
-    background:rgba(232,234,237,.09);color:#c4c7c5;font-size:16px;line-height:1;
+    width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+    background:transparent;color:var(--text-dim);font-size:16px;line-height:1;
     transition:background .12s;
   }
-  .pop-tools button:hover{background:rgba(232,234,237,.18);color:var(--text)}
+  .pop-tools button:hover{background:var(--surface-3);color:var(--text)}
   .pop-tools button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .pop-main{display:flex;gap:14px;padding:0 16px 4px}
-  .pop-dot{width:14px;height:14px;border-radius:4px;flex:none;margin-top:5px}
-  .pop-main h3{margin:0;font-size:20px;font-weight:400;line-height:1.35;letter-spacing:-.2px}
+  .pop-main{display:flex;gap:12px;padding:2px 18px 6px}
+  .pop-dot{width:12px;height:12px;border-radius:4px;flex:none;margin-top:8px}
+  .pop-main h3{margin:0;font-size:22px;font-weight:700;line-height:1.35;letter-spacing:-.035em}
   .pop-title-input{
     width:100%;font-size:20px;font-weight:400;letter-spacing:-.2px;color:var(--text);
     background:none;border:none;border-bottom:2px solid var(--accent);outline:none;padding:0 0 3px;
   }
-  .pop-main .when{margin:5px 0 0;font-size:13px;color:#c4c7c5;line-height:1.5}
-  .pop-row{display:flex;gap:14px;padding:10px 16px 0;font-size:13px;color:#c4c7c5}
-  .pop-row .ic{width:14px;flex:none;text-align:center;color:var(--text-dim);font-size:13px;margin-top:1px}
+  .pop-main .when{margin:7px 0 0;font-size:14px;font-weight:500;color:var(--text-dim);line-height:1.5}
+  .pop-row{display:flex;gap:14px;padding:12px 18px 0;font-size:14px;color:var(--text)}
+  .pop-row .ic{width:16px;flex:none;text-align:center;color:var(--text-dim);font-size:14px;margin-top:1px}
   .pop-row .val{min-width:0;line-height:1.6}
   .pop-att{display:flex;align-items:center;gap:9px;padding:5px 0}
   .pop-att .nm{font-size:13px}
   .pop-att .rl{font-size:11px;color:var(--text-dim)}
   .pop-tag{
     margin-left:auto;font-size:10px;border-radius:999px;padding:1px 7px;font-weight:600;
-    background:#c5221f;color:#fff;
+    background:var(--p5);color:#fff;
   }
   .pop-tag.opt{background:transparent;color:var(--text-dim);border:1px dashed var(--line);font-weight:400}
   /* 거절한 참석자 */
   .pop-att.no .nm{text-decoration:line-through;color:var(--text-dim)}
   .pop-att.no .rl{opacity:.6}
   .pop-att.no .avatar{opacity:.45}
-  .pop-tag.no{background:transparent;color:#f6aaa4;border:1px solid rgba(242,139,130,.5);font-weight:400}
+  .pop-tag.no{background:transparent;color:var(--bad-fg);border:1px solid rgba(240,68,82,.5);font-weight:400}
   .pop-org{font-size:11.5px;color:var(--text-faint);margin-top:2px}
 
   /* 화상회의 · 회의실 · 참석 응답 */
@@ -842,12 +900,12 @@
     flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
     color:var(--text-dim);font-size:15px;margin-top:-4px;
   }
-  .pop-row .act:hover{background:rgba(232,234,237,.12);color:var(--text)}
+  .pop-row .act:hover{background:rgba(240,240,242,.12);color:var(--text)}
   .meet-btn{
     background:var(--accent);color:var(--on-accent);border-radius:999px;
     padding:10px 22px;font-size:14px;font-weight:600;
   }
-  .meet-btn:hover{background:#bcd5fb}
+  .meet-btn:hover{background:var(--accent-deep)}
   .meet-link{font-size:12.5px;color:var(--text-dim);margin-top:9px;word-break:break-all}
   .pop-link{color:var(--accent);font-weight:500}
   .pop-link:hover{text-decoration:underline}
@@ -856,107 +914,121 @@
   .ava-wrap{position:relative;flex:none;display:inline-flex}
   .rsvp-mark{
     position:absolute;right:-3px;bottom:-3px;width:14px;height:14px;border-radius:50%;
-    background:#81c995;color:#10233f;font-size:8px;display:grid;place-items:center;
-    border:2px solid #2d2f31;
+    background:var(--p1);color:#0F1720;font-size:8px;display:grid;place-items:center;
+    border:2px solid var(--surface-2);
   }
-  .rsvp-mark.no{background:#f28b82}
+  .rsvp-mark.no{background:var(--p5)}
   .rsvp{
     display:flex;align-items:center;gap:8px;
     margin:16px -8px -16px;padding:13px 24px 15px;
     border-top:1px solid var(--line);border-radius:0 0 12px 12px;
-    position:sticky;bottom:0;background:#2d2f31;
+    position:sticky;bottom:0;background:var(--surface-2);
   }
-  .rsvp .lb{font-size:13px;color:#c4c7c5;margin-right:auto}
-  .rsvp button{border:1px solid var(--line);border-radius:999px;padding:7px 15px;font-size:13px;color:#c4c7c5}
-  .rsvp button:hover{background:rgba(232,234,237,.08)}
-  .rsvp button.on{background:#0842a0;border-color:#0842a0;color:#d3e3fd}
+  .rsvp .lb{font-size:13px;color:var(--text-dim);margin-right:auto}
+  .rsvp button{border:1px solid var(--line);border-radius:999px;padding:7px 15px;font-size:13px;color:var(--text-dim)}
+  .rsvp button:hover{background:rgba(240,240,242,.08)}
+  .rsvp button.on{background:var(--accent);border-color:var(--accent);color:#fff}
 
-  .btn{border-radius:999px;padding:11px 20px;font-size:14px;font-weight:600;background:var(--surface-3);color:var(--text)}
-  .btn:hover{background:#3a3c3f}
+  /* 토스 버튼 — 크고 굵고, 화면당 진한 버튼은 하나 */
+  /* 글자 수만큼만 — 두 글자짜리 버튼이 화면을 가로지르지 않게 */
+  .btn{
+    border-radius:var(--r-btn);padding:13px 22px;font-size:15.5px;font-weight:700;
+    background:var(--surface-2);color:var(--text);transition:background .12s,transform .08s;
+    white-space:nowrap;line-height:1.25;min-width:88px;
+  }
+  .btn:hover{background:var(--surface-3)}
+  .btn:active{transform:scale(.985)}
   .btn.primary{background:var(--accent);color:var(--on-accent)}
-  .btn.primary:hover{background:#bcd5fb}
-  .btn.primary[disabled]{background:var(--surface-3);color:var(--text-faint);cursor:not-allowed}
-  .btn.ghost{background:transparent;color:var(--accent)}
-  .btn.ghost:hover{background:rgba(168,199,250,.10)}
+  .btn.primary:hover{background:var(--accent-deep)}
+  .btn.primary[disabled]{background:var(--surface-2);color:var(--text-faint);cursor:not-allowed}
+  .btn.primary[disabled]:active{transform:none}
+  .btn.ghost{background:transparent;color:var(--text-dim);font-weight:600}
+  .btn.ghost:hover{background:var(--surface-2);color:var(--text)}
+  .btn.ghost:hover{background:rgba(49,130,246,.10)}
 
   /* ---------- 스캔 · 결과 ---------- */
   .scan{display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:18px;padding:80px 0;text-align:center}
   .spin{
     width:34px;height:34px;border-radius:50%;
-    border:3px solid rgba(168,199,250,.2);border-top-color:var(--accent);
+    border:3px solid rgba(49,130,246,.2);border-top-color:var(--accent);
     animation:spin .8s linear infinite;
   }
   @keyframes spin{to{transform:rotate(360deg)}}
   .scan p{margin:0;font-size:13.5px;color:var(--text-dim);line-height:1.8}
 
-  .banner{border-radius:10px;padding:12px 14px;font-size:12.5px;line-height:1.75;margin-bottom:16px;border:1px solid var(--line);background:var(--surface-2);color:#c4c7c5}
-  .banner.warn{border-color:rgba(253,214,99,.4);background:rgba(253,214,99,.08)}
-  .banner.good{border-color:rgba(129,201,149,.4);background:rgba(129,201,149,.08)}
-  .banner b{color:var(--text)}
+  .banner{
+    border-radius:14px;padding:15px 17px;font-size:14px;line-height:1.65;
+    margin-bottom:18px;background:var(--surface-2);color:var(--text-dim);
+  }
+  .banner.warn{background:rgba(255,200,69,.1);color:var(--warn-fg)}
+  .banner.good{background:rgba(21,196,126,.1);color:var(--good-fg)}
+  .banner b{color:var(--text);font-weight:700}
+  .banner.warn b{color:#FFC845}
+  .banner.good b{color:#15C47E}
 
-  .pill{font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 9px;color:#10233f}
+  .pill{font-size:12px;font-weight:700;border-radius:8px;padding:5px 10px;color:#0F1720}
   .pill.p1{background:var(--p1)} .pill.p2{background:var(--p2)}
   .pill.p3{background:var(--p3)} .pill.p4{background:var(--p4)}
-  .pill.p5{background:transparent;color:#f6aea9;border:1px solid rgba(242,139,130,.55)}
+  .pill.p5{background:transparent;color:var(--bad-fg);border:1px solid rgba(240,68,82,.55)}
 
   /* AI가 고른 시간 */
   .rec{
-    border:1.5px solid var(--accent);border-radius:12px;padding:16px;
-    background:rgba(168,199,250,.08);margin-bottom:14px;
+    border-radius:var(--r-card);padding:20px;
+    background:var(--surface-2);margin-bottom:14px;
   }
-  .rec-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-  .rec-when{font-size:20px;font-weight:600;letter-spacing:-.3px}
-  .rec-why{font-size:12.5px;color:#c4c7c5;line-height:1.75;margin-top:7px}
+  .rec-h{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .rec-when{font-size:26px;font-weight:700;letter-spacing:-.04em;line-height:1.25}
+  .rec-why{font-size:14px;color:var(--text-dim);line-height:1.65;margin-top:10px}
   .rec-ask{
-    margin-top:12px;padding-top:11px;border-top:1px solid rgba(168,199,250,.25);
+    margin-top:12px;padding-top:11px;border-top:1px solid rgba(49,130,246,.25);
     font-size:12.5px;color:var(--accent);line-height:1.7;
   }
-  .rec-ask b{color:#d3e3fd}
+  .rec-ask b{color:var(--accent-fg)}
 
   .alts-toggle{
     width:100%;text-align:left;font-size:12.5px;color:var(--text-dim);
-    padding:10px 2px;border-top:1px solid #313234;
+    padding:10px 2px;border-top:1px solid var(--line);
   }
   .alts-toggle:hover{color:var(--text)}
   .alt-row{
-    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
-    padding:10px 12px;border-radius:9px;border:1px solid var(--line);margin-bottom:6px;
+    display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+    padding:14px 15px;border-radius:12px;background:var(--surface-2);margin-bottom:7px;
   }
-  .alt-row:hover{border-color:#5a5e63;background:var(--surface-2)}
-  .alt-when{font-size:13px;font-weight:500}
+  .alt-row:hover{background:var(--surface-3)}
+  .alt-when{font-size:15px;font-weight:700;letter-spacing:-.02em}
   .alt-note{font-size:11px;color:var(--text-dim);margin-top:2px}
   .alt-pick{margin-left:auto;font-size:11.5px;color:var(--accent);flex:none}
 
   .conflict{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--text-dim);line-height:1.7}
   .conflict .row{display:flex;align-items:center;gap:7px;padding:2px 0;flex-wrap:wrap}
-  .conflict .blk{color:#e0c98a}
+  .conflict .blk{color:var(--warn-fg)}
 
   /* ---------- 회의실 ---------- */
-  .rooms{margin-top:14px;border-top:1px solid #313234;padding-top:12px}
+  .rooms{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
   .rooms-h{display:flex;align-items:center;gap:8px;margin-bottom:9px}
   .rooms-h .t{font-size:12px;font-weight:600;color:var(--text)}
   .rooms-h .c{font-size:11.5px;color:var(--text-dim)}
   .rooms-h .auto{margin-left:auto;font-size:10.5px;color:var(--accent);
-    border:1px solid rgba(168,199,250,.35);border-radius:999px;padding:2px 8px}
+    border:1px solid rgba(49,130,246,.35);border-radius:999px;padding:2px 8px}
   .room-row{
-    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
-    padding:9px 11px;border-radius:9px;border:1px solid var(--line);margin-bottom:6px;
+    display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+    padding:13px 14px;border-radius:12px;background:var(--surface-2);margin-bottom:7px;
   }
-  .room-row:not([disabled]):hover{border-color:#5a5e63;background:var(--surface-2)}
-  .room-row[disabled]{opacity:.42;cursor:default}
-  .room-row.on{border-color:var(--accent);background:rgba(168,199,250,.1)}
+  .room-row:not([disabled]):hover{background:var(--surface-3)}
+  .room-row[disabled]{opacity:.4;cursor:default}
+  .room-row.on{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
   .room-mark{
-    width:16px;height:16px;border-radius:50%;border:1.5px solid #5a5e63;flex:none;
+    width:16px;height:16px;border-radius:50%;border:1.5px solid var(--text-faint);flex:none;
     display:grid;place-items:center;font-size:10px;color:transparent;
   }
-  .room-row.on .room-mark{border-color:var(--accent);background:var(--accent);color:#10233f}
-  .room-n{font-size:12.5px;display:flex;align-items:center;gap:7px;min-width:0}
+  .room-row.on .room-mark{border-color:var(--accent);background:var(--accent);color:#0F1720}
+  .room-n{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:8px;min-width:0}
   .room-cap{font-size:11px;color:var(--text-faint)}
   .room-st{margin-left:auto;font-size:11px;flex:none;color:var(--text-dim);
     max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .room-st.ok{color:var(--p1)}
-  .room-st.busy{color:#e0c98a}
+  .room-st.busy{color:var(--warn-fg)}
 
   .done-rooms{margin-top:12px}
   .done-rooms > .pop-room-btn{margin:0}
@@ -970,32 +1042,28 @@
   .pop-row .room-row{padding:7px 9px;margin-bottom:4px}
 
   .done-wrap{text-align:center;padding:24px 6px}
-  .done-mark{width:56px;height:56px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;background:rgba(129,201,149,.15);color:var(--p1);font-size:26px}
+  .done-mark{width:56px;height:56px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;background:rgba(21,196,126,.15);color:var(--p1);font-size:26px}
   .done-wrap h3{margin:0 0 8px;font-size:17px}
   .why-box{
-    text-align:left;margin-top:22px;border:1px solid var(--line);border-radius:12px;
-    padding:14px 16px 15px;background:var(--surface-2);
+    text-align:left;margin-top:24px;border-radius:var(--r-card);
+    padding:18px 20px;background:var(--surface-2);
   }
-  .why-h{font-size:11.5px;color:var(--accent);font-weight:600;margin-bottom:9px}
-  .why-box ul{margin:0;padding-left:16px}
-  .why-box li{font-size:12.5px;line-height:1.85;color:#c4c7c5;margin-bottom:7px}
+  .why-h{font-size:13px;color:var(--text-dim);font-weight:700;margin-bottom:12px}
+  .why-box ul{margin:0;padding-left:18px}
+  .why-box li{font-size:14px;line-height:1.75;color:var(--text);margin-bottom:10px}
   .why-box li:last-child{margin-bottom:0}
   .why-box li::marker{color:var(--text-faint)}
   .why-box b{color:var(--text)}
   .done-wrap p{margin:0;font-size:13px;color:var(--text-dim);line-height:1.8}
-  .done-mark.hold{background:rgba(253,214,99,.15);color:var(--p3)}
+  .done-mark.hold{background:rgba(255,200,69,.15);color:var(--p3)}
 
   /* 잡아둔 시간 — 확정 전에만 다르게 보인다 */
   .ev.hold-wait{
-    background:rgba(253,214,99,.22) !important;color:#fce29b !important;
+    background:rgba(255,200,69,.22) !important;color:var(--warn-fg) !important;
     border:2px dashed var(--p3);
   }
-  .ev.hold-ok{
-    background:rgba(129,201,149,.24) !important;color:#c8ecd2 !important;
-    border:2px solid var(--p1);
-  }
   /* 자동 조율로 잡힌 일정은 확정된 뒤에도 표가 난다 */
-  .ev.hold-done{box-shadow:inset 0 0 0 2px rgba(129,201,149,.85)}
+  .ev.hold-done{box-shadow:inset 0 0 0 2px rgba(21,196,126,.85)}
 
   /* 결과를 보는 동안엔 잡힌 자리만 남기고 나머지는 물러난다 */
   .time-view.focus-hold .ev:not(.just){opacity:.16}
@@ -1003,7 +1071,7 @@
   .time-view.focus-hold .allday .cell > span{opacity:.3}
   .ev.just{
     outline:3px solid var(--accent);outline-offset:3px;z-index:9 !important;
-    box-shadow:0 0 0 9px rgba(168,199,250,.16), 0 8px 24px rgba(0,0,0,.55);
+    box-shadow:0 0 0 9px rgba(49,130,246,.16), 0 8px 24px rgba(0,0,0,.55);
   }
   /* 어느 칸인지 눈으로 짚어 준다 */
   .just-mark{
@@ -1014,7 +1082,7 @@
     transform:translateY(-100%);margin-bottom:9px;
     background:var(--accent);color:var(--on-accent);
     font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 10px;
-    box-shadow:0 3px 10px rgba(0,0,0,.5);white-space:nowrap;
+    box-shadow:0 3px 10px rgba(0,0,0,.22);white-space:nowrap;
   }
   .just-mark.below span{transform:none;margin:9px 0 0}
 
@@ -1037,6 +1105,7 @@
     <button class="icon-btn sm" id="btnSearchX" title="검색 지우기">✕</button>
   </div>
   <button class="icon-btn" id="btnHelp" title="지원">?</button>
+  <button class="icon-btn" id="btnTheme" title="화면 모드">☀</button>
   <button class="icon-btn" id="btnSettings" title="설정">⚙</button>
   <button class="g-btn" id="btnView">주 ▾</button>
   <button class="avatar-me" id="btnAccount">정</button>
@@ -1060,7 +1129,7 @@
         <button class="icon-btn sm" id="miniNext">›</button>
       </div>
       <div class="mini-grid" id="miniGrid"></div>
-      <div class="mini-note"><i></i>주말은 회의를 잡지 않습니다</div>
+      <div class="mini-note"><i></i>주말은 회의를 잡지 않아요</div>
     </div>
 
     <div class="side-search">
@@ -1080,7 +1149,7 @@
 
     <div class="side-h" id="otherCalHead"><span>다른 캘린더</span><span class="chev">⌃</span></div>
     <div id="otherList">
-      <div class="cal-row" data-other="hol"><span class="cbox" style="background:#f6aea9;color:#202124">✓</span>대한민국의 휴일</div>
+      <div class="cal-row" data-other="hol"><span class="cbox" style="background:#F79AA1;color:#17171C">✓</span>대한민국의 휴일</div>
     </div>
 
   </aside>
@@ -1151,23 +1220,24 @@ const LUNCH = [12,13];
 /* 색상은 구글 캘린더 팔레트를 그대로 쓴다.
    캘린더 하나에 색 하나, 일정은 그 캘린더 색으로 꽉 채우고,
    글자색은 배경 밝기로 정한다(밝으면 #3c4043, 어두우면 흰색). */
+/* 사람 색 — 토스 톤. 채도를 낮추고 명도를 맞춰 한 화면에 같이 놓아도 튀지 않게 */
 const PEOPLE = [
-  { id:"me",  name:"정슬기", email:"seulgi@company.co.kr",  role:"주최자",    color:"#3F51B5" }, /* Blueberry */
-  { id:"kdh", name:"김도현", email:"dohyun@company.co.kr",  role:"프로덕트",  color:"#0B8043" }, /* Basil */
-  { id:"psy", name:"박서연", email:"seoyeon@company.co.kr", role:"디자인",    color:"#F6BF26" }, /* Banana */
-  { id:"ljh", name:"이준호", email:"junho@company.co.kr",   role:"개발",      color:"#E67C73" }, /* Flamingo */
-  { id:"cma", name:"최민아", email:"mina@company.co.kr",    role:"마케팅",    color:"#8E24AA" }, /* Grape */
-  { id:"hjw", name:"한지우", email:"jiwoo@company.co.kr",   role:"데이터",    color:"#039BE5" }, /* Peacock */
-  { id:"kts", name:"강태섭", email:"ceo@company.co.kr",     role:"대표",      color:"#D50000", hardToReschedule:true }, /* Tomato */
-  { id:"ohj", name:"오하진", email:"hajin@company.co.kr",   role:"백엔드",    color:"#33B679" }, /* Sage */
-  { id:"ysj", name:"윤소정", email:"sojung@company.co.kr",  role:"프론트엔드",color:"#7986CB" }, /* Lavender */
-  { id:"jmk", name:"장민규", email:"mingyu@company.co.kr",  role:"QA",        color:"#F4511E" }, /* Tangerine */
-  { id:"shs", name:"서현수", email:"hyunsoo@company.co.kr", role:"세일즈",    color:"#616161" }, /* Graphite */
-  { id:"nby", name:"남보영", email:"boyoung@company.co.kr", role:"CS",        color:"#EF6C00" }, /* Pumpkin */
-  { id:"kje", name:"권재이", email:"jaei@company.co.kr",    role:"인사",      color:"#795548" }, /* Cocoa */
-  { id:"lth", name:"임태호", email:"taeho@company.co.kr",   role:"재무",      color:"#A79B8E" }, /* Birch */
-  { id:"bdy", name:"배다율", email:"dayul@company.co.kr",   role:"리서치",    color:"#4285F4" }, /* Cobalt */
-  { id:"gsw", name:"고승원", email:"seungwon@company.co.kr",role:"법무",      color:"#7CB342" }, /* Avocado */
+  { id:"me",  name:"정슬기", email:"seulgi@company.co.kr",  role:"주최자",    color:"#3182F6" },
+  { id:"kdh", name:"김도현", email:"dohyun@company.co.kr",  role:"프로덕트",  color:"#15C47E" },
+  { id:"psy", name:"박서연", email:"seoyeon@company.co.kr", role:"디자인",    color:"#FFC845" },
+  { id:"ljh", name:"이준호", email:"junho@company.co.kr",   role:"개발",      color:"#FF8A5B" },
+  { id:"cma", name:"최민아", email:"mina@company.co.kr",    role:"마케팅",    color:"#9B72F0" },
+  { id:"hjw", name:"한지우", email:"jiwoo@company.co.kr",   role:"데이터",    color:"#00B2D9" },
+  { id:"kts", name:"강태섭", email:"ceo@company.co.kr",     role:"대표",      color:"#F04452", hardToReschedule:true },
+  { id:"ohj", name:"오하진", email:"hajin@company.co.kr",   role:"백엔드",    color:"#2AC1A9" },
+  { id:"ysj", name:"윤소정", email:"sojung@company.co.kr",  role:"프론트엔드",color:"#7B8AF5" },
+  { id:"jmk", name:"장민규", email:"mingyu@company.co.kr",  role:"QA",        color:"#F2724B" },
+  { id:"shs", name:"서현수", email:"hyunsoo@company.co.kr", role:"세일즈",    color:"#6B7684" },
+  { id:"nby", name:"남보영", email:"boyoung@company.co.kr", role:"CS",        color:"#FF9F40" },
+  { id:"kje", name:"권재이", email:"jaei@company.co.kr",    role:"인사",      color:"#A98467" },
+  { id:"lth", name:"임태호", email:"taeho@company.co.kr",   role:"재무",      color:"#9FA7B0" },
+  { id:"bdy", name:"배다율", email:"dayul@company.co.kr",   role:"리서치",    color:"#4593FC" },
+  { id:"gsw", name:"고승원", email:"seungwon@company.co.kr",role:"법무",      color:"#82C43C" },
 ];
 
 const hex2rgb = h => [1,3,5].map(i => parseInt(h.slice(i, i + 2), 16));
@@ -1175,7 +1245,7 @@ const lum = h => { const c = hex2rgb(h); return (0.299*c[0] + 0.587*c[1] + 0.114
 const rgb2hex = c => "#" + c.map(v => Math.round(v).toString(16).padStart(2,"0")).join("");
 /* 흰색 쪽으로 섞어 옅은 톤을 만든다 — 팔레트에서 규칙으로 파생시킨 값 */
 const tint = (h, r) => rgb2hex(hex2rgb(h).map(v => v + (255 - v) * r));
-const inkFor = h => lum(h) > 0.62 ? "#3c4043" : "#ffffff";
+const inkFor = h => lum(h) > 0.62 ? "#17171C" : "#ffffff";
 
 PEOPLE.forEach(p => { p.ink = inkFor(p.color); });
 
@@ -1407,7 +1477,7 @@ const ROOMS = [
   { id:"E", n:"회의실 E", cap:16 },
 ];
 /* 회의실도 캘린더처럼 켜고 끌 수 있는 리소스다 */
-const RES_COLOR = "#8e918f";      /* 구글의 리소스 캘린더와 같은 무채색 */
+const RES_COLOR = "#6B7684";      /* 리소스 캘린더는 무채색으로 */
 const resOn = id => !!state.res[id];
 const anyRes = () => ROOMS.some(r => resOn(r.id));
 
@@ -1599,10 +1669,9 @@ const LINK_FIXTURES = {
   /* 서류 합격이 확정되면, 조율은 여기서 시작한다 */
   ats:{
     icon:"◎", label:"윤도경 · 프로덕트 디자이너 2차",
-    summary:"서류 합격 · 면접관 3명 지정됨 · 다른 회사 2곳 진행 중",
+    summary:"서류 합격 · 면접관 3명 지정됨",
     title:"윤도경 님 2차 면접",
-    for:{ name:"윤도경", role:"프로덕트 디자이너", stage:"2차 면접",
-          note:"다른 회사 2곳 최종 단계 · 이번 주 안에 잡히지 않으면 놓칠 수 있음" },
+    for:{ name:"윤도경", role:"프로덕트 디자이너", stage:"2차 면접" },
     steps:["지원자 단계와 상태 확인","면접 유형에 배정된 면접관 조회","최근 면접 이력으로 필수 여부 판단","필수 / 선택 배분"],
     people:[
       { id:"psy", need:"required", reason:"이 직무의 1차 면접관 — 2차도 이어서 봄",
@@ -1720,9 +1789,9 @@ const state = {
   miniYear:2026, miniMonth:7,
   hidden:{}, query:"", sidebar:true, userEvents:[], seeded:0, edits:{}, deleted:{},
   onbOpen:true, onbDone:{}, tipSeen:{}, picker:null, linkOpen:false, importOpen:false, hostJoins:true,
-  hold:null, reminders:0, holdAnswer:null, dropped:null, exhausted:false,
+  hold:null,
   blockedCount:0, blockedDays:[], showAlts:false, room:null, roomOpen:false, rsvp:{},
-  res:{}, roomsOnly:false, draft:null,
+  res:{}, roomsOnly:false, draft:null, pickOpen:false,
 };
 
 function save(){
@@ -1753,7 +1822,7 @@ const PERSIST_KEY = "auto-coordination-state-v1";
 function persist(){
   try{
     localStorage.setItem(PERSIST_KEY, JSON.stringify({
-      hold:state.hold, holdAnswer:state.holdAnswer, reminders:state.reminders,
+      hold:state.hold,
       userEvents:state.userEvents, hidden:state.hidden, edits:state.edits, deleted:state.deleted,
       rsvp:state.rsvp, res:state.res, roomsOnly:state.roomsOnly,
       onbDone:state.onbDone, tipSeen:state.tipSeen, onbOpen:state.onbOpen,
@@ -1771,8 +1840,6 @@ function loadPersist(){
       const r = ROOMS.filter(x => x.n === state.hold.room)[0];
       state.hold.roomId = r ? r.id : null;
     }
-    state.holdAnswer = d.holdAnswer || null;
-    state.reminders = d.reminders || 0;
     state.userEvents = Array.isArray(d.userEvents) ? d.userEvents : [];
     state.userEvents.forEach((u,i) => { u._k = "u" + i; });
     state.hidden = d.hidden || {};
@@ -2016,7 +2083,7 @@ function scheduleViewHTML(){
           '<span class="sv-w">' + cal.name + '</span></div>';
       }).join("") + '</div></div>';
   }
-  return '<div class="sv">' + (out || '<div class="sv-empty">표시할 일정이 없습니다.</div>') + '</div>';
+  return '<div class="sv">' + (out || '<div class="sv-empty">표시할 일정이 없어요.</div>') + '</div>';
 }
 
 function layoutDay(list){
@@ -2108,13 +2175,19 @@ function buildGrid(){
     lunch.style.height = (LUNCH[1] - LUNCH[0]) * rowH + "px";
     col.appendChild(lunch);
 
-    /* 전사 일정이 있는 날은 조율 중에 통째로 막아 보여준다 */
-    const dayAll = allDayOf(weekOffOf(dt)).find(a => a.d === d && a.block === "all");
-    if(dayAll && coordMode()){
-      const db = document.createElement("div");
-      db.className = "day-block";
-      db.innerHTML = '<span>' + dayAll.t + ' · 조율 불가</span>';
-      col.appendChild(db);
+    /* 전사 일정이나 필수 참석자의 휴가가 있는 날은 조율 중에 통째로 막아 보여준다.
+       빠진 이유가 화면에 남아야, 조용히 지운 것이 되지 않는다. */
+    if(coordMode()){
+      const ad = allDayOf(weekOffOf(dt));
+      const away = ad.find(a => a.d === d &&
+        (a.block === "all" || (a.block && needOf(a.block) === "required")));
+      if(away){
+        const db = document.createElement("div");
+        db.className = "day-block";
+        db.innerHTML = '<span>' + away.t +
+          (away.block === "all" ? ' · 조율 불가' : ' · 물어볼 수 없는 날') + '</span>';
+        col.appendChild(db);
+      }
     }
 
     layoutDay(instancesFor(dt)).forEach(ev => {
@@ -2147,7 +2220,7 @@ function buildGrid(){
       if(ev._res){
         el.classList.add("ev-res");
         el.style.backgroundColor = RES_COLOR;
-        el.style.color = "#202124";
+        el.style.color = "#ffffff";
       }
       const room = ev._res && ROOMS.filter(r => r.id === ev._res)[0];
       const sub = room ? room.n + " · " + ev.w.length + "명"
@@ -2175,8 +2248,8 @@ function buildGrid(){
         el.classList.add(hit ? "found" : "faded");
       }
       if(ev.hold){
-        const h = state.hold, ok = !h.confirmed && state.holdAnswer === "yes";
-        el.classList.add(h.confirmed ? "hold-done" : ok ? "hold-ok" : "hold-wait");
+        const h = state.hold;
+        el.classList.add(h.confirmed ? "hold-done" : "hold-wait");
         /* 방금 잡힌 자리는 결과 화면이 열려 있는 동안 눈에 띄게 둔다 */
         if(state.sheetOpen && state.step === 4 && !ev._res){
           el.classList.add("just");
@@ -2185,13 +2258,13 @@ function buildGrid(){
           const mk = document.createElement("div");
           mk.className = "just-mark" + (low ? " below" : "");
           mk.style.top = ((low ? ev.e : ev.s) - START_H) * rowH + "px";
-          mk.innerHTML = '<span>' + (h.confirmed ? "여기로 잡혔습니다" : "여기를 잡아뒀습니다") + '</span>';
+          mk.innerHTML = '<span>' + (h.confirmed ? "여기로 잡혔어요" : "여기를 잡아뒀어요") + '</span>';
           col.appendChild(mk);
         }
         if(!h.confirmed){
           el.querySelector(".tt").textContent = "[미정] " + ev.t;
           const s = el.querySelector(".wh");
-          if(s) s.textContent = ok ? "옮길 수 있다는 답 도착" : "답 기다리는 중";
+          if(s) s.textContent = "답 기다리는 중";
         }
         el.onclick = e => { e.stopPropagation(); openHoldPop(el); };
       }else{
@@ -2296,7 +2369,7 @@ function paintResList(){
   el.innerHTML = ROOMS.map(r => {
     const off = !resOn(r.id);
     return '<div class="cal-row' + (off ? " hid" : "") + '" data-res="' + r.id + '">' +
-      '<span class="cbox"' + (off ? '' : ' style="background:' + RES_COLOR + ';color:#202124"') + '>' +
+      '<span class="cbox"' + (off ? '' : ' style="background:' + RES_COLOR + ';color:#ffffff"') + '>' +
         (off ? '' : '✓') + '</span>' +
       r.n + '<span class="res-cap">' + r.cap + '인</span>' +
       '<span class="only" data-resonly="' + r.id + '">이 회의실만</span></div>';
@@ -2304,7 +2377,7 @@ function paintResList(){
     /* 방 일정만 남기면 어느 시간이 비어 있는지가 바로 읽힌다 */
     '<div class="cal-row res-only-row' + (anyRes() ? '' : ' off') + '" id="roomsOnly">' +
       '<span class="cbox' + (state.roomsOnly ? '' : ' sw-off') + '"' +
-        (state.roomsOnly ? ' style="background:' + RES_COLOR + ';color:#202124"' : '') + '>' +
+        (state.roomsOnly ? ' style="background:' + RES_COLOR + ';color:#ffffff"' : '') + '>' +
         (state.roomsOnly ? '✓' : '') + '</span>사람 일정 숨기기</div>';
 
   el.querySelectorAll("[data-res]").forEach(r => {
@@ -2346,7 +2419,7 @@ function syncGrid(){
     state.attendees.map(a => a.id + ":" + a.need), state.res, state.roomsOnly,
     /* 잡아둔 시간도 캘린더에 서는 블록이다 — 빠지면 화면에 안 나타난다 */
     h && [h.d, h.s, h.e, h.title, h.confirmed, h.roomId, (h.att || []).length],
-    state.holdAnswer, state.rsvp,
+    state.rsvp,
   ]);
   if(sig === gridSig) return;
   gridSig = sig;
@@ -2493,9 +2566,9 @@ function openEventPop(ev, anchor, when0, mode){
     mode === "mail"
       ? '<div class="quick" style="padding:14px 16px 4px">' +
           '<div class="w" style="margin-bottom:8px">받는 사람 · ' + to + '</div>' +
-          '<input class="text-input" id="mailSubj" value="' + esc("[" + ev.t + "] 확인 부탁드립니다") + '">' +
+          '<input class="text-input" id="mailSubj" value="' + esc("[" + ev.t + "] 확인 부탁드려요") + '">' +
           '<textarea class="text-input" id="mailBody" rows="3" style="margin-top:8px;resize:none">' +
-            esc(when + " 일정 관련해 확인 부탁드립니다.") + '</textarea>' +
+            esc(when + " 일정 관련해 확인 부탁드려요.") + '</textarea>' +
           '<div class="acts" style="margin-top:10px">' +
             '<button id="mailCancel">취소</button>' +
             '<button class="pri" id="mailSend">보내기</button></div></div>'
@@ -2546,7 +2619,7 @@ function openEventPop(ev, anchor, when0, mode){
   const cp = document.getElementById("meetCopy");
   if(cp) cp.onclick = e => {
     e.stopPropagation();
-    toast("회의 링크를 복사했습니다.");
+    toast("회의 링크를 복사했어요.");
   };
   pop.querySelectorAll("[data-rsvp]").forEach(b => {
     b.onclick = e => {
@@ -2560,7 +2633,7 @@ function openEventPop(ev, anchor, when0, mode){
     state.deleted[ev._k] = true;
     state.userEvents = state.userEvents.filter(u => u._k !== ev._k);
     closePop(); buildGrid(); paintCandidates(); persist();
-    toast('「' + ev.t + '」을 삭제했습니다.', "실행취소", () => {
+    toast('「' + ev.t + '」을 삭제했어요.', "실행취소", () => {
       delete state.deleted[ev._k];
       buildGrid(); paintCandidates(); persist();
     });
@@ -2586,7 +2659,7 @@ function openEventPop(ev, anchor, when0, mode){
   const ms = document.getElementById("mailSend");
   if(ms) ms.onclick = () => {
     closePop();
-    toast(to + "님에게 메일을 보냈습니다.");
+    toast(to + "님에게 메일을 보냈어요.");
   };
 
   pop.querySelectorAll("[data-color]").forEach(b => {
@@ -2648,16 +2721,9 @@ function openHoldPop(anchor, editing, roomOpen){
       '<button class="act" data-soon="메일 보내기" title="참석자에게 메일">✉</button></div>' +
     (h.confirmed
       ? '<div class="pop-row"><span class="ic">✓</span><span class="val">확정 · 참석자 전원에게 초대 발송됨</span></div>'
-      : state.holdAnswer === "yes"
-      ? '<div class="pop-row"><span class="ic">✓</span><span class="val">' +
-          '<b>' + h.askers.join(", ") + '</b>님이 <b>가능</b>으로 답했습니다.' +
-          '<div class="pop-org">겹쳤던 일정을 옮길 수 있습니다 · 확정하면 전원에게 초대가 나갑니다</div>' +
-        '</span></div>'
       : '<div class="pop-row"><span class="ic">💬</span><span class="val">' +
           '<b>' + h.askers.join(", ") + '</b>님에게 조율 요청' +
-          '<div class="pop-org">' + (state.reminders
-            ? "리마인드 " + state.reminders + "회 발송 · 아직 답 없음"
-            : "응답 대기 중") + '</div></span></div>' +
+          '<div class="pop-org">답을 기다리는 중</div></span></div>' +
         '<div class="pop-row"><span class="ic">🔒</span><span class="val">' +
           '다른 참석자에게는 알림 없음 · 자리만 확보</span></div>');
   const tools =
@@ -2669,15 +2735,11 @@ function openHoldPop(anchor, editing, roomOpen){
       '" placeholder="제목 추가" autocomplete="off">'
     : '<h3>' + esc((h.confirmed ? "" : "[미정] ") + (h.title || "(제목 없음)")) + '</h3>';
 
-  pop.innerHTML = popShell(h.confirmed ? P("me").color : (state.holdAnswer === "yes" ? "#81c995" : "#fdd663"),
+  pop.innerHTML = popShell(h.confirmed ? P("me").color : "#FFC845",
     "", (h.d != null ? fmt(h) : ""), rows, tools, titleHTML) +
     (h.confirmed ? "" :
       '<div class="pop-row" style="padding-top:14px">' +
-        (state.holdAnswer === "yes"
-          ? '<button class="btn primary" id="holdConfirm" style="flex:1;padding:9px 0;font-size:13px">전원 확정하기</button>'
-          : '<button class="btn primary" id="holdRemind" style="flex:1;padding:9px 0;font-size:13px">' +
-            (state.reminders ? "리마인드 다시 보내기" : "리마인드 보내기") + '</button>') +
-        '<button class="btn" id="holdDrop" style="padding:9px 16px;font-size:13px">확보 취소</button>' +
+        '<button class="btn" id="holdDrop" style="flex:1;padding:11px 0;font-size:14px">확보 취소</button>' +
       '</div>');
   placePop(anchor);
 
@@ -2691,7 +2753,7 @@ function openHoldPop(anchor, editing, roomOpen){
     state.hold.room = r ? r.n : null;
     persist(); syncGrid(); paintCandidates();
     openHoldPop(anchor, false, true);
-    toast(r ? r.n + "로 바꿨습니다." : "회의실 없이 진행합니다.");
+    toast(r ? r.n + "로 바꿨어요." : "회의실 없이 진행해요.");
   });
   const ti = document.getElementById("popTitle");
   if(ti){
@@ -2705,88 +2767,21 @@ function openHoldPop(anchor, editing, roomOpen){
   }
   const del = document.getElementById("popDel");
   if(del) del.onclick = () => {
-    state.hold = null; state.holdAnswer = null; clearTimeout(replyTimer);
+    state.hold = null;
     closePop(); persist(); syncGrid(); paintCandidates();
-    toast("일정을 삭제했습니다.");
+    toast("일정을 삭제했어요.");
   };
 
-  const c = document.getElementById("holdConfirm");
-  if(c) c.onclick = confirmHold;
-  const r = document.getElementById("holdRemind");
-  if(r) r.onclick = () => { sendRemind(); closePop(); };
   const d = document.getElementById("holdDrop");
   if(d) d.onclick = () => {
-    state.hold = null; state.holdAnswer = null; clearTimeout(replyTimer);
+    state.hold = null;
     closePop(); persist(); syncGrid(); paintCandidates();
-    toast("확보한 시간을 취소했습니다.");
+    toast("확보한 시간을 취소했어요.");
   };
 }
 
-function sendRemind(){
-  state.reminders++;
-  toast(state.hold.askers.join(", ") + "님에게 한 번 더 물었습니다.");
-  scheduleReply();
-}
-
-/* 옮길 수 있는지는 그날의 사정에 달렸다 — 제목만 보고는 도구도 모른다.
-   그래서 답은 그 사람과 그 일정에 따라 갈리고, 같은 자리에서는 늘 같은 답이 온다. */
-function replyFor(sl){
-  const c = sl && sl.conflicts[0];
-  if(!c) return "yes";
-  let h = 0;
-  const s = c.who + "|" + c.block;
-  for(let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 9973;
-  return h % 3 === 0 ? "no" : "yes";
-}
-
-/* 물어본 사람이 답을 보내온다 */
-let replyTimer = null;
-function scheduleReply(){
-  clearTimeout(replyTimer);
-  replyTimer = setTimeout(() => {
-    if(!state.hold || state.hold.confirmed || state.holdAnswer) return;
-    const who = state.hold.askers.join(", ");
-    state.holdAnswer = replyFor(state.slots[state.selectedSlot]);
-    persist(); syncGrid(); paintCandidates();
-    if(state.sheetOpen) render();       /* 시트를 닫아 뒀으면 캘린더만 갱신한다 */
-    if(state.holdAnswer === "yes"){
-      toast(who + "님이 ‘가능’으로 답했습니다.", "전원 확정하기", confirmHold);
-      return;
-    }
-    /* 옮길 수 없다는 답이 오면 그 후보는 빠지고 다음 순위로 넘어간다 */
-    toast(who + "님이 ‘어렵다’고 답했습니다.");
-    setTimeout(dropAndAdvance, 1800);
-  }, 4000);
-}
-
-/* 거절당한 자리를 후보에서 빼고, 남은 것 중 가장 높은 순위를 다시 제안한다 */
-function dropAndAdvance(){
-  if(state.holdAnswer !== "no" || !state.hold) return;
-  const sl = state.slots[state.selectedSlot];
-  state.dropped = { who:state.hold.askers.join(", "), block:sl.conflicts[0].block, when:fmt(sl) };
-  state.slots = state.slots.filter((s, i) => i !== state.selectedSlot);
-  state.hold = null; state.holdAnswer = null; state.reminders = 0;
-
-  if(!state.slots.length){            /* 더 물어볼 자리가 없다 */
-    state.selectedSlot = null;
-    state.exhausted = true;
-    state.step = 3;
-    persist(); syncGrid(); paintCandidates();
-    if(state.sheetOpen) render();
-    toast("물어본 자리가 모두 어렵다는 답을 받았습니다.");
-    return;
-  }
-  proposeSlot(0);
-}
-
-/* 겹쳤던 한 명이 옮겨주면, 그 자리에서 참석자 전원의 일정이 확정된다 */
-function confirmHold(){
-  if(!state.hold) return;
-  state.hold.confirmed = true;
-  state.holdAnswer = null;
-  closePop(); persist(); syncGrid(); paintCandidates();
-  toast("일정이 확정됐습니다 · 참석자 " + state.hold.people + "명 전원 캘린더에 등록되었습니다.");
-}
+/* 답이 오는 뒤쪽은 이 도구의 몫이 아니다.
+   여기서 하는 일은 물어볼 사람을 한 명으로 줄이고 그 자리를 잡아두는 데까지다. */
 
 /* 빠른 일정 만들기 — 캘린더의 빈 칸도, 만들기 메뉴도 여기로 온다 */
 const DURS = [[0.5,"30분"],[1,"1시간"],[1.5,"1시간 30분"],[2,"2시간"]];
@@ -2807,14 +2802,14 @@ function openCreate(dt, h, dur, anchor, keep){
       '<button class="with-others" id="qWith">' +
         '<span class="ic">👥</span>' +
         '<span><b>다른 사람도 부를까요?</b>' +
-          '<i>그러면 이 시간은 추측입니다 — 다 되는 시간을 찾아 드립니다</i></span>' +
+          '<i>그러면 이 시간은 추측이에요 — 다 되는 시간을 찾아 드려요</i></span>' +
         '<span class="go">자동 조율 →</span></button>' +
 
       '<div class="acts">' +
         '<button id="qMore">옵션 더보기</button>' +
         '<button class="pri" id="qSave">저장</button>' +
       '</div>' +
-      '<div class="note">정슬기 캘린더에 만들어집니다.</div>' +
+      '<div class="note">정슬기 캘린더에 만들어져요.</div>' +
     '</div>';
   placePop(anchor);
   const ti = document.getElementById("qTitle");
@@ -2835,7 +2830,7 @@ function openCreate(dt, h, dur, anchor, keep){
       _k:"u" + state.userEvents.length,
     });
     closePop(); buildGrid(); paintCandidates();
-    toast('「' + t + '」 일정을 만들었습니다.');
+    toast('「' + t + '」 일정을 만들었어요.');
   }
 }
 
@@ -2853,7 +2848,7 @@ function placePop(anchor){
   pop.classList.add("on");
   /* 아직 안 만든 기능은 조용히 알려만 준다 */
   setTimeout(() => pop.querySelectorAll("[data-soon]").forEach(b => {
-    b.onclick = () => { closePop(); toast(b.dataset.soon + "은 프로토타입에서 지원하지 않습니다."); };
+    b.onclick = () => { closePop(); toast(b.dataset.soon + "은 프로토타입에서 지원하지 않아요."); };
   }), 0);
   const r = anchor.getBoundingClientRect();
   const w = pop.offsetWidth, h = pop.offsetHeight;
@@ -2893,14 +2888,18 @@ function computeSlots(){
     const db = dayBlock(d);
     if(db){ state.blockedDays.push({ d, t:db.t }); continue; }
 
+    /* 휴가는 물어볼 대상이 아니다.
+       「고객사 방문」은 미리 양해를 구하면 옮겨지지만, 휴가는 그 사람이 회사에 없다.
+       쉬는 날을 물어보는 것은 이 도구가 없애려던 바로 그 압박이다. */
+    const off = req.map(id => personBlock(d, id)).filter(Boolean)[0];
+    if(off){ state.blockedDays.push({ d, t:off.t, away:true }); continue; }
+
     for(let s = START_H; s + 1 <= END_H; s += 0.5){
       const e = s + 1;
       if(s < LUNCH[1] && e > LUNCH[0]) continue;            /* 점심시간 제외 */
 
       const rc = [], oc = [], hard = [];
       req.forEach(id => {
-        const pb = personBlock(d, id);
-        if(pb){ hard.push({ who:id, block:pb.t, k:null, m:"fixed" }); return; }
         const ev = busyEvent(id, d, s, e);
         if(!ev) return;
         const m = mobility(ev);
@@ -3068,10 +3067,10 @@ function render(){
   /* 그 화면에 처음 왔을 때만 한 줄 */
   if(!pickingPeople() && coordMode())
     tip("filter", "#calList",
-      "이 회의 <b>참석자의 캘린더만</b> 남았습니다. 어느 시간이 왜 막혔는지가 그제야 읽힙니다.", "right");
+      "이 회의 <b>참석자의 캘린더만</b> 남았어요. 어느 시간이 왜 막혔는지가 그제야 읽혀요.", "right");
   if(state.step === 4 && state.hold && !state.hold.confirmed)
     setTimeout(() => tip("hold", ".ev.hold-wait",
-      "확정이 아니라 <b>자리만 잡아둔 상태</b>입니다. 블록을 누르면 리마인드하거나 취소할 수 있어요.", "left"), 500);
+      "확정이 아니라 <b>자리만 잡아둔 상태</b>예요. 블록을 누르면 리마인드하거나 취소할 수 있어요.", "left"), 500);
 }
 
 /* --------- 0. 일정 만들기 --------- */
@@ -3090,7 +3089,7 @@ function renderEditor(){
   const me = P("me");
 
   title.textContent = "일정 만들기";
-  sub.textContent = "나 혼자 쓰는 시간입니다. 이 시간이 맞다고 이미 알고 있을 때.";
+  sub.textContent = "나 혼자 쓰는 시간이에요. 이 시간이 맞다고 이미 알고 있을 때.";
 
   const row = (ic, inner, cls) =>
     '<div class="ed-row' + (cls ? " " + cls : "") + '"><span class="ic">' + ic + '</span>' +
@@ -3117,7 +3116,7 @@ function renderEditor(){
     row("👥",
       '<button class="ed-add" id="edPeople">참석자 추가' +
         '<span class="go">자동 조율로</span></button>' +
-      '<div class="ed-hint">다른 사람이 오면 이 시간은 추측이 됩니다.</div>') +
+      '<div class="ed-hint">다른 사람이 오면 이 시간은 추측이 돼요.</div>') +
 
     row("📹", d.meet
       ? '<div class="ed-on">Google Meet 화상 회의' +
@@ -3238,22 +3237,22 @@ function saveDraft(){
   });
   persist();
   closeSheet();
-  toast('「' + t + '」 일정을 만들었습니다.' + (room ? " · " + room.n : ""));
+  toast('「' + t + '」 일정을 만들었어요.' + (room ? " · " + room.n : ""));
 }
 
 /* --------- 1. 인원 지정 --------- */
 function renderSetup(){
   title.textContent = "일정 만들기";
   sub.textContent = state.forWhom
-    ? "면접관 " + required().length + "명이 모두 되는 시간을 찾습니다."
-    : "회의 이야기가 오간 곳을 알려주시면, 거기서 올 사람을 찾아옵니다.";
+    ? "면접관 " + required().length + "명이 모두 되는 시간을 찾아요."
+    : "회의 이야기가 오간 곳을 알려주시면, 거기서 올 사람을 찾아와요.";
 
   body.innerHTML =
     (state.restored
-      ? '<div class="banner">새로고침 전에 작성하던 내용을 불러왔습니다.' +
+      ? '<div class="banner">새로고침 전에 작성하던 내용을 불러왔어요.' +
         '<button class="btn ghost" id="newDraft" style="padding:4px 10px;font-size:12px;margin-left:6px">새로 시작</button></div>'
       : state.seeded && state.attendees.some(a => a.from === "calendar")
-      ? '<div class="banner">내 캘린더에서 켜 둔 <b>' + state.seeded + '명</b>을 가져왔습니다.</div>'
+      ? '<div class="banner">내 캘린더에서 켜 둔 <b>' + state.seeded + '명</b>을 가져왔어요.</div>'
       : '') +
     forWhomCard() +
     '<div class="field">' +
@@ -3264,7 +3263,7 @@ function renderSetup(){
       '<div class="label">누구를 부를까요?</div>' +
       '<input class="text-input" id="searchInput" placeholder="이름 또는 이메일 검색" autocomplete="off">' +
       '<div class="results" id="searchResults"></div>' +
-      '<div class="field-note">왼쪽 <b>부를 사람</b> 목록에서 체크해도 됩니다.</div>' +
+      '<div class="field-note">왼쪽 <b>부를 사람</b> 목록에서 체크해도 돼요.</div>' +
     '</div>' +
     linkBlock() +
     '<div class="field">' +
@@ -3274,11 +3273,11 @@ function renderSetup(){
         (state.attendees.some(a => a.auto) ? '<span class="tag-ai">AI 제안</span>' : '') + '</div>' +
       hostRow() +
       (state.attendees.length ? state.attendees.map(attRow).join("")
-        : '<div class="banner">아직 부를 사람이 없습니다. 위에 링크를 붙여넣으면 그 대화에 있던 사람부터 찾아옵니다.</div>') +
+        : '<div class="banner">아직 부를 사람이 없어요. 위에서 지원자나 링크를 고르면 거기 있던 사람부터 찾아와요.</div>') +
       (state.attendees.some(a => a.auto)
-        ? '<div class="banner" style="margin-top:10px">AI가 뽑은 배분입니다. <b>필수 / 선택은 주최자가 바로 바꿀 수 있고</b>, 바꾼 줄은 “주최자 수정”으로 표시됩니다.</div>' : '') +
+        ? '<div class="banner" style="margin-top:10px">AI가 뽑은 배분이에요. <b>필수 / 선택은 바로 바꿀 수 있고</b>, 바꾼 줄은 “주최자 수정”으로 표시돼요.</div>' : '') +
     '</div>' +
-    (hasHard() ? '<div class="banner warn">참석자 중 <b>재조율이 어려운 사람</b>이 있습니다. 조율 요청에 “놓치면 다시 잡기 어렵다” 표시가 함께 나갑니다.</div>' : '');
+    (hasHard() ? '<div class="banner warn">참석자 중 <b>재조율이 어려운 분</b>이 있어요. 조율 요청에 “놓치면 다시 잡기 어렵다” 표시가 함께 나가요.</div>' : '');
 
   foot.innerHTML =
     '<div class="autosave idle" id="saveFlag">자동 저장됨 · 새로고침해도 유지</div>' +
@@ -3329,27 +3328,35 @@ function renderSetup(){
 
   const si = document.getElementById("searchInput");
   const rs = document.getElementById("searchResults");
-  si.oninput = () => {
+  /* 처음 쓰는 사람은 회사에 누가 있는지 모른다 — 누르면 그냥 전부 보여준다 */
+  const showPeople = () => {
     const q = si.value.trim().toLowerCase();
-    if(!q){ rs.classList.remove("on"); return; }
-    const hits = PEOPLE.filter(p => p.id !== "me" && (
+    const hits = PEOPLE.filter(p => p.id !== "me" && (!q ||
       p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q) || p.role.includes(q)));
-    rs.innerHTML = hits.length ? hits.map(p => {
-      const added = state.attendees.some(a => a.id === p.id);
-      return '<button class="res-item" data-id="' + p.id + '"' + (added ? " disabled" : "") + '>' +
-        avatar(p) + '<span class="meta"><span class="nm">' + p.name + ' · ' + p.role + '</span>' +
-        '<span class="em">' + p.email + (added ? " · 추가됨" : "") + '</span></span></button>';
-    }).join("") : '<div style="padding:12px;color:var(--text-faint);font-size:12px">검색 결과가 없습니다.</div>';
+    rs.innerHTML =
+      (q ? "" : '<div class="res-h">함께 일하는 사람 ' + hits.length + '명</div>') +
+      (hits.length ? hits.map(p => {
+        const added = state.attendees.some(a => a.id === p.id);
+        return '<button class="res-item" data-id="' + p.id + '"' + (added ? " disabled" : "") + '>' +
+          avatar(p) + '<span class="meta"><span class="nm">' + p.name + ' · ' + p.role + '</span>' +
+          '<span class="em">' + p.email + '</span></span>' +
+          (added ? '<span class="res-added">추가됨</span>' : '<span class="res-plus">＋</span>') +
+          '</button>';
+      }).join("") : '<div class="res-none">그런 이름은 없어요.</div>');
     rs.classList.add("on");
     rs.querySelectorAll(".res-item[data-id]:not([disabled])").forEach(b => {
       b.onclick = () => {
         state.attendees.push({ id:b.dataset.id, need:"required" });
         state.hidden[b.dataset.id] = false;   /* 부른 사람의 일정은 보여야 한다 */
+        state.pickOpen = true;                /* 이어서 더 고를 수 있게 열어 둔다 */
         save(); render();
         setTimeout(() => { const n = document.getElementById("searchInput"); if(n) n.focus(); }, 0);
       };
     });
   };
+  si.oninput = showPeople;
+  si.onfocus = showPeople;
+  if(state.pickOpen){ state.pickOpen = false; showPeople(); }
   si.onblur = () => setTimeout(() => rs.classList.remove("on"), 160);
 
   body.querySelectorAll("[data-host]").forEach(b => {
@@ -3460,8 +3467,8 @@ function hostRow(){
       '<span class="host-tag">주최자</span></span>' +
     '<span class="em">' + p.email + '</span>' +
     '<span class="why">' + (join
-      ? "내 일정도 비어야 후보로 잡힙니다"
-      : "자리만 만들고 참석하지 않습니다 · 내 일정은 계산에서 빠집니다") + '</span></span>' +
+      ? "내 일정도 비어야 후보로 잡혀요"
+      : "자리만 만들고 참석하지 않아요 · 내 일정은 계산에서 빠져요") + '</span></span>' +
     '<span class="seg">' +
       '<button data-host="1" class="' + (join ? "on" : "") + '">참석</button>' +
       '<button data-host="0" class="' + (join ? "" : "on") + '">불참</button>' +
@@ -3499,7 +3506,6 @@ function startScan(){
   state.step = 2;
   state.selectedSlot = null;
   state.room = null; state.roomOpen = false;
-  state.dropped = null; state.exhausted = false;
   state.slots = computeSlots();
   if(state.view !== "week" || weekOff() !== 0){ state.view = "week"; paintViewBtn(); gotoWeek(0); }
   render();
@@ -3518,8 +3524,6 @@ function proposeSlot(i){
   if(!sl) return;
   const rm = (state.selectedSlot = i, pickedRoom(sl));
   state.sent = sl.rank <= 2 ? "invite" : "ask";
-  state.holdAnswer = null;
-  state.reminders = 0;
   state.hold = {
     d:sl.d, s:sl.s, e:sl.e, rank:sl.rank, confirmed:sl.rank <= 2,
     title:state.title, people:headCount(),
@@ -3531,7 +3535,6 @@ function proposeSlot(i){
   state.step = 4;
   persist(); syncGrid(); paintCandidates();
   if(state.sheetOpen) render();
-  if(!state.hold.confirmed) scheduleReply();   /* 물어봤으니 답이 온다 */
 }
 
 function renderScan(){
@@ -3539,7 +3542,7 @@ function renderScan(){
   sub.textContent = "";
   body.innerHTML =
     '<div class="scan"><div class="spin"></div>' +
-      '<p>다음 주 평일에서 잡을 수 있는 시간을 찾고 있습니다.</p></div>';
+      '<p>다음 주 평일에서 잡을 수 있는 시간을 찾고 있어요.</p></div>';
   foot.innerHTML = '<div style="flex:1"></div>';
 }
 
@@ -3614,16 +3617,11 @@ function renderResults(){
   title.textContent = "가능한 일정";
 
   if(!slots.length){
-    /* 애초에 없었던 것과, 물어봤다가 다 거절당한 것은 다른 상황이다 */
-    sub.textContent = state.exhausted
-      ? "물어본 자리가 모두 어렵다는 답을 받았습니다."
-      : "물어볼 만한 시간까지 봤지만 후보가 없습니다.";
-    body.innerHTML = state.exhausted
-      ? '<div class="banner warn">겹친 분들이 모두 <b>옮기기 어렵다</b>고 답해 후보가 다 빠졌습니다. ' +
-        '필수를 줄이거나 범위를 다음다음 주로 넓혀야 합니다.</div>'
-      : '<div class="banner warn">어느 자리든 <b>물어볼 사람이 셋 넘게</b> 생깁니다' +
-        (state.blockedCount ? ' (' + state.blockedCount + '칸)' : '') + '. ' +
-        '필수를 줄이거나 범위를 다음다음 주로 넓혀야 합니다.</div>';
+    sub.textContent = "물어볼 만한 시간까지 봤는데 후보가 없어요.";
+    body.innerHTML =
+      '<div class="banner warn">어느 자리든 <b>물어볼 사람이 셋 넘게</b> 생겨요' +
+      (state.blockedCount ? ' (' + state.blockedCount + '칸)' : '') + '. ' +
+      '필수를 줄이거나 범위를 다음다음 주로 넓혀야 해요.</div>';
     foot.innerHTML = '<button class="btn ghost" id="backBtn">인원 수정</button>';
     document.getElementById("backBtn").onclick = () => { state.step = 1; render(); };
     return;
@@ -3636,22 +3634,22 @@ function renderResults(){
   const alts = slots.map((s,i) => ({ s, i })).filter(o => o.i !== state.selectedSlot);
 
   sub.textContent = confirmable
-    ? "AI가 고른 시간입니다. 보낼지만 정하시면 됩니다."
+    ? "AI가 고른 시간이에요. 보낼지만 정하시면 돼요."
     : sel.rank === 5
-    ? "앞 순위가 없어, 어려워 보이는 자리까지 후보로 올렸습니다."
-    : "전원이 비는 시간이 없어, 물어볼 사람이 가장 적은 시간을 골랐습니다.";
+    ? "앞 순위가 없어서 어려워 보이는 자리까지 올렸어요."
+    : "전원이 비는 시간이 없어서, 물어볼 사람이 가장 적은 시간을 골랐어요.";
 
   body.innerHTML =
     (confirmable
-      ? '<div class="banner good">전원이 비는 시간을 찾았습니다. 바로 확정 초대가 나갑니다.</div>'
+      ? '<div class="banner good">전원이 비는 시간을 찾았어요. 바로 확정 초대가 나가요.</div>'
       : sel.rank === 5
       /* 사람이라면 지웠을 자리 — 지우지 않은 이유를 밝힌다 */
-      ? '<div class="banner warn"><b>여기는 화면만 보면 안 되는 시간처럼 보입니다.</b> ' +
-        '그래도 지우지 않았습니다. 「고객사 방문」도 미리 양해를 구하면 옮겨지고, ' +
-        '그 사정은 캘린더에 적혀 있지 않습니다. 물어볼지는 주최자가 정합니다.</div>'
-      : '<div class="banner warn"><b>전원이 비는 시간은 없습니다.</b> 여기서 멈추지 않고 ' +
-        '<b>혼자 하는 일정과 겹치는 시간</b>까지 봤습니다. ' +
-        '“일정이 있다”를 확정된 불가능이 아니라 아직 물어보지 않은 상태로 취급합니다.</div>') +
+      ? '<div class="banner warn"><b>여기는 화면만 보면 안 되는 시간처럼 보여요.</b> ' +
+        '그래도 지우지 않았어요. 「고객사 방문」도 미리 양해를 구하면 옮겨지고, ' +
+        '그 사정은 캘린더에 적혀 있지 않아요. 물어볼지는 주최자가 정해요. 휴가처럼 <b>물어볼 수 없는 날</b>은 여기까지 오지도 않아요.</div>'
+      : '<div class="banner warn"><b>전원이 비는 시간은 없어요.</b> 여기서 멈추지 않고 ' +
+        '<b>혼자 하는 일정과 겹치는 시간</b>까지 봤어요. ' +
+        '“일정이 있다”를 확정된 불가능이 아니라 아직 물어보지 않은 상태로 봐요.</div>') +
 
     '<div class="rec">' +
       '<div class="rec-h"><span class="pill p' + sel.rank + '">' + sel.rank + '순위</span>' +
@@ -3659,12 +3657,12 @@ function renderResults(){
       '<div class="rec-when">' + fmt(sel) + '</div>' +
       '<div class="rec-why">' + pickReason(sel, slots) + '</div>' +
       (sel.lowFocus
-        ? '<div class="lowfocus-note">점심 직후 — 참석은 되지만 결정의 질이 떨어지는 시간입니다.</div>' : '') +
+        ? '<div class="lowfocus-note">점심 직후 — 참석은 되지만 결정의 질이 떨어지는 시간이에요.</div>' : '') +
       conflictHTML(sel) +
       (sel.conflicts.length
         ? '<div class="rec-ask"><b>' + sel.conflicts.map(c => P(c.who).name).join(", ") +
-          '</b>에게만 조율 요청이 갑니다. 나머지 ' +
-          (state.attendees.length - sel.conflicts.length) + '명에게는 아무 알림도 가지 않습니다.</div>'
+          '</b>에게만 조율 요청이 가요. 나머지 ' +
+          (state.attendees.length - sel.conflicts.length) + '명에게는 아무 알림도 가지 않아요.</div>'
         : '') +
       roomsHTML(sel, headCount(), (pickedRoom(sel) || {}).id || "none", !state.room) +
     '</div>' +
@@ -3687,7 +3685,6 @@ function renderResults(){
       state.selectedSlot = +c.dataset.slot;
       state.showAlts = false;
       state.room = null;              /* 시간이 바뀌면 빈 방도 달라진다 */
-      state.dropped = null;           /* 주최자가 직접 고른 자리다 */
       render();
     };
   });
@@ -3724,15 +3721,15 @@ function conflictHTML(sl){
 function pickReason(sl, all){
   const fewest = Math.min.apply(null, all.map(s => s.conflicts.length));
   if(sl.rank === 1)
-    return "필수·선택 인원이 모두 실제로 비어 있는 시간 중 가장 이른 자리입니다.";
+    return "필수·선택 인원이 모두 실제로 비어 있는 시간 중 가장 일러요.";
   if(sl.rank === 2)
     return "필수 인원은 모두 가능하고, 선택 인원 " +
-      sl.optConflicts.map(c => P(c.who).name).join(", ") + "만 겹칩니다. 물어볼 사람이 없습니다.";
+      sl.optConflicts.map(c => P(c.who).name).join(", ") + "만 겹쳐요. 물어볼 사람이 없어요.";
   if(sl.rank === 5)
-    return "앞 순위 후보가 없어 여기까지 내려왔습니다. 「" + sl.conflicts[0].block +
-      "」은 어려워 보이지만, 물어보기 전에는 모릅니다.";
-  return "겹치는 일정이 " + sl.conflicts.length + "건뿐이고, 모두 혼자 하는 일정이라 물어볼 만합니다." +
-    (sl.conflicts.length === fewest ? " 후보 중 물어볼 사람이 가장 적습니다." : "");
+    return "앞 순위 후보가 없어 여기까지 내려왔어요. 「" + sl.conflicts[0].block +
+      "」은 어려워 보이지만, 물어보기 전에는 몰라요.";
+  return "겹치는 일정이 " + sl.conflicts.length + "건뿐이고, 모두 혼자 하는 일정이라 물어볼 만해요." +
+    (sl.conflicts.length === fewest ? " 후보 중 물어볼 사람이 가장 적어요." : "");
 }
 
 /* --------- 4. 완료 --------- */
@@ -3743,25 +3740,25 @@ function whyBox(sl){
   const lines = [];
 
   if(sl.rank === 1){
-    lines.push('그 시간에 <b>' + req + '명 모두</b> 다른 일정이 없습니다.');
-    lines.push('아무에게도 일정을 옮겨달라고 하지 않아도 됩니다.');
+    lines.push('그 시간에 <b>' + req + '명 모두</b> 다른 일정이 없어요.');
+    lines.push('아무에게도 일정을 옮겨달라고 하지 않아도 돼요.');
   }else if(sl.rank === 2){
-    lines.push('꼭 와야 하는 <b>' + req + '명</b>은 그 시간이 비어 있습니다.');
-    lines.push('<b>' + names(sl.optConflicts) + '</b>님만 다른 일정이 있는데, 안 와도 되는 분이라 그대로 잡았습니다.');
+    lines.push('꼭 와야 하는 <b>' + req + '명</b>은 그 시간이 비어 있어요.');
+    lines.push('<b>' + names(sl.optConflicts) + '</b>님만 다른 일정이 있는데, 안 와도 되는 분이라 그대로 잡았어요.');
   }else if(sl.rank === 5){
     /* 화면만 보고 지워버리던 자리 — 지우는 대신 맨 뒤에 남겨 물어보게 한다 */
-    lines.push('앞 순위 후보가 없어, <b>어려워 보이는 자리</b>까지 내려왔습니다.');
+    lines.push('앞 순위 후보가 없어서 <b>어려워 보이는 자리</b>까지 내려왔어요.');
     lines.push('<b>' + names(sl.conflicts) + '</b>님의 <b>「' + sl.conflicts[0].block +
-      '」</b>과 겹칩니다. 미리 양해를 구하면 옮겨질 수도 있어, 지우지 않고 남겼습니다.');
+      '」</b>과 겹쳐요. 미리 양해를 구하면 옮겨질 수도 있어서 지우지 않고 남겼어요.');
   }else{
-    lines.push('그 시간에 일정이 있는 사람은 <b>' + names(sl.conflicts) + '</b>님뿐입니다.');
+    lines.push('그 시간에 일정이 있는 사람은 <b>' + names(sl.conflicts) + '</b>님뿐이에요.');
     /* 옮길 수 있는지는 본인만 안다 — 도구는 본 것만 말한다 */
-    lines.push('그 일정이 <b>「' + sl.conflicts[0].block + '」</b>이라 물어볼 만하다고 봤습니다. ' +
-      '옮길 수 있는지는 본인만 압니다.');
+    lines.push('그 일정이 <b>「' + sl.conflicts[0].block + '」</b>이라 물어볼 만하다고 봤어요. ' +
+      '옮길 수 있는지는 본인만 알아요.');
   }
 
-  lines.push('전사 일정으로 막힌 날과 점심시간만 후보에서 뺐습니다. ' +
-    '나머지는 순서만 매기고 지우지 않았습니다.');
+  lines.push('전사 일정 · 필수 참석자 휴가 · 점심시간만 후보에서 뺐어요. ' +
+    '나머지는 순서만 매기고 지우지 않았어요.');
 
   return '<div class="why-box"><div class="why-h">왜 이 시간인가요</div><ul>' +
     lines.slice(0, 3).map(l => '<li>' + l + '</li>').join("") + '</ul></div>';
@@ -3773,13 +3770,6 @@ function renderDone(){
   const held = state.attendees.filter(a => !sl.conflicts.some(c => c.who === a.id));
   const confirmed = state.hold && state.hold.confirmed;
 
-  /* 앞 후보가 왜 빠졌는지 — 한 번 물었다가 접었다는 사실을 남긴다 */
-  const dp = state.dropped;
-  const dropBanner = dp
-    ? '<div class="banner"><b>' + esc(dp.when) + '</b>은 <b>' + esc(dp.who) +
-      '</b>님이 「' + esc(dp.block) + '」을 옮기기 어렵다고 해서 빠졌습니다. ' +
-      '다음 순위로 넘어왔습니다.</div>'
-    : '';
 
   /* ---------- 1·2순위 또는 조율 성공 → 확정 ---------- */
   if(confirmed){
@@ -3788,43 +3778,33 @@ function renderDone(){
     const room = state.hold && state.hold.room;
     title.textContent = "확정 완료";
     sub.textContent = viaAsk
-      ? "겹친 일정이 옮겨져서 가예약이 확정으로 바뀌었습니다."
-      : "전원이 비는 시간이라 바로 확정했습니다.";
-    body.innerHTML = dropBanner +
+      ? "겹친 일정이 옮겨져서 가예약이 확정으로 바뀌었어요."
+      : "전원이 비는 시간이라 바로 확정했어요.";
+    body.innerHTML =
       '<div class="done-wrap"><div class="done-mark">✓</div>' +
-        '<h3>일정이 잡혔습니다</h3>' +
+        '<h3>일정이 잡혔어요</h3>' +
         '<p><b>' + fmt(sl) + '</b> · ' + (room || "회의실 없이 진행") + '<br>' +
           (viaAsk
-            ? askers.map(p => p.name).join(", ") + "님이 옮겨줘서 자리가 났습니다."
-            : "참석자 " + people + "명에게 초대가 나갔습니다.") + '</p>' +
+            ? askers.map(p => p.name).join(", ") + "님이 옮겨줘서 자리가 났어요."
+            : "참석자 " + people + "명에게 초대가 나갔어요.") + '</p>' +
         doneRoomHTML() +
         whyBox(sl) +
       '</div>';
   }else{
     /* ---------- 3·4순위 → 시간만 확보하고 겹친 사람에게만 묻는다 ---------- */
-    title.textContent = askers.map(p => p.name).join(", ") + "님 답을 기다립니다";
-    sub.textContent = "답이 오면 그때 확정하고 초대를 보냅니다.";
+    title.textContent = askers.map(p => p.name).join(", ") + "님 답을 기다려요";
+    sub.textContent = "답이 오면 그때 확정하고 초대를 보내요.";
 
     const room = state.hold && state.hold.room;
 
-    body.innerHTML = dropBanner +
+    body.innerHTML =
       '<div class="done-wrap"><div class="done-mark hold">⏳</div>' +
-        '<h3>이 시간을 잡아뒀습니다</h3>' +
+        '<h3>이 시간을 잡아뒀어요</h3>' +
         '<p><b>' + fmt(sl) + '</b> · ' + (room || "회의실 없이 진행") + '<br>' +
           askers.map((p,i) => '<b>' + p.name + '</b>님께 「' + sl.conflicts[i].block +
-            '」을 옮길 수 있는지 물었습니다.').join("<br>") + '<br>' +
-          '나머지 ' + held.length + '명에게는 아직 아무 연락도 가지 않았습니다.</p>' +
+            '」을 옮길 수 있는지 물었어요.').join("<br>") + '<br>' +
+          '나머지 ' + held.length + '명에게는 아직 아무 연락도 가지 않았어요.</p>' +
         doneRoomHTML() +
-
-        (state.holdAnswer === "yes"
-          ? '<div class="banner good"><b>' + askers.map(p => p.name).join(", ") +
-            '</b>님이 <b>옮길 수 있다</b>고 답했습니다. 이제 확정할 수 있습니다.</div>'
-          : state.holdAnswer === "no"
-          ? '<div class="banner warn"><b>' + askers.map(p => p.name).join(", ") +
-            '</b>님이 <b>옮기기 어렵다</b>고 답했습니다. ' +
-            '이 자리는 후보에서 빼고 다음 순위로 넘어갑니다.</div>'
-          : '') +
-
         whyBox(sl) +
       '</div>';
   }
@@ -3837,33 +3817,23 @@ function renderDone(){
     state.hold.roomId = r ? r.id : null;
     state.hold.room = r ? r.n : null;
     persist(); paintCandidates(); render();
-    toast(r ? r.n + "로 바꿨습니다." : "회의실 없이 진행합니다.");
+    toast(r ? r.n + "로 바꿨어요." : "회의실 없이 진행해요.");
   });
 
-  /* 응답 상태에 따른 주최자의 다음 행동 */
-  const ans = state.holdAnswer;
-
-  /* 확정되면 더 고를 것이 없다 — 확인 하나로 끝낸다 */
+  /* 물어본 다음은 이 도구의 몫이 아니다 — 여기서 끝낸다 */
   foot.innerHTML = confirmed
     ? '<div style="flex:1"></div><button class="btn primary" id="doneBtn">확인</button>'
     : '<button class="btn ghost" id="againBtn">다른 시간으로</button>' +
       '<div style="flex:1"></div>' +
-      /* 거절 답이 오면 도구가 알아서 다음 순위로 넘어간다 — 재촉할 버튼이 없다 */
-      (ans === "no" ? '<button class="btn primary" id="nextBtn">다음 순위로</button>'
-        : ans === "yes" ? '<button class="btn primary" id="confirmBtn">확정하고 전원 초대</button>'
-        : '<button class="btn primary" id="doneBtn">완료</button>');
+      '<button class="btn primary" id="doneBtn">완료</button>';
 
   const ag = document.getElementById("againBtn");
   if(ag) ag.onclick = () => { state.showAlts = true; state.step = 3; render(); };
-  const cb = document.getElementById("confirmBtn");
-  if(cb) cb.onclick = () => { state.hold.confirmed = true; state.reminders = 0; render(); };
-  const nx = document.getElementById("nextBtn");
-  if(nx) nx.onclick = dropAndAdvance;
   const db = document.getElementById("doneBtn");
   if(db) db.onclick = () => {
     const done = state.hold && state.hold.confirmed;
     closeSheet();
-    toast(done ? "일정이 캘린더에 등록되었습니다." : "확보한 시간이 캘린더에 남아 있습니다.");
+    toast(done ? "일정이 캘린더에 등록됐어요." : "확보한 시간이 캘린더에 남아 있어요.");
   };
 }
 
@@ -3892,10 +3862,9 @@ function makeDraft(dt, h0){
 /* 만들기 — 두 화면이 하나의 초안을 나눠 쓴다. 기본값은 자동 조율. */
 function openSheet(mode, dt0, h0, seedTitle){
   closePop();
-  clearTimeout(replyTimer);
   const dt = dt0 || new Date(state.focus);
   state.sent = null; state.selectedSlot = null; state.slots = [];
-  state.hold = null; state.reminders = 0; state.holdAnswer = null;
+  state.hold = null;
   state.room = null; state.roomOpen = false;
   state.draft = makeDraft(dt, h0);
   if(seedTitle){ state.title = seedTitle; save(); }
@@ -3917,7 +3886,7 @@ function openSheet(mode, dt0, h0, seedTitle){
   onbMark("open");
   if(mode === 1) setTimeout(() => tip("link", ".import-row",
     "<b>서류 합격한 지원자</b>나 이야기가 오간 <b>슬랙 스레드</b>가 있다면, " +
-    "여기서 면접관·참석자를 한 번에 가져올 수 있습니다.", "left"), 400);
+    "여기서 면접관·참석자를 한 번에 가져올 수 있어요.", "left"), 400);
   showSheet();
 }
 /* 만들기 버튼은 자동 조율로 연다 */
@@ -4043,7 +4012,7 @@ userSearch.oninput = () => {
     '<button class="res-item" data-uid="' + p.id + '">' + avatar(p) +
       '<span class="meta"><span class="nm">' + p.name + ' · ' + p.role + '</span>' +
       '<span class="em">' + p.email + '</span></span></button>').join("")
-    : '<div style="padding:12px;color:var(--text-faint);font-size:12px">검색 결과가 없습니다.</div>';
+    : '<div style="padding:12px;color:var(--text-faint);font-size:12px">검색 결과가 없어요.</div>';
   userResults.classList.add("on");
   userResults.querySelectorAll("[data-uid]").forEach(b => {
     b.onclick = () => {
@@ -4131,14 +4100,38 @@ btnAccount.onclick = () => openMenu(btnAccount,
     '<span><div class="nm">정슬기</div><div class="em">seulgi@company.co.kr</div></span></div>' +
   '<div class="tsep"></div>' + item("다른 계정 추가") + item("로그아웃"));
 
+/* ===================== 화면 모드 =====================
+   기본은 밝은 모드. 고른 값만 기억하고, 안 고르면 늘 밝게 연다. */
+const THEME_KEY = "auto-coordination-theme";
+function applyTheme(t){
+  const dark = t === "dark";
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  const b = document.getElementById("btnTheme");
+  if(b){ b.textContent = dark ? "☽" : "☀"; b.title = dark ? "밝은 모드로" : "어두운 모드로"; }
+}
+function loadTheme(){
+  let t = "light";
+  try{ t = localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light"; }catch(e){}
+  applyTheme(t);
+}
+document.getElementById("btnTheme").onclick = () => {
+  const dark = document.documentElement.getAttribute("data-theme") === "dark";
+  const next = dark ? "light" : "dark";
+  applyTheme(next);
+  try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+  buildGrid();                       /* 블록 글자색은 배경 밝기로 정해진다 */
+  toast(next === "dark" ? "어두운 모드로 바꿨어요." : "밝은 모드로 바꿨어요.");
+};
+loadTheme();
+
 /* ===================== 시작하기 =====================
    긴 투어 대신, 꼭 해봐야 할 것만 체크리스트로 두고
    나머지는 그 화면에 도달했을 때 한 줄 힌트로 알려준다. */
 const ONB = [
   { k:"open",   t:"자동 조율 열기",   h:"만들기 → 참석자 추가" },
   { k:"people", t:"면접관 넣기",     h:"서류 합격한 지원자를 고르면 자동으로" },
-  { k:"scan",   t:"가능한 일정 뽑기", h:"물어보면 열릴 시간까지 찾습니다" },
-  { k:"send",   t:"조율 요청 보내기", h:"겹친 한 명에게만 갑니다" },
+  { k:"scan",   t:"가능한 일정 뽑기", h:"물어보면 열릴 시간까지 찾아요" },
+  { k:"send",   t:"조율 요청 보내기", h:"겹친 한 명에게만 가요" },
 ];
 const onbEl = document.getElementById("onb");
 let onbTimer = null;
@@ -4163,7 +4156,7 @@ function paintOnb(){
 
   if(!next){
     onbEl.innerHTML =
-      '<div class="onb-done"><h4>다 해보셨습니다</h4>' +
+      '<div class="onb-done"><h4>다 해보셨어요</h4>' +
       '<p>남은 기능은 그 화면에 갔을 때<br>한 줄로 알려드릴게요.</p>' +
       '<button class="onb-again" id="onbAgain">↺ 처음부터 다시</button></div>';
     onbEl.classList.add("on");
@@ -4282,8 +4275,7 @@ function ensureScan(cb){
 /* 이미 해본 단계를 다시 — 그 지점까지 처음부터 되돌린 뒤 실행한다 */
 function onbRedo(k){
   closeSheet();
-  state.hold = null; state.holdAnswer = null; state.reminders = 0;
-  clearTimeout(replyTimer);
+  state.hold = null;
   syncGrid(); paintCandidates();
   const from = ONB.findIndex(i => i.k === k);
   ONB.forEach((i, n) => { if(n >= from) state.onbDone[i.k] = false; });
@@ -4292,9 +4284,9 @@ function onbRedo(k){
 }
 
 function onbRun(k){
-  if(k === "open")   return ensureSheet(() => flash(".sheet-head", "자동 조율이 열렸습니다", 300));
-  if(k === "people") return ensurePeople(() => flash(".att", "면접관 3명을 찾아왔습니다", 300));
-  if(k === "scan")   return ensureScan(() => flash(".done-wrap h3", "AI가 고르고 보냈습니다", 300));
+  if(k === "open")   return ensureSheet(() => flash(".sheet-head", "자동 조율이 열렸어요", 300));
+  if(k === "people") return ensurePeople(() => flash(".att", "면접관 3명을 찾아왔어요", 300));
+  if(k === "scan")   return ensureScan(() => flash(".done-wrap h3", "AI가 고르고 보냈어요", 300));
   if(k === "send")   return ensureScan(() => {
     const b = document.getElementById("doneBtn");
     if(!b) return;
