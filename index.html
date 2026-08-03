@@ -38,6 +38,7 @@
     --scroll:#D1D6DB;
     --scroll-hover:#B0B8C1;
     --shadow-pop:0 10px 32px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06);
+    --guide-scrim:rgba(25,31,40,.34);
     --r-card:16px;
     --r-btn:12px;
     --gutter:60px;
@@ -70,6 +71,7 @@
     --scroll:#3A3A44;
     --scroll-hover:#4A4A56;
     --shadow-pop:0 12px 32px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.35);
+    --guide-scrim:rgba(0,0,0,.55);
   }  *{box-sizing:border-box}
   html,body{height:100%}
   body{
@@ -247,7 +249,7 @@
   .tmenu .acct .nm{font-size:14px}
   .tmenu .acct .em{font-size:12px;color:var(--text-dim)}
 
-  /* ---------- 둘러보기 ---------- */
+  /* ---------- 시작하기 체크리스트 ---------- */
   /* 우측 하단 플로팅 버튼 — 여기서 안내가 펼쳐진다 */
   /* 만들기 바로 아래 — 캘린더를 가리지 않는다 */
   .tour-btn{
@@ -258,11 +260,7 @@
   }
   .tour-btn .lb{font-size:14.5px}
   .tour-btn:hover{background:rgba(49,130,246,.22)}
-  .tour-btn.on{background:var(--accent);color:var(--on-accent);border-color:transparent}
-  .tour-btn.on{
-    background:var(--surface-3);color:var(--accent);
-    box-shadow:0 2px 6px rgba(0,0,0,.35);
-  }
+  .tour-btn.on{background:var(--accent);color:#fff}
   /* 사이드바를 접으면 카드도 따라 붙는다 */
   .onb{transition:left .22s cubic-bezier(.2,.7,.3,1)}
   .app.no-side ~ .onb,
@@ -295,34 +293,35 @@
   }
   .onb-i{width:100%;text-align:left;cursor:pointer}
   .onb-i:hover{background:rgba(240,240,242,.07)}
-  .onb-i .lb{display:block;font-size:12.5px;line-height:1.5}
-  .onb-i .hint{display:block;font-size:11px;color:var(--text-faint);margin-top:2px;line-height:1.5}
+  .onb-i .lb{display:block;font-size:14px;font-weight:700;line-height:1.45}
+  .onb-i .hint{display:block;font-size:12px;color:var(--text-faint);margin-top:2px;line-height:1.45;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .onb-i .go{
-    margin-left:auto;flex:none;font-size:10.5px;color:var(--accent);opacity:0;transition:opacity .12s;
+    margin-left:auto;flex:none;font-size:12px;font-weight:700;
+    color:var(--accent);background:var(--accent-soft);
+    border-radius:999px;padding:5px 11px;transition:background .12s,color .12s;
   }
-  .onb-i:hover .go{opacity:1}
-  .onb-i.next{background:rgba(49,130,246,.1)}
-  .onb-i.done .go{color:var(--text-dim)}
+  .onb-i:hover .go{background:var(--accent);color:#fff}
+  .onb-i.done .go{color:var(--text-faint);background:transparent;font-weight:600}
+  .onb-i.done:hover .go{background:var(--surface-3);color:var(--text-dim)}
+  /* 다음에 할 줄은 눌러야 한다는 게 한눈에 보인다 */
+  .onb-i.next{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
 
   /* 눌렀을 때 어디가 움직이는지 짚어준다 */
   /* 나머지를 어둡게 덮고 대상만 뚫어 보여준다 — 시선이 바로 간다 */
+  /* 누를 때까지 남아 있는다 — 대신 눌러주지 않으니 사라지면 안 된다 */
   .flash-ring{
     position:fixed;z-index:215;pointer-events:none;
     box-shadow:0 0 0 3px var(--accent),
-               0 0 0 9px rgba(49,130,246,.25),
-               0 0 0 9999px rgba(0,0,0,.62);
-    animation:flashout 2.6s ease-out forwards;
+               0 0 0 9px rgba(49,130,246,.22),
+               0 0 0 9999px var(--guide-scrim);
+    animation:flashin .22s ease-out both;
   }
-  @keyframes flashout{
-    0%{opacity:0}
-    12%{opacity:1}
-    85%{opacity:1}
-    100%{opacity:0}
-  }
+  @keyframes flashin{ from{opacity:0} to{opacity:1} }
   /* 나타날 때 한 번만 퍼진다 */
   .flash-ring::after{
     content:"";position:absolute;inset:-3px;border-radius:inherit;
-    border:2px solid var(--accent);animation:flashpulse .9s ease-out 1 forwards;
+    border:2px solid var(--accent);animation:flashpulse .8s ease-out 1 both;
   }
   @keyframes flashpulse{
     0%{transform:scale(1);opacity:.9}
@@ -330,8 +329,9 @@
   }
   .flash-lb{
     position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;z-index:1;
-    background:var(--accent);color:var(--on-accent);font-size:12px;font-weight:700;
-    border-radius:999px;padding:6px 14px;box-shadow:0 4px 12px rgba(0,0,0,.55);
+    background:var(--accent);color:#fff;font-size:13px;font-weight:700;
+    border-radius:999px;padding:7px 15px;box-shadow:0 4px 14px rgba(0,0,0,.3);
+    max-width:calc(100vw - 24px);overflow:hidden;text-overflow:ellipsis;
   }
   .flash-lb.up{bottom:calc(100% + 8px)}
   .flash-lb.down{top:calc(100% + 8px)}
@@ -559,6 +559,7 @@
   .cand.p2{border:2px solid var(--p2);background:rgba(49,130,246,.22);color:var(--accent-fg)}
   .cand.p3{border:2px dashed var(--p3);background:rgba(255,200,69,.18);color:var(--warn-fg)}
   .cand.p4{border:2px dashed var(--p4);background:rgba(155,114,240,.18);color:var(--p4)}
+  .cand.p5{border:2px dotted var(--p5);background:rgba(240,68,82,.14);color:var(--bad-fg)}
   .cand.sel{box-shadow:0 0 0 2px var(--accent),0 4px 14px rgba(0,0,0,.18)}
   @keyframes fade{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
 
@@ -652,17 +653,11 @@
     display:flex;align-items:center;gap:10px;width:100%;
   }
   .ed-add:hover{color:var(--text)}
-  .ed-add.accent{color:var(--accent);font-weight:500}
   .ed-add .go{
     margin-left:auto;flex:none;font-size:10.5px;font-weight:700;
     color:var(--on-accent);background:var(--accent);border-radius:999px;padding:2px 9px;
   }
   .ed-hint{width:100%;font-size:11.5px;color:var(--text-faint);line-height:1.6;margin-top:3px}
-  .ed-people{
-    border:1px solid rgba(49,130,246,.35);background:rgba(49,130,246,.08);
-    border-radius:10px;padding:11px 12px;margin:4px 0 6px;
-  }
-  .ed-people:hover{background:rgba(49,130,246,.14);border-color:var(--accent)}
   .ed-on{color:var(--text);display:flex;align-items:center;gap:8px}
   .ed-dot{width:11px;height:11px;border-radius:50%;display:inline-block}
   .ed-x{margin-left:auto;flex:none;color:var(--text-faint);padding:0 4px;font-size:12px}
@@ -878,7 +873,7 @@
   .pop-main .when{margin:7px 0 0;font-size:14px;font-weight:500;color:var(--text-dim);line-height:1.5}
   .pop-row{display:flex;gap:14px;padding:12px 18px 0;font-size:14px;color:var(--text)}
   .pop-row .ic{width:16px;flex:none;text-align:center;color:var(--text-dim);font-size:14px;margin-top:1px}
-  .pop-row .val{min-width:0;line-height:1.6}
+  .pop-row .val{flex:1;min-width:0;line-height:1.6}
   .pop-att{display:flex;align-items:center;gap:9px;padding:5px 0}
   .pop-att .nm{font-size:13px}
   .pop-att .rl{font-size:11px;color:var(--text-dim)}
@@ -895,7 +890,6 @@
   .pop-org{font-size:11.5px;color:var(--text-faint);margin-top:2px}
 
   /* 화상회의 · 회의실 · 참석 응답 */
-  .pop-row .val{flex:1}
   .pop-row .act{
     flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
     color:var(--text-dim);font-size:15px;margin-top:-4px;
@@ -944,7 +938,6 @@
   .btn.primary[disabled]:active{transform:none}
   .btn.ghost{background:transparent;color:var(--text-dim);font-weight:600}
   .btn.ghost:hover{background:var(--surface-2);color:var(--text)}
-  .btn.ghost:hover{background:rgba(49,130,246,.10)}
 
   /* ---------- 스캔 · 결과 ---------- */
   .scan{display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -1551,11 +1544,6 @@ function roomStatus(d, s, e, people){
     const w = x => x.busy ? 2 : x.fits ? 0 : 1;
     return (w(a) - w(b)) || (a.cap - b.cap);
   });
-}
-/* 그 시간에 비어 있는 방 중 인원에 맞는 가장 작은 방 */
-function freeRoom(d, s, e, people){
-  const fit = roomStatus(d, s, e, people).filter(r => !r.busy && r.fits);
-  return fit.length ? fit[0] : null;
 }
 
 /* 매주 반복되는 일정 — 어느 주에나 그대로 선다 */
@@ -2297,7 +2285,7 @@ function calOn(p){
 function setPicked(id, on){
   if(id === "me"){ state.hostJoins = on; return; }
   state.attendees = state.attendees.filter(a => a.id !== id);
-  if(on) state.attendees.push({ id, need:"required", from:"calendar" });
+  if(on){ state.attendees.push({ id, need:"required", from:"calendar" }); onbMark("people"); }
   state.hidden[id] = !on;
 }
 /* 시트에서 사람이 바뀌면 그 사람들의 캘린더는 켜 둔다 — 꺼져 있으면 일정이 안 보인다 */
@@ -2956,7 +2944,6 @@ function computeSlots(){
 const required = () => state.attendees.filter(a => a.need === "required");
 const optional = () => state.attendees.filter(a => a.need === "optional");
 const hasHard  = () => state.attendees.some(a => P(a.id) && P(a.id).hardToReschedule);
-const hasTopRank = () => state.slots.some(s => s.rank <= 2);
 const fmt = sl => "8/" + DATES[sl.d] + "(" + DAYS[sl.d] + ") " + hhmm(sl.s) + "–" + hhmm(sl.e);
 function hhmm(h){
   const H = Math.floor(h + 1e-9), M = Math.round((h - H) * 60);
@@ -2998,6 +2985,7 @@ function applyAnalysis(){
   state.source = { kind, url, icon:fx.icon, label:label || fx.label, summary:fx.summary };
   /* 이 회의는 누구를 위한 것인가 — 참석자가 아니라 회의의 이유다 */
   state.forWhom = fx.for || null;
+  onbMark("people");
   if(fx.hostJoins === false) state.hostJoins = false;
   if(!state.title.trim()) state.title = fx.title;
   fx.people.forEach(sp => {
@@ -3056,7 +3044,6 @@ function paintTabs(){
 function render(){
   syncGrid();
   paintTabs();
-  if(state.attendees.length) onbMark("people");
   if(state.step === 0)      renderEditor();
   else if(state.step === 1) renderSetup();
   else if(state.step === 2) renderScan();
@@ -3070,7 +3057,7 @@ function render(){
       "이 회의 <b>참석자의 캘린더만</b> 남았어요. 어느 시간이 왜 막혔는지가 그제야 읽혀요.", "right");
   if(state.step === 4 && state.hold && !state.hold.confirmed)
     setTimeout(() => tip("hold", ".ev.hold-wait",
-      "확정이 아니라 <b>자리만 잡아둔 상태</b>예요. 블록을 누르면 리마인드하거나 취소할 수 있어요.", "left"), 500);
+      "확정이 아니라 <b>자리만 잡아둔 상태</b>예요. 블록을 누르면 확보를 취소할 수 있어요.", "left"), 500);
 }
 
 /* --------- 0. 일정 만들기 --------- */
@@ -3266,7 +3253,7 @@ function renderSetup(){
       '<div class="field-note">왼쪽 <b>부를 사람</b> 목록에서 체크해도 돼요.</div>' +
     '</div>' +
     linkBlock() +
-    '<div class="field">' +
+    '<div class="field" id="peopleField">' +
       '<div class="label">부를 사람 ' + state.attendees.length + '명' +
         (required().length ? ' · 필수 ' + required().length : '') +
         (optional().length ? ' · 선택 ' + optional().length : '') +
@@ -3348,6 +3335,7 @@ function renderSetup(){
       b.onclick = () => {
         state.attendees.push({ id:b.dataset.id, need:"required" });
         state.hidden[b.dataset.id] = false;   /* 부른 사람의 일정은 보여야 한다 */
+        onbMark("people");
         state.pickOpen = true;                /* 이어서 더 고를 수 있게 열어 둔다 */
         save(); render();
         setTimeout(() => { const n = document.getElementById("searchInput"); if(n) n.focus(); }, 0);
@@ -3513,7 +3501,6 @@ function startScan(){
     if(state.step !== 2) return;
     if(!state.slots.length){ state.selectedSlot = null; state.step = 3; render(); return; }
     /* 고르는 것도 보내는 것도 AI가 한다 — 주최자는 결과를 보고 되돌린다 */
-    onbMark("send");
     proposeSlot(0);
   }, 1500);
 }
@@ -3613,7 +3600,6 @@ function bindRooms(root, pick){
 /* --------- 3. 결과 --------- */
 function renderResults(){
   const slots = state.slots;
-  const top = hasTopRank();
   title.textContent = "가능한 일정";
 
   if(!slots.length){
@@ -3692,7 +3678,7 @@ function renderResults(){
   foot.innerHTML =
     '<button class="btn ghost" id="backBtn">인원 수정</button><div style="flex:1"></div>' +
     '<button class="btn primary" id="sendBtn"' + (sel ? "" : " disabled") + '>' +
-      (confirmable ? "초대 + 리마인드 보내기" : "시간 확보 + 조율 요청") + '</button>';
+      (confirmable ? "확정하고 초대 보내기" : "시간 확보 + 조율 요청") + '</button>';
   document.getElementById("backBtn").onclick = () => { state.step = 1; render(); };
   const sn = document.getElementById("sendBtn");
   if(sn) sn.onclick = () => proposeSlot(state.selectedSlot);
@@ -3832,6 +3818,7 @@ function renderDone(){
   const db = document.getElementById("doneBtn");
   if(db) db.onclick = () => {
     const done = state.hold && state.hold.confirmed;
+    onbMark("send");
     closeSheet();
     toast(done ? "일정이 캘린더에 등록됐어요." : "확보한 시간이 캘린더에 남아 있어요.");
   };
@@ -4128,10 +4115,10 @@ loadTheme();
    긴 투어 대신, 꼭 해봐야 할 것만 체크리스트로 두고
    나머지는 그 화면에 도달했을 때 한 줄 힌트로 알려준다. */
 const ONB = [
-  { k:"open",   t:"자동 조율 열기",   h:"만들기 → 참석자 추가" },
-  { k:"people", t:"면접관 넣기",     h:"서류 합격한 지원자를 고르면 자동으로" },
+  { k:"open",   t:"자동 조율 열기",   h:"만들기 버튼을 눌러요" },
+  { k:"people", t:"면접관 넣기",     h:"지원자를 고르면 자동으로" },
   { k:"scan",   t:"가능한 일정 뽑기", h:"물어보면 열릴 시간까지 찾아요" },
-  { k:"send",   t:"조율 요청 보내기", h:"겹친 한 명에게만 가요" },
+  { k:"send",   t:"잡아둔 자리 확인",  h:"캘린더에 남는 걸 봐요" },
 ];
 const onbEl = document.getElementById("onb");
 let onbTimer = null;
@@ -4144,8 +4131,14 @@ function onbReset(){
 }
 
 function onbMark(k){
-  if(state.onbDone[k]) return;
-  state.onbDone[k] = true;
+  const at = ONB.findIndex(i => i.k === k);
+  if(at < 0 || state.onbDone[k]) return;
+  let changed = false;
+  ONB.forEach((i, n) => {
+    if(n <= at && !state.onbDone[i.k]){ state.onbDone[i.k] = true; changed = true; }
+  });
+  if(!changed) return;
+  clearGuide();                      /* 그 단계는 끝났으니 짚기를 거둔다 */
   persist();
   if(state.onbOpen) paintOnb();
 }
@@ -4199,6 +4192,7 @@ function paintOnb(){
     b.onclick = () => onbRedo(b.dataset.redo);
   });
   document.getElementById("onbClose").onclick = () => {
+    clearGuide();
     state.onbOpen = false;
     btnTour.classList.remove("on");
     onbEl.classList.remove("on");
@@ -4220,82 +4214,115 @@ btnTour.onclick = () => {
   persist();
 };
 
-/* 어디를 눌러서 이렇게 됐는지 이름표와 함께 짚어준다 */
-function flash(sel, label, delay){
+/* 대신 눌러주지 않는다 — 어디를 눌러야 하는지만 짚고 기다린다.
+   어떤 단계는 자동, 어떤 단계는 수동이면 규칙이 없는 화면이 된다. */
+let guideEl = null, guideOff = null;
+function clearGuide(){
+  if(guideEl){ guideEl.remove(); guideEl = null; }
+  if(guideOff){ guideOff(); guideOff = null; }
+}
+
+function guide(sel, label){
+  clearGuide();
+  const pre = document.querySelector(sel);
+  if(!pre) return;
+  if(pre.scrollIntoView) pre.scrollIntoView({ behavior:"smooth", block:"nearest" });
+
   setTimeout(() => {
     const el = document.querySelector(sel);
     if(!el) return;
     const r = el.getBoundingClientRect();
+    /* 목록이 길면 보이는 만큼만 두른다 */
+    const top = Math.max(r.top, 12);
+    const bottom = Math.min(r.bottom, window.innerHeight - 12);
+    if(bottom <= top) return;
     const br = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 8;
+    const h = bottom - top;
+
     const n = document.createElement("div");
     n.className = "flash-ring";
     n.style.left = (r.left - 3) + "px";
-    n.style.top = (r.top - 3) + "px";
+    n.style.top = (top - 3) + "px";
     n.style.width = (r.width + 6) + "px";
-    n.style.height = (r.height + 6) + "px";
-    n.style.borderRadius = Math.min(br + 3, r.height / 2 + 3) + "px";
+    n.style.height = (h + 6) + "px";
+    n.style.borderRadius = Math.min(br + 3, h / 2 + 3) + "px";
     if(label)
-      n.innerHTML = '<span class="flash-lb ' + (r.top < 54 ? "down" : "up") + '">' + label + '</span>';
+      n.innerHTML = '<span class="flash-lb ' + (top < 54 ? "down" : "up") + '">' + label + '</span>';
     document.body.appendChild(n);
-    setTimeout(() => n.remove(), 2600);
-  }, delay || 0);
+    guideEl = n;
+
+    /* 화면 가장자리에 붙은 버튼이면 이름표가 잘린다 — 안쪽으로 민다 */
+    const lb = n.querySelector(".flash-lb");
+    if(lb){
+      const lr = lb.getBoundingClientRect();
+      let dx = 0;
+      if(lr.right > window.innerWidth - 12) dx = window.innerWidth - 12 - lr.right;
+      if(lr.left + dx < 12) dx = 12 - lr.left;
+      if(dx) lb.style.transform = "translateX(calc(-50% + " + Math.round(dx) + "px))";
+    }
+
+    /* 그 자리를 누르면 짚기를 거둔다 */
+    const done = () => clearGuide();
+    el.addEventListener("click", done, { once:true });
+    guideOff = () => el.removeEventListener("click", done);
+  }, 420);
 }
 
-/* 체크리스트 항목을 누르면 그 단계가 실제로 실행된다.
-   앞 단계가 안 돼 있으면 거기서부터 이어서 진행한다. */
-/* 이름표를 읽을 시간을 준 뒤에 실제로 누른다 */
-const READ = 1200;
-function ensureSheet(cb){
-  if(state.sheetOpen) return cb();
-  flash("#createBtn", "만들기 → 참석자 추가");
-  setTimeout(() => {
-    openAuto();
-    setTimeout(cb, 400);
-  }, READ);
-}
-function ensurePeople(cb){
-  ensureSheet(() => {
-    if(state.attendees.length) return cb();
-    state.importOpen = true; render();
-    flash(".src-btns", "채용 시스템에서 지원자 고르기");
-    setTimeout(() => startAnalyze(SRC_META.ats.url, RECENT.ats[0].t), READ);
-    setTimeout(cb, READ + 2900);
-  });
-}
-function ensureScan(cb){
-  ensurePeople(() => {
-    if(state.step === 4) return cb();
-    const b = document.getElementById("scanBtn");
-    if(!b) return;
-    flash("#scanBtn", "가능한 일정 뽑기");
-    setTimeout(() => b.click(), READ);
-    setTimeout(cb, READ + 1900);
-  });
-}
-/* 이미 해본 단계를 다시 — 그 지점까지 처음부터 되돌린 뒤 실행한다 */
-function onbRedo(k){
-  closeSheet();
-  state.hold = null;
-  syncGrid(); paintCandidates();
-  const from = ONB.findIndex(i => i.k === k);
-  ONB.forEach((i, n) => { if(n >= from) state.onbDone[i.k] = false; });
-  paintOnb();
-  setTimeout(() => onbRun(k), 320);
+/* 체크리스트 항목을 누르면, 지금 눌러야 할 곳 하나만 짚는다.
+   앞 단계가 안 돼 있으면 거기부터 짚는다 — 순서는 화면이 안내한다. */
+function guideFor(k){
+  /* 그 단계에 닿으려면 먼저 해야 하는 것 — 되돌린 게 아니라 앞선 것이다 */
+  const pre = k !== "open" ? "먼저 " : "";
+  if(!state.sheetOpen)
+    return { sel:"#createBtn", label:pre + "자동 조율을 열어요" };
+  if(state.step === 0)
+    return { sel:'.sheet-tabs [data-mode="1"]', label:pre + "자동 조율로 바꿔요" };
+
+  if(!state.attendees.length){
+    const p2 = k === "people" ? "" : "먼저 ";
+    if(!state.importOpen) return { sel:"#importOpen", label:p2 + "여기서 가져와요" };
+    if(!state.picker)     return { sel:".src-btn", label:"채용 시스템을 눌러요" };
+    return { sel:".pick", label:"지원자를 골라요" };
+  }
+  if(k === "open")   return { sel:".sheet-head", label:"자동 조율이 열려 있어요" };
+  if(k === "people") return { sel:"#peopleField", label:"이 사람들에게 물어봐요" };
+
+  if(state.step === 1)
+    return { sel:"#scanBtn", label:(k === "scan" ? "" : "먼저 ") + "가능한 일정을 뽑아요" };
+  if(state.step === 3) return { sel:"#sendBtn", label:"이 시간으로 보내요" };
+  if(state.step === 4)
+    return k === "scan"
+      ? { sel:".why-box", label:"왜 이 시간인지 적혀 있어요" }
+      : { sel:"#doneBtn", label:"완료를 눌러요" };
+  return null;
 }
 
 function onbRun(k){
-  if(k === "open")   return ensureSheet(() => flash(".sheet-head", "자동 조율이 열렸어요", 300));
-  if(k === "people") return ensurePeople(() => flash(".att", "면접관 3명을 찾아왔어요", 300));
-  if(k === "scan")   return ensureScan(() => flash(".done-wrap h3", "AI가 고르고 보냈어요", 300));
-  if(k === "send")   return ensureScan(() => {
-    const b = document.getElementById("doneBtn");
-    if(!b) return;
-    flash("#doneBtn", "완료");
-    setTimeout(() => {
-      b.click();
-      flash(".ev.hold-wait", "캘린더에 잡아둔 시간", 500);
-    }, READ);
-  });
+  /* 이미 해본 단계는 되살린다 — 그 자리로 데려다 놓는 것이지, 대신 해주는 게 아니다.
+     아직 안 해본 단계는 짚어주고 기다린다. */
+  const at = ONB.findIndex(i => i.k === k);
+  if(at >= 1 && state.onbDone.open && !state.sheetOpen){
+    openAuto();
+    setTimeout(() => { const g = guideFor(k); if(g) guide(g.sel, g.label); }, 380);
+    return;
+  }
+  const g = guideFor(k);
+  if(g) guide(g.sel, g.label);
+}
+
+/* 이미 해본 단계를 다시 — 그 지점까지 되돌린 뒤 다시 짚어준다 */
+function onbRedo(k){
+  clearGuide();
+  const from = ONB.findIndex(i => i.k === k);
+  ONB.forEach((i, n) => { if(n >= from) state.onbDone[i.k] = false; });
+  /* 처음 단계를 다시 할 때만 판을 접는다 */
+  if(k === "open"){
+    closeSheet();
+    state.hold = null;
+    syncGrid(); paintCandidates();
+  }
+  paintOnb();
+  setTimeout(() => onbRun(k), 420);
 }
 
 /* ---- 점진적 공개 — 그 자리에 처음 왔을 때만 한 줄 ---- */
